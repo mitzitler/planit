@@ -1,0 +1,35 @@
+<div class="star-field" aria-hidden="true">
+  @for (star of stars; track $index) {
+    @if (star.type === 'dot') {
+      <div class="star star-dot"
+        [ngStyle]="{
+          left: star.x + '%',
+          top: star.y + '%',
+          width: star.size + 'px',
+          height: star.size + 'px',
+          opacity: star.opacity,
+          background: star.color
+        }">
+      </div>
+    } @else if (star.type === 'sparkle') {
+      <span class="star star-sparkle"
+        [ngStyle]="{
+          left: star.x + '%',
+          top: star.y + '%',
+          fontSize: (star.size * 3) + 'px',
+          opacity: star.opacity,
+          color: star.color
+        }">✦</span>
+    } @else {
+      <div class="star star-glow"
+        [ngStyle]="{
+          left: star.x + '%',
+          top: star.y + '%',
+          width: (star.size * 10) + 'px',
+          height: (star.size * 10) + 'px',
+          opacity: star.opacity * 0.25
+        }">
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,37 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Welcome back, Astronaut. 👋</h1>
+      <p class="dashboard-subtitle">Pick up where you left off, or launch something new.</p>
+    </div>
+    <a class="btn-primary btn-large" routerLink="/events/new">+ New Event</a>
+  </header>
+
+  <section class="dashboard-section">
+    <h2 class="dashboard-section-title">Your Events</h2>
+
+    <div class="event-grid">
+
+      <!-- New event card -->
+      <a class="event-card event-card--new" routerLink="/events/new">
+        <span class="event-card-new-icon">🚀</span>
+        <span class="event-card-new-label">Plan a new event</span>
+      </a>
+
+      <!-- Existing event cards -->
+      @for (event of events; track event.id) {
+        <a class="event-card" [routerLink]="['/events', event.id, 'manage']">
+          <div class="event-card-header">
+            <span class="event-card-status">{{ statusLabel[event.status] }}</span>
+          </div>
+          <h3 class="event-card-name">{{ event.name }}</h3>
+          <div class="event-card-meta">
+            <span>📅 {{ event.date }}</span>
+            <span>👥 {{ event.guestCount }} guests</span>
+          </div>
+        </a>
+      }
+
+    </div>
+  </section>
+</div>

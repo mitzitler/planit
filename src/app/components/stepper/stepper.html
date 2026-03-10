@@ -1,0 +1,21 @@
+<div class="stepper">
+  @for (step of steps; track step.route; let i = $index) {
+    <div class="stepper-item" [ngClass]="{
+      'is-complete': i < currentIndex,
+      'is-active': i === currentIndex,
+      'is-upcoming': i > currentIndex
+    }">
+      <div class="stepper-circle">
+        @if (i < currentIndex) {
+          <span class="stepper-check">✓</span>
+        } @else {
+          <span>{{ i + 1 }}</span>
+        }
+      </div>
+      <span class="stepper-label">{{ step.label }}</span>
+    </div>
+    @if (i < steps.length - 1) {
+      <div class="stepper-connector" [ngClass]="{ 'is-complete': i < currentIndex }"></div>
+    }
+  }
+</div>

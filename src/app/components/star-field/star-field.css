@@ -1,0 +1,27 @@
+.star-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.star-dot {
+  border-radius: 50%;
+}
+
+.star-sparkle {
+  line-height: 1;
+  font-family: sans-serif;
+}
+
+.star-glow {
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 200, 255, 0.6) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+}

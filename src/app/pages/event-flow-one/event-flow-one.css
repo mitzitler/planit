@@ -1,0 +1,252 @@
+/* Local nav */
+.local-nav {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  margin: 0.75rem 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.local-nav-text {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.02em;
+}
+
+.local-nav-event-name {
+  color: #f87171;
+  font-style: italic;
+}
+
+.local-nav-spaced {
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-title);
+}
+
+/* Cards container */
+.cards-container {
+  display: flex;
+  gap: 10px;
+  padding: 0 1rem 1rem;
+  height: calc(100vh - var(--nav-height) - 48px - 1.75rem);
+  position: relative;
+  z-index: 1;
+}
+
+/* Individual card */
+.event-card {
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: 0;
+  min-width: 52px;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: flex-grow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Glass effect */
+  background: rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 3px solid rgba(200, 180, 255, 0.4);
+}
+
+.event-card.is-active {
+  flex-grow: 23;
+  cursor: default;
+}
+
+/* White overlay — opacity driven by data-distance, transitions via CSS */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: white;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.card-overlay[data-distance="1"] { opacity: 0.05; }
+.card-overlay[data-distance="2"] { opacity: 0.10; }
+.card-overlay[data-distance="3"] { opacity: 0.15; }
+.card-overlay[data-distance="4"] { opacity: 0.20; }
+
+/* Collapsed state */
+.card-collapsed-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  z-index: 2;
+}
+
+.card-icon {
+  font-size: 1.6rem;
+}
+
+.card-label-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: var(--font-title);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Expanded content */
+@keyframes cardContentFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.card-expanded-content {
+  position: absolute;
+  inset: 0;
+  padding: 2rem;
+  overflow-y: auto;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: cardContentFadeIn 0.3s ease forwards;
+  animation-delay: 0.35s;
+  opacity: 0;
+}
+
+.card-question {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+}
+
+.card-subquestion {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: -0.75rem 0 0;
+}
+
+.card-copy {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+}
+
+.card-copy strong {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.card-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  outline: none;
+  width: 100%;
+  max-width: 320px;
+  transition: border-color 0.15s;
+}
+
+.card-input:focus { border-color: rgba(255, 255, 255, 0.5); }
+.card-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+
+/* Bucket buttons */
+.bucket-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.bucket-grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 0.75rem;
+  width: fit-content;
+}
+
+.bucket-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.65rem 1.1rem;
+  background: #c9a432;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  font-family: var(--font-body);
+}
+
+.bucket-btn:hover {
+  background: #d4af3a;
+  transform: translateY(-1px);
+}
+
+.bucket-btn.is-selected {
+  background: #e8c040;
+  border-color: white;
+}
+
+.bucket-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1a1400;
+}
+
+.bucket-sublabel {
+  font-size: 0.72rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Activity columns */
+.activity-columns {
+  display: flex;
+  gap: 1.5rem;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.activity-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 120px;
+}
+
+.activity-category-label {
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  color: #c9a432;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.05em;
+}
+
+.activity-option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+}
+
+.activity-option input[type="checkbox"] {
+  accent-color: #c9a432;
+  cursor: pointer;
+}

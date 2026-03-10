@@ -1,0 +1,120 @@
+<!-- Local nav bar -->
+<div class="local-nav">
+  <span class="local-nav-text">
+    lets work on...
+    <span class="local-nav-event-name">event name</span>
+    ...
+    <span class="local-nav-spaced">S P A C E !</span>
+  </span>
+</div>
+
+<!-- 5-card layout -->
+<div class="cards-container">
+  @for (card of cards; track card.id; let i = $index) {
+    <div
+      class="event-card"
+      [class.is-active]="activeCardIndex === i"
+      [class.is-collapsed]="activeCardIndex !== -1 && activeCardIndex !== i"
+      (click)="setActiveCard(i)"
+    >
+      <!-- White overlay fades based on distance from active card -->
+      <div
+        class="card-overlay"
+        [attr.data-distance]="getOverlayDistance(i)"
+      ></div>
+
+      <!-- Collapsed: vertical label -->
+      @if (activeCardIndex !== i) {
+        <div class="card-collapsed-content">
+          <span class="card-icon">{{ card.icon }}</span>
+          <span class="card-label-vertical">{{ card.label }}</span>
+        </div>
+      }
+
+      <!-- Expanded: full content -->
+      @if (activeCardIndex === i) {
+        <div class="card-expanded-content" (click)="$event.stopPropagation()">
+
+          @switch (card.id) {
+
+            @case ('size') {
+              <h2 class="card-question">how big is this party?</h2>
+              <div class="bucket-row">
+                @for (bucket of sizeBuckets; track bucket.id) {
+                  <button
+                    class="bucket-btn"
+                    [class.is-selected]="selectedSize === bucket.id"
+                    (click)="selectedSize = bucket.id"
+                  >
+                    <span class="bucket-label">{{ bucket.label }}</span>
+                    @if (bucket.sublabel) {
+                      <span class="bucket-sublabel">{{ bucket.sublabel }}</span>
+                    }
+                  </button>
+                }
+              </div>
+              <p class="card-copy">
+                this is why we should lock down an approximate size, and we can narrow it as we go —
+                alternatively, if you have a <strong>hard number:</strong>
+              </p>
+              <input class="card-input" type="number" placeholder="exact guest count" [(ngModel)]="exactGuestCount" />
+            }
+
+            @case ('place') {
+              <h2 class="card-question">where do you see this happening?</h2>
+              <div class="bucket-grid">
+                @for (bucket of placeBuckets; track bucket.id) {
+                  <button
+                    class="bucket-btn"
+                    [class.is-selected]="selectedPlace === bucket.id"
+                    (click)="selectedPlace = bucket.id"
+                  >
+                    <span class="bucket-label">{{ bucket.label }}</span>
+                  </button>
+                }
+              </div>
+              <p class="card-copy">
+                knowing the type of venue will help specify planning opportunities, and avoid possible pitfalls!
+                of course, if you have <strong>anything specific in mind:</strong>
+              </p>
+              <input class="card-input" type="text" placeholder="specific venue name or address" [(ngModel)]="specificVenue" />
+            }
+
+            @case ('activities') {
+              <h2 class="card-question">shoot for the stars —</h2>
+              <p class="card-subquestion">what would you want to do together, if planning was no object? choose lots!</p>
+              <div class="activity-columns">
+                @for (category of activityCategories; track category.id) {
+                  <div class="activity-column">
+                    <h3 class="activity-category-label">{{ category.label }}</h3>
+                    @for (option of category.options; track option) {
+                      <label class="activity-option">
+                        <input
+                          type="checkbox"
+                          [checked]="selectedActivities.has(option)"
+                          (change)="toggleActivity(option)"
+                        />
+                        {{ option }}
+                      </label>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @case ('cost') {
+              <h2 class="card-question">let's talk budget.</h2>
+              <p class="card-copy">cost planning coming soon.</p>
+            }
+
+            @case ('extras') {
+              <h2 class="card-question">anything else?</h2>
+              <p class="card-copy">extras coming soon.</p>
+            }
+
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

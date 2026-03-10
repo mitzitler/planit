@@ -1,0 +1,18 @@
+<div class="flow-two-shell">
+  <header class="flow-two-header">
+    <h1 class="flow-two-title">Mission Control</h1>
+    <p class="flow-two-subtitle">Manage every detail of your event.</p>
+  </header>
+  <nav class="flow-two-tabs">
+    @for (tab of tabs; track tab.path) {
+      <a
+        class="flow-two-tab"
+        [routerLink]="tab.path"
+        routerLinkActive="is-active"
+      >{{ tab.label }}</a>
+    }
+  </nav>
+  <section class="flow-two-body">
+    <router-outlet />
+  </section>
+</div>

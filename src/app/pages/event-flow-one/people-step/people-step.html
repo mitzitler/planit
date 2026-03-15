@@ -2,8 +2,19 @@
   <h2 class="step-title">👥 Who's coming?</h2>
   <p class="step-description">Give us a rough headcount — don't worry, we can adjust later.</p>
   <div class="step-body">
-    <!-- People form fields go here -->
-    <p class="placeholder-text">Approximate guest count input coming soon.</p>
+    <div class="size-grid">
+      @for (bucket of buckets; track bucket.label) {
+        <button
+          class="size-tile"
+          [class.is-selected]="selected()?.label === bucket.label"
+          (click)="select(bucket)"
+          type="button"
+        >
+          <span class="size-tile-label">{{ bucket.label }}</span>
+          <span class="size-tile-range">{{ bucket.display }}</span>
+        </button>
+      }
+    </div>
   </div>
   <div class="step-actions">
     <span></span>

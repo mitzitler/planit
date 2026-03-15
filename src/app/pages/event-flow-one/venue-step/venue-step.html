@@ -1,9 +1,58 @@
 <div class="step-card">
   <h2 class="step-title">📍 Where's it happening?</h2>
-  <p class="step-description">Pick the type of venue — we'll help you think through the details.</p>
+  <p class="step-description">Pick the type of venue — choose as many as apply.</p>
   <div class="step-body">
-    <!-- Venue selection goes here -->
-    <p class="placeholder-text">Venue picker coming soon.</p>
+    <div class="place-tree">
+      @for (category of placeOptions; track category.id) {
+        <div class="place-category">
+
+          <button class="place-category-header" type="button" (click)="toggleExpand(category.id)">
+            <span>{{ category.label }}</span>
+            <span class="place-caret">{{ isExpanded(category.id) ? '▾' : '▸' }}</span>
+          </button>
+
+          @if (isExpanded(category.id)) {
+            <div class="place-children">
+              @for (option of category.children; track option.id) {
+                <div class="place-option-row">
+
+                  <button
+                    class="place-chip"
+                    type="button"
+                    [class.is-selected]="isSelected(option.id)"
+                    (click)="toggleSelect(option.id)"
+                  >{{ option.label }}</button>
+
+                  @if (option.children?.length) {
+                    <button
+                      class="place-expand-btn"
+                      type="button"
+                      (click)="toggleExpand(option.id)"
+                      [attr.aria-label]="'Expand ' + option.label"
+                    >{{ isExpanded(option.id) ? '▾' : '▸' }}</button>
+                  }
+
+                  @if (option.children?.length && isExpanded(option.id)) {
+                    <div class="place-grandchildren">
+                      @for (sub of option.children!; track sub.id) {
+                        <button
+                          class="place-chip place-chip--sub"
+                          type="button"
+                          [class.is-selected]="isSelected(sub.id)"
+                          (click)="toggleSelect(sub.id)"
+                        >{{ sub.label }}</button>
+                      }
+                    </div>
+                  }
+
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+      }
+    </div>
   </div>
   <div class="step-actions">
     <a class="btn-secondary" routerLink="/events/new/activities">← Back</a>

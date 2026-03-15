@@ -1,0 +1,101 @@
+.place-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ── Category header ──────────────────────────────────────── */
+.place-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+}
+
+.place-category-header:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg);
+}
+
+.place-caret {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+/* ── Children container ───────────────────────────────────── */
+.place-children {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem 0 0.25rem 1rem;
+}
+
+/* ── Option row (chip + optional expand btn) ──────────────── */
+.place-option-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Chips ────────────────────────────────────────────────── */
+.place-chip {
+  padding: 0.4rem 0.9rem;
+  background: var(--color-surface-alt);
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.place-chip:hover {
+  border-color: var(--color-primary-hover);
+}
+
+.place-chip.is-selected {
+  border-color: var(--color-primary);
+  background: rgba(124, 90, 245, 0.18);
+}
+
+.place-chip--sub {
+  font-size: 0.82rem;
+  padding: 0.3rem 0.75rem;
+}
+
+/* ── Expand button for nodes with children ────────────────── */
+.place-expand-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  transition: color 0.15s;
+}
+
+.place-expand-btn:hover {
+  color: var(--color-text);
+}
+
+/* ── Grandchildren ────────────────────────────────────────── */
+.place-grandchildren {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  width: 100%;
+  padding-left: 0.5rem;
+}

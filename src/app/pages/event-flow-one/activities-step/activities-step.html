@@ -1,9 +1,32 @@
 <div class="step-card">
   <h2 class="step-title">🎉 What's on the agenda?</h2>
-  <p class="step-description">Pick the activities that'll make your event shine.</p>
+  <p class="step-description">Pick the activities that'll make your event shine — choose as many as apply.</p>
   <div class="step-body">
-    <!-- Activities selection goes here -->
-    <p class="placeholder-text">Activity picker coming soon.</p>
+    <div class="activity-tree">
+      @for (category of activityOptions; track category.id) {
+        <div class="activity-category">
+
+          <button class="activity-category-header" type="button" (click)="toggleExpand(category.id)">
+            <span>{{ category.label }}</span>
+            <span class="activity-caret">{{ isExpanded(category.id) ? '▾' : '▸' }}</span>
+          </button>
+
+          @if (isExpanded(category.id)) {
+            <div class="activity-children">
+              @for (option of category.children; track option.id) {
+                <button
+                  class="activity-chip"
+                  type="button"
+                  [class.is-selected]="isSelected(option.id)"
+                  (click)="toggleSelect(option.id)"
+                >{{ option.label }}</button>
+              }
+            </div>
+          }
+
+        </div>
+      }
+    </div>
   </div>
   <div class="step-actions">
     <a class="btn-secondary" routerLink="/events/new/people">← Back</a>

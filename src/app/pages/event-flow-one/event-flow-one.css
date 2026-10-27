@@ -96,6 +96,12 @@
   font-size: 1.6rem;
 }
 
+.card-icon--placeholder {
+  display: block;
+  margin: auto;
+  font-size: 8rem;
+}
+
 .card-label-vertical {
   writing-mode: vertical-rl;
   text-orientation: mixed;

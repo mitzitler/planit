@@ -6,7 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "prestart": "node scripts/write-env.mjs",
+    "prebuild": "node scripts/write-env.mjs",
+    "pretest": "node scripts/write-env.mjs"
   },
   "prettier": {
     "printWidth": 100,

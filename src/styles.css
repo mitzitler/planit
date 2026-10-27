@@ -1,7 +1,8 @@
 /* ── Design tokens ─────────────────────────────────────────── */
 :root {
   --font-title: 'Audiowide', sans-serif;
-  --font-body:  'Galindo', system-ui, sans-serif;
+  --font-body:  'Michroma', system-ui, sans-serif;
+  --font-alt:   'Zen Dots', sans-serif;
 
   --color-bg:           #150e52;
   --color-surface:      #120a3a;

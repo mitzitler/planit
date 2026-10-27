@@ -17,13 +17,11 @@
       [class.is-collapsed]="activeCardIndex !== -1 && activeCardIndex !== i"
       (click)="setActiveCard(i)"
     >
-      <!-- White overlay fades based on distance from active card -->
       <div
         class="card-overlay"
         [attr.data-distance]="getOverlayDistance(i)"
       ></div>
 
-      <!-- Collapsed: vertical label -->
       @if (activeCardIndex !== i) {
         <div class="card-collapsed-content">
           <span class="card-icon">{{ card.icon }}</span>
@@ -31,7 +29,6 @@
         </div>
       }
 
-      <!-- Expanded: full content -->
       @if (activeCardIndex === i) {
         <div class="card-expanded-content" (click)="$event.stopPropagation()">
 
@@ -39,20 +36,21 @@
 
             @case ('size') {
               <h2 class="card-question">how big is this party?</h2>
+              <p class="card-copy">placeholder — a line or two about why size matters for planning.</p>
               <div class="bucket-row">
-                @for (bucket of sizeBuckets; track bucket.id) {
+                @for (bucket of sizeBuckets; track bucket.label) {
                   <button
                     class="bucket-btn"
-                    [class.is-selected]="selectedSize === bucket.id"
-                    (click)="selectedSize = bucket.id"
+                    [class.is-selected]="selectedSize() === bucket.label"
+                    (click)="selectSize(bucket.label)"
+                    type="button"
                   >
                     <span class="bucket-label">{{ bucket.label }}</span>
-                    @if (bucket.sublabel) {
-                      <span class="bucket-sublabel">{{ bucket.sublabel }}</span>
-                    }
+                    <span class="bucket-sublabel">{{ bucket.display }}</span>
                   </button>
                 }
               </div>
+              <p class="card-copy">placeholder — a note about what changes based on the size you pick.</p>
               <p class="card-copy">
                 this is why we should lock down an approximate size, and we can narrow it as we go —
                 alternatively, if you have a <strong>hard number:</strong>
@@ -62,15 +60,45 @@
 
             @case ('place') {
               <h2 class="card-question">where do you see this happening?</h2>
-              <div class="bucket-grid">
-                @for (bucket of placeBuckets; track bucket.id) {
-                  <button
-                    class="bucket-btn"
-                    [class.is-selected]="selectedPlace === bucket.id"
-                    (click)="selectedPlace = bucket.id"
-                  >
-                    <span class="bucket-label">{{ bucket.label }}</span>
-                  </button>
+              <div class="place-tree">
+                @for (category of placeOptions; track category.id) {
+                  <div class="place-cat">
+                    <button class="place-cat-header" type="button" (click)="togglePlaceExpand(category.id)">
+                      <span>{{ category.label }}</span>
+                      <span class="place-caret">{{ isPlaceExpanded(category.id) ? '▾' : '▸' }}</span>
+                    </button>
+                    @if (isPlaceExpanded(category.id)) {
+                      <div class="place-chips">
+                        @for (option of category.children; track option.id) {
+                          <div class="place-chip-row">
+                            <button
+                              class="place-chip-btn"
+                              type="button"
+                              [class.is-selected]="isPlaceSelected(option.id)"
+                              (click)="togglePlaceSelect(option.id)"
+                            >{{ option.label }}</button>
+                            @if (option.children?.length) {
+                              <button class="place-sub-expand" type="button" (click)="togglePlaceExpand(option.id)">
+                                {{ isPlaceExpanded(option.id) ? '▾' : '▸' }}
+                              </button>
+                            }
+                            @if (option.children?.length && isPlaceExpanded(option.id)) {
+                              <div class="place-subchips">
+                                @for (sub of option.children!; track sub.id) {
+                                  <button
+                                    class="place-chip-btn place-chip-btn--sub"
+                                    type="button"
+                                    [class.is-selected]="isPlaceSelected(sub.id)"
+                                    (click)="togglePlaceSelect(sub.id)"
+                                  >{{ sub.label }}</button>
+                                }
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
                 }
               </div>
               <p class="card-copy">
@@ -84,17 +112,17 @@
               <h2 class="card-question">shoot for the stars —</h2>
               <p class="card-subquestion">what would you want to do together, if planning was no object? choose lots!</p>
               <div class="activity-columns">
-                @for (category of activityCategories; track category.id) {
+                @for (category of activityOptions; track category.id) {
                   <div class="activity-column">
                     <h3 class="activity-category-label">{{ category.label }}</h3>
-                    @for (option of category.options; track option) {
+                    @for (option of category.children ?? []; track option.id) {
                       <label class="activity-option">
                         <input
                           type="checkbox"
-                          [checked]="selectedActivities.has(option)"
-                          (change)="toggleActivity(option)"
+                          [checked]="isActivitySelected(option.id)"
+                          (change)="toggleActivitySelect(option.id)"
                         />
-                        {{ option }}
+                        {{ option.label }}
                       </label>
                     }
                   </div>

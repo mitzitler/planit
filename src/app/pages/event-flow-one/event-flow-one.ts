@@ -1,22 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SIZE_BUCKETS, PLACE_OPTIONS, ACTIVITY_OPTIONS } from '../../services/decision-tree';
+import { EventDraftService } from '../../services/event-draft.service';
 
 interface Card {
   id: 'size' | 'place' | 'activities' | 'cost' | 'extras';
   label: string;
   icon: string;
-}
-
-interface Bucket {
-  id: string;
-  label: string;
-  sublabel?: string;
-}
-
-interface ActivityCategory {
-  id: string;
-  label: string;
-  options: string[];
 }
 
 @Component({
@@ -26,6 +16,8 @@ interface ActivityCategory {
   styleUrl: './event-flow-one.css',
 })
 export class EventFlowOneComponent {
+  private draftService = inject(EventDraftService);
+
   activeCardIndex = -1;
 
   cards: Card[] = [
@@ -36,54 +28,58 @@ export class EventFlowOneComponent {
     { id: 'extras',     label: 'EXTRAS',     icon: '💬' },
   ];
 
-  // SIZE
-  sizeBuckets: Bucket[] = [
-    { id: 'intimate', label: 'intimate',  sublabel: '8 or less' },
-    { id: 'mixer',    label: 'mixer',     sublabel: '9 - 20' },
-    { id: 'large',    label: 'large',     sublabel: '21 - 50' },
-    { id: 'rager',    label: 'rager',     sublabel: '51 - 90' },
-    { id: 'massive',  label: 'massive',   sublabel: '91+' },
-  ];
-  selectedSize: string | null = null;
+  // ── Size ─────────────────────────────────────────────────────
+  readonly sizeBuckets = SIZE_BUCKETS;
+  selectedSize = signal<string | null>(this.draftService.snapshot.size);
   exactGuestCount = '';
 
-  // PLACE
-  placeBuckets: Bucket[] = [
-    { id: 'my-house',      label: 'my house!' },
-    { id: 'restaurant',    label: 'a restaurant?' },
-    { id: 'public-park',   label: 'a public park?' },
-    { id: 'friends-house', label: "or a friend's house?" },
-    { id: 'bar',           label: 'a bar?' },
-    { id: 'event-venue',   label: 'an event venue?' },
-  ];
-  selectedPlace: string | null = null;
+  selectSize(label: string): void {
+    this.selectedSize.set(label);
+    this.draftService.setSize(label);
+  }
+
+  // ── Place ─────────────────────────────────────────────────────
+  readonly placeOptions = PLACE_OPTIONS;
+  private expandedPlaceIds = signal<Set<string>>(new Set());
+  private selectedPlaceIds = signal<Set<string>>(new Set(this.draftService.snapshot.places));
   specificVenue = '';
 
-  // ACTIVITIES
-  activityCategories: ActivityCategory[] = [
-    { id: 'eating',      label: 'eating...',   options: ['brunch', 'dinner', 'potluck', 'cooking', 'etc'] },
-    { id: 'drinking',    label: 'drinking',    options: ['tea time', 'cocktails', 'wine bar', 'kegger', 'etc'] },
-    { id: 'playing',     label: 'playing',     options: ['board games', 'sports', 'charades', 'video games', 'etc'] },
-    { id: 'relaxing',    label: 'relaxing',    options: ['hiking', 'picnic', 'spa day', 'study date', 'etc'] },
-    { id: 'celebrating', label: 'celebrating', options: ['graduation', 'birthday', 'housewarming', 'engagement', 'wedding', 'finals', 'etc'] },
-  ];
-  selectedActivities: Set<string> = new Set();
+  isPlaceExpanded(id: string): boolean { return this.expandedPlaceIds().has(id); }
+  isPlaceSelected(id: string): boolean { return this.selectedPlaceIds().has(id); }
 
-  setActiveCard(index: number) {
+  togglePlaceExpand(id: string): void {
+    const next = new Set(this.expandedPlaceIds());
+    next.has(id) ? next.delete(id) : next.add(id);
+    this.expandedPlaceIds.set(next);
+  }
+
+  togglePlaceSelect(id: string): void {
+    const next = new Set(this.selectedPlaceIds());
+    next.has(id) ? next.delete(id) : next.add(id);
+    this.selectedPlaceIds.set(next);
+    this.draftService.setPlaces([...next]);
+  }
+
+  // ── Activities ────────────────────────────────────────────────
+  readonly activityOptions = ACTIVITY_OPTIONS;
+  private selectedActivityIds = signal<Set<string>>(new Set(this.draftService.snapshot.activities));
+
+  isActivitySelected(id: string): boolean { return this.selectedActivityIds().has(id); }
+
+  toggleActivitySelect(id: string): void {
+    const next = new Set(this.selectedActivityIds());
+    next.has(id) ? next.delete(id) : next.add(id);
+    this.selectedActivityIds.set(next);
+    this.draftService.setActivities([...next]);
+  }
+
+  // ── Card layout ───────────────────────────────────────────────
+  setActiveCard(index: number): void {
     this.activeCardIndex = this.activeCardIndex === index ? -1 : index;
   }
 
-  // Returns 0-4 for CSS class binding
   getOverlayDistance(index: number): number {
     if (this.activeCardIndex === -1) return 0;
     return Math.abs(index - this.activeCardIndex);
-  }
-
-  toggleActivity(option: string) {
-    if (this.selectedActivities.has(option)) {
-      this.selectedActivities.delete(option);
-    } else {
-      this.selectedActivities.add(option);
-    }
   }
 }

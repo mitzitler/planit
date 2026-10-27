@@ -1,0 +1,107 @@
+:host {
+  /* Let the card's flex column lay out this component's children directly */
+  display: contents;
+}
+
+/* Place tree */
+.place-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.place-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.place-cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+}
+
+.place-cat-header:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(201, 164, 50, 0.5);
+}
+
+.place-caret {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.place-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.15rem 0 0.15rem 0.75rem;
+}
+
+.place-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.place-chip-btn {
+  padding: 0.3rem 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.place-chip-btn:hover {
+  border-color: rgba(201, 164, 50, 0.55);
+  color: white;
+}
+
+.place-chip-btn.is-selected {
+  border-color: #c9a432;
+  background: rgba(201, 164, 50, 0.15);
+  color: white;
+}
+
+.place-chip-btn--sub {
+  font-size: 0.76rem;
+  padding: 0.22rem 0.6rem;
+}
+
+.place-sub-expand {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.2rem 0.3rem;
+  transition: color 0.15s;
+}
+
+.place-sub-expand:hover { color: rgba(255, 255, 255, 0.75); }
+
+.place-subchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  width: 100%;
+  padding-left: 0.4rem;
+}

@@ -1,0 +1,19 @@
+<h2 class="card-question">shoot for the stars —</h2>
+<p class="card-subquestion">what would you want to do together, if planning was no object? choose lots!</p>
+<div class="activity-columns">
+  @for (category of activityOptions; track category.id) {
+    <div class="activity-column">
+      <h3 class="activity-category-label">{{ category.label }}</h3>
+      @for (option of category.children ?? []; track option.id) {
+        <label class="activity-option">
+          <input
+            type="checkbox"
+            [checked]="isActivitySelected(option.id)"
+            (change)="toggleActivitySelect(option.id)"
+          />
+          {{ option.label }}
+        </label>
+      }
+    </div>
+  }
+</div>

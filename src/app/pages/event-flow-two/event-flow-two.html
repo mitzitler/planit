@@ -3,6 +3,16 @@
     <h1 class="flow-two-title">Mission Control</h1>
     <p class="flow-two-subtitle">Manage every detail of your event.</p>
   </header>
+
+  @if (loadError()) {
+    <p class="flow-two-error" role="alert">{{ loadError() }}</p>
+  } @else if (plan(); as plan) {
+    <div class="flow-two-agent">
+      <app-agent-chat [eventId]="eventId" (planChange)="this.plan.set($event)" />
+      <app-plan-card [plan]="plan" />
+    </div>
+  }
+
   <nav class="flow-two-tabs">
     @for (tab of tabs; track tab.path) {
       <a

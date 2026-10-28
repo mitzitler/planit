@@ -1,0 +1,40 @@
+<section class="chat" aria-label="Planning assistant">
+  <div class="chat-log" #log aria-live="polite">
+    @for (line of lines(); track $index) {
+      <p class="chat-line" [class.is-user]="line.role === 'user'">
+        @if (line.text) {
+          {{ line.text }}
+        } @else {
+          <span class="chat-typing" aria-label="Assistant is working">
+            <span></span><span></span><span></span>
+          </span>
+        }
+      </p>
+    } @empty {
+      <div class="chat-empty">
+        <p>Tell me about your event and I'll fill in the plan.</p>
+        @for (suggestion of suggestions; track suggestion) {
+          <button class="chat-suggestion" type="button" (click)="send(suggestion)">{{ suggestion }}</button>
+        }
+      </div>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <p class="chat-error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <form class="chat-form" (ngSubmit)="send()">
+    <textarea
+      class="card-input chat-input"
+      name="draft"
+      rows="2"
+      maxlength="2000"
+      placeholder="e.g. Add a $60 line for snacks"
+      aria-label="Message the assistant"
+      [(ngModel)]="draft"
+      (keydown)="onKeydown($event)"
+    ></textarea>
+    <button class="btn-primary" type="submit" [disabled]="busy()">Send</button>
+  </form>
+</section>

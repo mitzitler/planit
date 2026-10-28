@@ -1,0 +1,75 @@
+<section class="plan-card" aria-label="Event plan">
+  <h2 class="plan-name">{{ plan().name ?? 'Untitled event' }}</h2>
+
+  <dl class="plan-facts">
+    <div>
+      <dt>Date</dt>
+      <dd>{{ plan().date ? formatDate(plan().date!) : '—' }}</dd>
+    </div>
+    <div>
+      <dt>Guests</dt>
+      <dd>
+        @if (plan().guestCount) {
+          {{ plan().guestCount }} <span class="plan-muted">({{ plan().size }})</span>
+        } @else {
+          —
+        }
+      </dd>
+    </div>
+    <div>
+      <dt>Places</dt>
+      <dd>
+        @for (place of places(); track place) {
+          <span class="plan-chip">{{ place }}</span>
+        } @empty {
+          —
+        }
+      </dd>
+    </div>
+    <div>
+      <dt>Activities</dt>
+      <dd>
+        @for (activity of activities(); track activity) {
+          <span class="plan-chip">{{ activity }}</span>
+        } @empty {
+          —
+        }
+      </dd>
+    </div>
+  </dl>
+
+  <h3 class="plan-heading">
+    Budget
+    @if (plan().budgetTotal !== null) {
+      <span class="plan-total" [class.is-over]="overBudget()">
+        {{ formatMoney(budgetSpent()) }} of {{ formatMoney(plan().budgetTotal!) }}
+      </span>
+    }
+  </h3>
+  @if (plan().budget.length) {
+    <ul class="plan-list">
+      @for (item of plan().budget; track $index) {
+        <li><span>{{ item.label }}</span><span>{{ formatMoney(item.amount) }}</span></li>
+      }
+    </ul>
+  } @else {
+    <p class="plan-muted">No budget items yet.</p>
+  }
+
+  <h3 class="plan-heading">Schedule</h3>
+  @if (plan().schedule.length) {
+    <ul class="plan-list">
+      @for (item of plan().schedule; track $index) {
+        <li>
+          <span class="plan-time">{{ item.time }}</span>
+          <span class="plan-grow">{{ item.title }}</span>
+          @if (item.date !== plan().date) {
+            <span class="plan-muted">{{ formatDate(item.date) }}</span>
+          }
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="plan-muted">Nothing scheduled yet.</p>
+  }
+</section>

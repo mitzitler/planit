@@ -1,13 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
-
-interface EventCard {
-  id: string;
-  name: string;
-  date: string;
-  guestCount: number;
-  status: 'planning' | 'confirmed' | 'complete';
-}
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { EventsService, type EventRow } from '../../services/events.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,17 +8,45 @@ interface EventCard {
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class DashboardComponent {
-  // Stub events — will be replaced with real Supabase data after auth
-  events: EventCard[] = [
-    { id: '1', name: 'Mia\'s Birthday Bash', date: 'Mar 15, 2026', guestCount: 24, status: 'planning' },
-    { id: '2', name: 'Summer Rooftop Hang', date: 'Jun 21, 2026', guestCount: 40, status: 'confirmed' },
-    { id: '3', name: 'Book Club Potluck', date: 'Feb 28, 2026', guestCount: 10, status: 'complete' },
-  ];
+export class DashboardComponent implements OnInit {
+  private eventsService = inject(EventsService);
+  private router = inject(Router);
 
-  statusLabel: Record<EventCard['status'], string> = {
-    planning:  '🛸 Planning',
-    confirmed: '✅ Confirmed',
-    complete:  '🏁 Complete',
-  };
+  events = signal<EventRow[]>([]);
+  loading = signal(true);
+  creating = signal(false);
+  errorMessage = signal('');
+
+  async ngOnInit() {
+    try {
+      this.events.set(await this.eventsService.list());
+    } catch {
+      this.errorMessage.set('Could not load your events. Refresh to try again.');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  // Creates an empty event and opens it in Mission Control, where the assistant fills it in
+  async createEvent() {
+    this.creating.set(true);
+    this.errorMessage.set('');
+    try {
+      const id = await this.eventsService.create();
+      this.router.navigate(['/events', id, 'manage']);
+    } catch {
+      this.errorMessage.set('Could not create the event. Try again.');
+      this.creating.set(false);
+    }
+  }
+
+  // Plan dates are YYYY-MM-DD; formatted in UTC so the day doesn't shift with the time zone
+  formatDate(date: string) {
+    return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+  }
 }

@@ -1,0 +1,14 @@
+/* Chat on the left, live plan on the right; stacked on narrow screens */
+.flow-two-agent {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 720px) {
+  .flow-two-agent { grid-template-columns: minmax(0, 1fr); }
+}
+
+.flow-two-error { color: #fca5a5; margin-bottom: 2rem; }

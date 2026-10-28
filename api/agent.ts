@@ -7,7 +7,7 @@
 // Reads and saves the event as the user, so row-level security applies. Only the agent_runs
 // log uses the service-role key, because users can't write that table.
 //
-// Env: ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+// Env: ANTHROPIC_KEY (or ANTHROPIC_API_KEY), SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 import Anthropic from '@anthropic-ai/sdk';
 import type { BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
 import { createClient } from '@supabase/supabase-js';
@@ -19,7 +19,8 @@ const MAX_HISTORY_BYTES = 200_000; // the whole history is resent (and billed) o
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const anthropic = new Anthropic(); // reads ANTHROPIC_API_KEY
+// Vercel names the key ANTHROPIC_KEY; ANTHROPIC_API_KEY is the SDK's default, used locally
+const anthropic = new Anthropic({ apiKey: process.env['ANTHROPIC_KEY'] ?? process.env['ANTHROPIC_API_KEY'] });
 const tools = PLAN_TOOLS as unknown as Anthropic.Beta.BetaTool[];
 
 const callModel: CallModel = async (messages, onText) => {

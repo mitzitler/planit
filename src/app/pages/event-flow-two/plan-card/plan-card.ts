@@ -6,7 +6,8 @@ import {
   type ActivityOption,
   type PlaceOption,
 } from '../../../services/decision-tree';
-import { guestConflict, type Plan } from '../../../shared/plan';
+import { formatDate, formatMoney, formatRange, formatTime } from '../../../shared/format';
+import { budgetRange, guestConflict, type Plan } from '../../../shared/plan';
 
 // id → label for every place and activity
 const LABELS = new Map<string, string>();
@@ -53,32 +54,18 @@ export class PlanCardComponent {
     return range ? `${range} · prefers ${preferred}` : `About ${preferred}`;
   });
 
-  // Estimates count at their low end here and at their high end (amount) in budgetHigh
-  budgetLow = computed(() => this.plan().budget.reduce((sum, item) => sum + (item.low ?? item.amount), 0));
-  budgetHigh = computed(() => this.plan().budget.reduce((sum, item) => sum + item.amount, 0));
+  private budget = computed(() => budgetRange(this.plan().budget));
+  budgetLow = computed(() => this.budget().low);
+  budgetHigh = computed(() => this.budget().high);
   overBudget = computed(() => {
     const total = this.plan().budgetTotal;
     return total !== null && this.budgetHigh() > total;
   });
 
-  formatDate(date: string) {
-    return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      timeZone: 'UTC',
-    });
-  }
-
-  formatMoney(amount: number) {
-    return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
-  }
-
-  // "$40–70" for a range, "$60" otherwise
-  formatRange(low: number, high: number) {
-    return low === high ? this.formatMoney(high) : `${this.formatMoney(low)}–${this.formatMoney(high).slice(1)}`;
-  }
+  formatDate = formatDate;
+  formatTime = formatTime;
+  formatMoney = formatMoney;
+  formatRange = formatRange;
 }
 
 function label(id: string) {

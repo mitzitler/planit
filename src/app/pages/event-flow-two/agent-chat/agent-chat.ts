@@ -1,8 +1,8 @@
-import { Component, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
 import { AgentService } from '../../../services/agent.service';
-import type { Plan } from '../../../shared/plan';
+import { EventPlanStore } from '../event-plan.store';
 
 interface ChatLine {
   role: 'user' | 'assistant';
@@ -22,12 +22,13 @@ const SUGGESTIONS = [
 })
 export class AgentChatComponent {
   private agent = inject(AgentService);
+  private store = inject(EventPlanStore);
 
   eventId = input.required<string>();
-  planChange = output<Plan>();
 
   lines = signal<ChatLine[]>([]);
-  busy = signal(false);
+  busy = this.store.agentBusy;
+  saving = this.store.saving;
   errorMessage = signal('');
   draft = '';
   suggestions = SUGGESTIONS;
@@ -40,7 +41,7 @@ export class AgentChatComponent {
 
   async send(text = this.draft) {
     const message = text.trim();
-    if (!message || this.busy()) return;
+    if (!message || this.busy() || this.saving()) return;
 
     this.draft = '';
     this.errorMessage.set('');
@@ -62,11 +63,11 @@ export class AgentChatComponent {
             replaceReply = true;
             break;
           case 'plan':
-            this.planChange.emit(event.plan);
+            this.store.plan.set(event.plan);
             break;
           case 'done':
             this.history = [...this.history, ...event.messages];
-            this.planChange.emit(event.plan);
+            this.store.plan.set(event.plan);
             break;
           case 'error':
             this.errorMessage.set(event.error);

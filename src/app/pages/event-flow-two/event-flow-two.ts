@@ -5,21 +5,23 @@ import { PlanCardComponent } from './plan-card/plan-card';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { PlanBarComponent } from '../../components/plan-bar/plan-bar';
 import { EventsService } from '../../services/events.service';
-import { applyTool, type Plan } from '../../shared/plan';
+import { EventPlanStore } from './event-plan.store';
 
 @Component({
   selector: 'app-event-flow-two',
   imports: [RouterOutlet, RouterLink, RouterLinkActive, AgentChatComponent, PlanCardComponent, ConfirmDialogComponent, PlanBarComponent],
   templateUrl: './event-flow-two.html',
   styleUrl: './event-flow-two.css',
+  providers: [EventPlanStore],
 })
 export class EventFlowTwoComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private eventsService = inject(EventsService);
   private router = inject(Router);
+  private store = inject(EventPlanStore);
 
   eventId = this.route.snapshot.paramMap.get('id')!;
-  plan = signal<Plan | null>(null);
+  plan = this.store.plan;
   loadError = signal('');
 
   renameError = signal('');
@@ -34,6 +36,7 @@ export class EventFlowTwoComponent implements OnInit {
   ];
 
   async ngOnInit() {
+    this.store.eventId = this.eventId;
     try {
       const event = await this.eventsService.get(this.eventId);
       if (event) this.plan.set(event.plan);
@@ -44,18 +47,7 @@ export class EventFlowTwoComponent implements OnInit {
   }
 
   async rename(name: string) {
-    const current = this.plan();
-    if (!current) return;
-    const result = applyTool(current, 'set_basics', { name });
-    if (!result.ok) return;
-    this.plan.set(result.plan);
-    this.renameError.set('');
-    try {
-      await this.eventsService.savePlan(this.eventId, result.plan);
-    } catch {
-      this.plan.set(current);
-      this.renameError.set("Couldn't save the new name. Try again.");
-    }
+    this.renameError.set((await this.store.apply('set_basics', { name })) ?? '');
   }
 
   askDelete() {

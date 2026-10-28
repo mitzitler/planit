@@ -1,4 +1,4 @@
-// The event plan and the 5 tools that change it.
+// The event plan and the 7 tools that change it.
 // Pure TypeScript with no Angular imports: the Angular app and api/agent.ts both use this file,
 // so the wizard, the agent and the validation can never disagree about what a valid plan is.
 import {
@@ -102,6 +102,16 @@ export function guestConflict(guests: GuestCounts | undefined): string | null {
   return null;
 }
 
+// ── Budget ───────────────────────────────────────────────────
+
+// The budget's spread: estimates count at their low end in `low` and their high end in `high`
+export function budgetRange(budget: BudgetItem[]): { low: number; high: number } {
+  return {
+    low: budget.reduce((sum, item) => sum + (item.low ?? item.amount), 0),
+    high: budget.reduce((sum, item) => sum + item.amount, 0),
+  };
+}
+
 // ── Names ────────────────────────────────────────────────────
 
 export const EVENT_NAME_MAX = 80;
@@ -139,7 +149,9 @@ export type ToolName =
   | 'choose_places'
   | 'choose_activities'
   | 'add_budget_item'
-  | 'add_schedule_item';
+  | 'remove_budget_item'
+  | 'add_schedule_item'
+  | 'remove_schedule_item';
 
 export type ToolResult = { ok: true; plan: Plan } | { ok: false; error: string };
 
@@ -222,6 +234,19 @@ export const PLAN_TOOLS = [
     },
   },
   {
+    name: 'remove_budget_item',
+    description:
+      'Remove one budget item by its position in the current plan\'s budget list (0 is the first). ' +
+      'To change an item, remove it and add the corrected one. Positions shift after a removal.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        index: { type: 'integer', minimum: 0, description: 'Position in plan.budget, starting at 0.' },
+      },
+      required: ['index'],
+    },
+  },
+  {
     name: 'add_schedule_item',
     description: 'Add one item to the schedule. Date defaults to the event date.',
     input_schema: {
@@ -232,6 +257,19 @@ export const PLAN_TOOLS = [
         title: { type: 'string', description: 'What happens, e.g. "Guests arrive".' },
       },
       required: ['time', 'title'],
+    },
+  },
+  {
+    name: 'remove_schedule_item',
+    description:
+      'Remove one schedule item by its position in the current plan\'s schedule list (0 is the first). ' +
+      'To move an item, remove it and add it again at the new time. Positions shift after a removal.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        index: { type: 'integer', minimum: 0, description: 'Position in plan.schedule, starting at 0.' },
+      },
+      required: ['index'],
     },
   },
 ] as const;
@@ -250,8 +288,12 @@ export function applyTool(plan: Plan, name: string, input: Input): ToolResult {
       return chooseIds(plan, input, 'activities', SELECTABLE_ACTIVITY_IDS);
     case 'add_budget_item':
       return addBudgetItem(plan, input);
+    case 'remove_budget_item':
+      return removeAt(plan, input, 'budget', item => `${item.label}`);
     case 'add_schedule_item':
       return addScheduleItem(plan, input);
+    case 'remove_schedule_item':
+      return removeAt(plan, input, 'schedule', item => `${item.date} ${item.time} ${item.title}`);
     default:
       return fail(`Unknown tool "${name}".`);
   }
@@ -390,6 +432,24 @@ function addScheduleItem(plan: Plan, input: Input): ToolResult {
     `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`),
   );
   return { ok: true, plan: { ...plan, schedule } };
+}
+
+// Removes plan[field][index]. The error lists the items with their positions, so the model can
+// find the right one if the list changed under it.
+function removeAt<F extends 'budget' | 'schedule'>(
+  plan: Plan,
+  input: Input,
+  field: F,
+  describe: (item: Plan[F][number]) => string,
+): ToolResult {
+  const list = plan[field] as Plan[F][number][];
+  const { index } = input;
+  if (!list.length) return fail(`The ${field} is empty; there is nothing to remove.`);
+  if (!Number.isInteger(index) || (index as number) < 0 || (index as number) >= list.length) {
+    const items = list.map((item, i) => `${i}: ${describe(item)}`).join('; ');
+    return fail(`index must be a whole number from 0 to ${list.length - 1}; got ${JSON.stringify(index)}. The ${field} is: ${items}.`);
+  }
+  return { ok: true, plan: { ...plan, [field]: list.filter((_, i) => i !== index) } };
 }
 
 // ── Validators ───────────────────────────────────────────────

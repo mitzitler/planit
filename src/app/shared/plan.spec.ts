@@ -200,6 +200,36 @@ describe('add_schedule_item', () => {
   });
 });
 
+describe('remove_budget_item / remove_schedule_item', () => {
+  const plan: Plan = {
+    ...emptyPlan(),
+    budget: [
+      { label: 'Pizza', amount: 70, low: 40, high: 70 },
+      { label: 'Plates', amount: 10 },
+    ],
+    schedule: [
+      { date: '2026-11-14', time: '18:00', title: 'Setup' },
+      { date: '2026-11-14', time: '19:00', title: 'Guests arrive' },
+    ],
+  };
+
+  it('removes the item at the index and leaves the rest', () => {
+    expect(expectOk(applyTool(plan, 'remove_budget_item', { index: 0 })).budget).toEqual([plan.budget[1]]);
+    expect(expectOk(applyTool(plan, 'remove_schedule_item', { index: 1 })).schedule).toEqual([plan.schedule[0]]);
+    expect(plan.budget).toHaveLength(2); // not mutated
+  });
+
+  it('rejects a bad index and lists the items', () => {
+    const error = expectError(applyTool(plan, 'remove_budget_item', { index: 2 }));
+    expect(error).toContain('0: Pizza');
+    expect(error).toContain('1: Plates');
+    expectError(applyTool(plan, 'remove_schedule_item', { index: -1 }));
+    expectError(applyTool(plan, 'remove_schedule_item', { index: 0.5 }));
+    expectError(applyTool(plan, 'remove_schedule_item', {}));
+    expect(expectError(applyTool(emptyPlan(), 'remove_budget_item', { index: 0 }))).toContain('empty');
+  });
+});
+
 describe('helpers', () => {
   it('rejects unknown tools', () => {
     expectError(applyTool(emptyPlan(), 'delete_everything', {}));

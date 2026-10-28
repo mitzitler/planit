@@ -1,1 +1,62 @@
-<p>calendar-tool works!</p>
+@if (plan(); as plan) {
+  <section class="tool" aria-label="Calendar">
+    <div class="tool-summary">
+      <p class="tool-figure">
+        @if (plan.date) {
+          {{ formatDate(plan.date) }}
+        } @else {
+          <span class="tool-muted">No event date yet</span>
+        }
+      </p>
+      <form class="tool-inline" (ngSubmit)="setEventDate()">
+        <label class="tool-muted" for="calendar-event-date">{{ plan.date ? 'Move the event to' : 'Set the event date' }}</label>
+        <input id="calendar-event-date" class="card-input tool-input-sm" type="date" name="eventDate"
+          [(ngModel)]="eventDate" [disabled]="locked()" />
+        <button class="btn-secondary" type="submit" [disabled]="locked()">Save</button>
+      </form>
+    </div>
+
+    @for (day of days(); track day.date) {
+      <div class="calendar-day">
+        <h3 class="calendar-day-title">
+          {{ formatDate(day.date) }}
+          @if (day.date === plan.date) {
+            <span class="calendar-tag">Event day</span>
+          }
+        </h3>
+        <ul class="tool-list">
+          @for (entry of day.items; track entry.index) {
+            <li class="tool-item">
+              <span class="calendar-time">{{ formatTime(entry.item.time) }}</span>
+              <span class="tool-grow">{{ entry.item.title }}</span>
+              <button class="tool-remove" type="button" [disabled]="locked()" (click)="remove(entry.index)"
+                [attr.aria-label]="'Remove ' + entry.item.title">Remove</button>
+            </li>
+          }
+        </ul>
+      </div>
+    } @empty {
+      <p class="tool-muted">Nothing scheduled yet. Add an item below, or ask the assistant.</p>
+    }
+
+    <form class="tool-form" (ngSubmit)="add()">
+      <input class="card-input tool-input-sm" type="date" name="date" aria-label="Date (defaults to the event date)"
+        [(ngModel)]="date" [disabled]="locked()" />
+      <input class="card-input tool-input-sm" type="time" name="time" aria-label="Time"
+        [(ngModel)]="time" [disabled]="locked()" />
+      <input class="card-input tool-grow" type="text" name="title" maxlength="80" aria-label="What happens"
+        placeholder="What happens, e.g. Guests arrive" [(ngModel)]="title" [disabled]="locked()" />
+      <button class="btn-primary" type="submit" [disabled]="locked()">Add</button>
+    </form>
+    @if (plan.date) {
+      <p class="tool-muted tool-hint">Leave the date empty to use the event day.</p>
+    }
+
+    @if (locked()) {
+      <p class="tool-muted">The assistant is working. You can edit again once it replies.</p>
+    }
+    @if (error()) {
+      <p class="tool-error" role="alert">{{ error() }}</p>
+    }
+  </section>
+}

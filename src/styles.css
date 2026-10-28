@@ -465,6 +465,55 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
   border-bottom: 2px solid var(--color-primary);
 }
 
+/* Mission Control tabs (Budget, Calendar): shared layout for the summary, item lists and add forms */
+.tool { display: grid; gap: 1.25rem; font-size: 0.9rem; }
+
+.tool-summary {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.tool-figure { font-family: var(--font-title); font-size: 1.4rem; }
+.tool-figure .tool-muted { font-family: var(--font-body); font-size: 0.85rem; }
+
+.tool-inline, .tool-form { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+.tool-list { list-style: none; display: grid; gap: 0.4rem; }
+
+.tool-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.85rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.tool-grow { flex: 1; min-width: 10rem; max-width: none; }
+.tool-input-sm { width: auto; max-width: 10rem; }
+.tool-muted { color: var(--color-text-muted); }
+.tool-hint { font-size: 0.8rem; margin-top: -0.75rem; }
+.tool-error { color: #fca5a5; }
+
+.tool-remove {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.tool-remove:hover { color: #fca5a5; border-color: #fca5a5; }
+.tool-remove:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* Event cards: shared question, copy and input styles (used by the Flow One card components) */
 .card-question {
   font-family: var(--font-title);

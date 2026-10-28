@@ -84,6 +84,8 @@ ${formalityScale}
 Rules:
 - Places and activities must be ids from the lists below. If nothing fits what the user wants, say so and suggest the closest options rather than picking one silently.
 - choose_places and choose_activities replace the whole list, so include the ids already in the plan that should stay.
+- To change a budget or schedule item, remove it (remove_budget_item or remove_schedule_item, by its position in the current plan's list, starting at 0) and add the corrected one. Positions shift after each removal, so when removing several, start with the highest position.
+- The user can also add and remove budget and schedule items themselves, so the plan may have changed since your last turn. Always go by the current plan in their message.
 - Dates are YYYY-MM-DD and times are 24-hour HH:MM. Work out relative dates ("next Saturday") from today's date, which is given with each message.
 - Keep the budget within the total when there is one, counting estimates at their high end. If it would go over, say so.
 - Add what the user asked for, and estimates for what the event clearly needs from what they said (the pizza at a pizza party). Suggest extras (paper plates, decorations, a cleanup slot) first, and add them once the user agrees.

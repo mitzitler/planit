@@ -35,6 +35,6 @@
       [(ngModel)]="draft"
       (keydown)="onKeydown($event)"
     ></textarea>
-    <button class="btn-primary" type="submit" [disabled]="busy()">Send</button>
+    <button class="btn-primary" type="submit" [disabled]="busy() || saving()">Send</button>
   </form>
 </section>

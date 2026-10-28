@@ -20,7 +20,7 @@
     <p class="flow-two-error" role="alert">{{ loadError() }}</p>
   } @else if (plan(); as plan) {
     <div class="flow-two-agent">
-      <app-agent-chat [eventId]="eventId" (planChange)="this.plan.set($event)" />
+      <app-agent-chat [eventId]="eventId" />
       <app-plan-card [plan]="plan" />
     </div>
   }

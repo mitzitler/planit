@@ -18,4 +18,15 @@
   this is why we should lock down an approximate size, and we can narrow it as we go —
   alternatively, if you have a <strong>hard number:</strong>
 </p>
-<input class="card-input" type="number" placeholder="exact guest count" [(ngModel)]="exactGuestCount" />
+<input
+  class="card-input"
+  type="number"
+  min="1"
+  step="1"
+  placeholder="exact guest count"
+  [(ngModel)]="exactGuestCount"
+  (change)="saveExactGuests()"
+/>
+@if (exactError()) {
+  <p class="card-copy card-error" role="alert">{{ exactError() }}</p>
+}

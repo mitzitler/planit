@@ -10,3 +10,31 @@
 }
 
 .btn-primary:disabled { opacity: 0.6; cursor: wait; }
+
+/* Event cards with a delete button in the corner */
+.event-card-shell { position: relative; display: grid; }
+
+.event-card-shell .event-card { padding-right: 5.5rem; }
+
+.event-card-delete {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  padding: 0.3rem 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  border-radius: var(--radius-sm);
+  color: #fca5a5;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.event-card-delete:hover,
+.event-card-delete:focus-visible {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}

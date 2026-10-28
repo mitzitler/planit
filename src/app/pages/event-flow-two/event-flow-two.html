@@ -1,7 +1,12 @@
 <div class="flow-two-shell">
   <header class="flow-two-header">
-    <h1 class="flow-two-title">Mission Control</h1>
-    <p class="flow-two-subtitle">Manage every detail of your event.</p>
+    <div>
+      <h1 class="flow-two-title">Mission Control</h1>
+      <p class="flow-two-subtitle">Manage every detail of your event.</p>
+    </div>
+    @if (plan()) {
+      <button class="btn-danger" type="button" (click)="askDelete()">Delete event</button>
+    }
   </header>
 
   @if (loadError()) {
@@ -19,10 +24,22 @@
         class="flow-two-tab"
         [routerLink]="tab.path"
         routerLinkActive="is-active"
-      >{{ tab.label }}</a>
+      ><img class="icon" [src]="'/icons/' + tab.icon + '.svg'" alt="" /> {{ tab.label }}</a>
     }
   </nav>
   <section class="flow-two-body">
     <router-outlet />
   </section>
+
+  <app-confirm-dialog
+    heading="Delete event?"
+    [open]="confirmingDelete()"
+    [busy]="deleting()"
+    [error]="deleteError()"
+    (confirm)="confirmDelete()"
+    (cancel)="confirmingDelete.set(false)"
+  >
+    Are you sure you want to delete <strong>{{ plan()?.name ?? 'Untitled event' }}</strong>?
+    This can't be undone.
+  </app-confirm-dialog>
 </div>

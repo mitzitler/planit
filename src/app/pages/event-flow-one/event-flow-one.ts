@@ -8,7 +8,7 @@ import { ActivitiesCardComponent } from './activities-card/activities-card';
 interface Card {
   id: 'size' | 'place' | 'activities' | 'cost' | 'extras';
   label: string;
-  icon: string;
+  icon: string; // file name in public/icons
 }
 
 @Component({
@@ -27,11 +27,11 @@ export class EventFlowOneComponent implements OnInit {
   activeCardIndex = -1;
 
   cards: Card[] = [
-    { id: 'size',       label: 'SIZE',       icon: '👥' },
-    { id: 'place',      label: 'PLACE',      icon: '🏠' },
-    { id: 'activities', label: 'ACTIVITIES', icon: '🎲' },
-    { id: 'cost',       label: 'COST',       icon: '💰' },
-    { id: 'extras',     label: 'EXTRAS',     icon: '💬' },
+    { id: 'size',       label: 'SIZE',       icon: 'people'     },
+    { id: 'place',      label: 'PLACE',      icon: 'place'      },
+    { id: 'activities', label: 'ACTIVITIES', icon: 'activities' },
+    { id: 'cost',       label: 'COST',       icon: 'money'      },
+    { id: 'extras',     label: 'EXTRAS',     icon: 'wormhole'   },
   ];
 
   // The cards read the plan when they open, so they're only shown once it has loaded

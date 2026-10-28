@@ -42,6 +42,12 @@ export class EventsService {
     return data.id;
   }
 
+  // Agent run logs are kept; their event_id is cleared by the foreign key
+  async delete(id: string): Promise<void> {
+    const { error } = await this.supabase.client.from('events').delete().eq('id', id);
+    if (error) throw error;
+  }
+
   async savePlan(id: string, plan: Plan): Promise<void> {
     const { error } = await this.supabase.client.from('events').update({ plan }).eq('id', id);
     if (error) throw error;

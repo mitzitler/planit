@@ -32,7 +32,7 @@
 
       @if (activeCardIndex !== i) {
         <div class="card-collapsed-content">
-          <span class="card-icon">{{ card.icon }}</span>
+          <span class="card-icon"><img class="icon" [src]="'/icons/' + card.icon + '.svg'" alt="" /></span>
           <span class="card-label-vertical">{{ card.label }}</span>
         </div>
       }

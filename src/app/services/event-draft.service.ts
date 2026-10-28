@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { getSizeBucket } from './decision-tree';
 import { EventsService } from './events.service';
-import type { Plan } from '../shared/plan';
+import { applyTool, type Plan } from '../shared/plan';
 
 // The plan the step-by-step wizard is editing. Each choice is saved to the event's row straight away,
 // so the assistant in Mission Control sees it and the plan survives a reload or another device.
@@ -37,6 +37,17 @@ export class EventDraftService {
       const fits = plan.guestCount !== null && getSizeBucket(plan.guestCount)?.label === label;
       return fits ? { ...plan, size: label } : { ...plan, size: label, guestCount: null, guests: undefined };
     });
+  }
+
+  // A hard head count. Goes through set_basics so the size bucket is derived the same way the
+  // assistant's changes are. Returns an error message for an invalid number.
+  setExactGuests(count: number): string | null {
+    const current = this.plan();
+    if (!current) return null;
+    const result = applyTool(current, 'set_basics', { guests: { exact: count } });
+    if (!result.ok) return 'Enter a whole number of guests, 1 or more.';
+    this.update(() => result.plan);
+    return null;
   }
 
   setPlaces(ids: string[]): void {

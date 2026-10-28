@@ -72,6 +72,14 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
   letter-spacing: -0.02em;
 }
 
+/* Illustrated icons from public/icons; they size to the surrounding font size */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+}
+
 .nav-logo-icon { font-size: 1.6rem; }
 .nav-logo-text { color: var(--color-text); font-family: var(--font-title); }
 
@@ -87,7 +95,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 
 /* ── Buttons ───────────────────────────────────────────────── */
 .btn-primary,
-.btn-secondary {
+.btn-secondary,
+.btn-danger {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -112,6 +121,10 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
   border: 1px solid var(--color-border);
 }
 .btn-secondary:hover { color: var(--color-text); border-color: var(--color-text-muted); }
+
+.btn-danger { background: #dc2626; color: #fff; }
+.btn-danger:hover { background: #ef4444; }
+.btn-danger:disabled, .btn-secondary:disabled { opacity: 0.6; cursor: wait; }
 
 .btn-large { padding: 0.85rem 2rem; font-size: 1.05rem; border-radius: var(--radius-md); }
 
@@ -417,7 +430,14 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 /* ── Event Flow 2 ──────────────────────────────────────────── */
 .flow-two-shell { max-width: 900px; margin: 0 auto; }
 
-.flow-two-header { margin-bottom: 1.5rem; }
+.flow-two-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
 
 .flow-two-title { font-size: 2rem; font-weight: 800; }
 

@@ -1,10 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { EventsService, type EventRow } from '../../services/events.service';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, ConfirmDialogComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -16,6 +17,11 @@ export class DashboardComponent implements OnInit {
   loading = signal(true);
   creating = signal(false);
   errorMessage = signal('');
+
+  // The event waiting on "Are you sure?", if any
+  pendingDelete = signal<EventRow | null>(null);
+  deleting = signal(false);
+  deleteError = signal('');
 
   async ngOnInit() {
     try {
@@ -38,6 +44,26 @@ export class DashboardComponent implements OnInit {
     } catch {
       this.errorMessage.set('Could not create the event. Try again.');
       this.creating.set(false);
+    }
+  }
+
+  askDelete(event: EventRow) {
+    this.deleteError.set('');
+    this.pendingDelete.set(event);
+  }
+
+  async confirmDelete() {
+    const event = this.pendingDelete();
+    if (!event) return;
+    this.deleting.set(true);
+    try {
+      await this.eventsService.delete(event.id);
+      this.events.update(events => events.filter(e => e.id !== event.id));
+      this.pendingDelete.set(null);
+    } catch {
+      this.deleteError.set('Could not delete the event. Try again.');
+    } finally {
+      this.deleting.set(false);
     }
   }
 

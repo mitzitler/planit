@@ -46,3 +46,5 @@
   font-size: 0.72rem;
   color: rgba(0, 0, 0, 0.6);
 }
+
+.card-error { color: #fca5a5; }

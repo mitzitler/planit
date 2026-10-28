@@ -1,9 +1,9 @@
 // Runs one real agent turn against the Claude API, without Supabase or the browser.
 // Usage: npx tsx --env-file=.env.local scripts/agent-smoke.mts "birthday for 12 at my place, $300"
-// Costs a few cents per run.
+// Start from a saved plan with PLAN='{"places":["home-my"]}'. Costs a few cents per run.
 import Anthropic from '@anthropic-ai/sdk';
 import { AGENT_MODEL, SYSTEM_PROMPT, runAgent, type CallModel } from '../src/app/shared/agent';
-import { PLAN_TOOLS, emptyPlan } from '../src/app/shared/plan';
+import { PLAN_TOOLS, normalizePlan } from '../src/app/shared/plan';
 
 const anthropic = new Anthropic();
 
@@ -30,7 +30,7 @@ const prompt = process.argv[2] ?? 'Birthday for 12 at my place next Saturday, bo
 const started = Date.now();
 const run = await runAgent({
   callModel,
-  plan: emptyPlan(),
+  plan: normalizePlan(process.env['PLAN'] ? JSON.parse(process.env['PLAN']) : null),
   history: [],
   userText: prompt,
   today: new Date().toISOString().slice(0, 10),

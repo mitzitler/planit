@@ -40,12 +40,6 @@
     </div>
   }
 </div>
-<p class="card-copy">
-  knowing the type of venue will help specify planning opportunities, and avoid possible pitfalls!
-  of course, if you have <strong>anything specific in mind:</strong>
-</p>
-<input class="card-input" type="text" placeholder="specific venue name or address" [(ngModel)]="specificVenue" />
-
 <h3 class="card-question formality-question">how dressed up is it?</h3>
 <div class="formality-scale" role="radiogroup" aria-label="Formality">
   @for (level of formalityLevels; track level.id) {
@@ -60,3 +54,9 @@
     >{{ level.label }}</button>
   }
 </div>
+<p class="card-copy">
+  knowing the type of venue will help specify planning opportunities, and avoid possible pitfalls!
+  of course, if you have <strong>anything specific in mind:</strong>
+</p>
+<input class="card-input" type="text" placeholder="specific venue name or address" [(ngModel)]="specificVenue" />
+

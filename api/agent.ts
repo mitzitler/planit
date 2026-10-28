@@ -5,7 +5,8 @@
 // Response: newline-delimited JSON AgentEvents (src/app/shared/agent.ts), streamed.
 //
 // Reads and saves the event as the user, so row-level security applies. Only the agent_runs
-// log uses the service-role key, because users can't write that table.
+// log uses the service-role key, because users can't write that table. Each user gets
+// RUNS_PER_DAY runs per rolling 24 hours, counted from that log.
 //
 // Env: ANTHROPIC_KEY (or ANTHROPIC_API_KEY), SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 import Anthropic from '@anthropic-ai/sdk';
@@ -16,6 +17,7 @@ import { PLAN_TOOLS, normalizePlan } from '../src/app/shared/plan';
 
 const MAX_MESSAGE_CHARS = 2000;
 const MAX_HISTORY_BYTES = 200_000; // the whole history is resent (and billed) on every call
+const RUNS_PER_DAY = 20; // per user, over the last 24 hours, to keep API spend bounded
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -76,6 +78,18 @@ export async function POST(request: Request): Promise<Response> {
   if (!Array.isArray(history)) return json(400, { error: 'history must be an array.' });
   if (JSON.stringify(history).length > MAX_HISTORY_BYTES) {
     return json(413, { error: 'This conversation is too long. Reload the page to start a new one.' });
+  }
+
+  // ── Daily limit, counted from the run log (RLS lets users read only their own rows) ──
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count, error: countError } = await db
+    .from('agent_runs')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .gte('created_at', since);
+  if (countError) return json(500, { error: 'Could not check your assistant usage. Try again.' });
+  if ((count ?? 0) >= RUNS_PER_DAY) {
+    return json(429, { error: `You've used the assistant ${RUNS_PER_DAY} times today. Try again tomorrow.` });
   }
 
   // ── Their event (RLS returns nothing for someone else's) ──

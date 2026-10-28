@@ -22,6 +22,7 @@ An event planning app built to help users organize, budget, and communicate arou
 
 ### Design
 - **Figma** — UI/UX design and flow mockups
+- **Icons** — the SVGs in `public/icons/` are from Moonpunch Studio's [Sci-Fi Icons](https://moonpunchstudio.itch.io/scifi-icons) pack on itch.io
 
 ### AI Assistance
 - **Claude (Anthropic)** — used throughout development for code generation, architecture decisions, and iterative UI building via [Claude Code](https://claude.ai/code)
@@ -47,8 +48,11 @@ Build artifacts go to `dist/`.
 ## Testing
 
 ```bash
-ng test
+ng test          # unit tests
+npm run eval     # agent eval against the real model (about $0.65)
 ```
+
+See [TESTING.md](TESTING.md) for what each layer covers and how the agent eval works.
 
 ## Project Structure
 

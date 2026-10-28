@@ -9,7 +9,8 @@
     "test": "ng test",
     "prestart": "node scripts/write-env.mjs",
     "prebuild": "node scripts/write-env.mjs",
-    "pretest": "node scripts/write-env.mjs"
+    "pretest": "node scripts/write-env.mjs",
+    "eval": "tsx --env-file=.env.local scripts/agent-eval.mts"
   },
   "prettier": {
     "printWidth": 100,
@@ -42,6 +43,7 @@
     "@angular/cli": "^21.1.4",
     "@angular/compiler-cli": "^21.1.0",
     "jsdom": "^27.1.0",
+    "tsx": "^4.23.15",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }

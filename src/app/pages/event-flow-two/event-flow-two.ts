@@ -3,12 +3,13 @@ import { RouterOutlet, RouterLink, RouterLinkActive, ActivatedRoute, Router } fr
 import { AgentChatComponent } from './agent-chat/agent-chat';
 import { PlanCardComponent } from './plan-card/plan-card';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { PlanBarComponent } from '../../components/plan-bar/plan-bar';
 import { EventsService } from '../../services/events.service';
-import type { Plan } from '../../shared/plan';
+import { applyTool, type Plan } from '../../shared/plan';
 
 @Component({
   selector: 'app-event-flow-two',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, AgentChatComponent, PlanCardComponent, ConfirmDialogComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, AgentChatComponent, PlanCardComponent, ConfirmDialogComponent, PlanBarComponent],
   templateUrl: './event-flow-two.html',
   styleUrl: './event-flow-two.css',
 })
@@ -21,6 +22,7 @@ export class EventFlowTwoComponent implements OnInit {
   plan = signal<Plan | null>(null);
   loadError = signal('');
 
+  renameError = signal('');
   confirmingDelete = signal(false);
   deleting = signal(false);
   deleteError = signal('');
@@ -38,6 +40,21 @@ export class EventFlowTwoComponent implements OnInit {
       else this.loadError.set('This event doesn’t exist, or it belongs to another account.');
     } catch {
       this.loadError.set('Could not load this event. Refresh to try again.');
+    }
+  }
+
+  async rename(name: string) {
+    const current = this.plan();
+    if (!current) return;
+    const result = applyTool(current, 'set_basics', { name });
+    if (!result.ok) return;
+    this.plan.set(result.plan);
+    this.renameError.set('');
+    try {
+      await this.eventsService.savePlan(this.eventId, result.plan);
+    } catch {
+      this.plan.set(current);
+      this.renameError.set("Couldn't save the new name. Try again.");
     }
   }
 

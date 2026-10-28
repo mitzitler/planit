@@ -1,32 +1,7 @@
-/* Local nav */
-.local-nav {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
+/* Plan bar: same height and margins as the old local nav, so the cards' height calc still fits */
+.wizard-bar {
+  display: block;
   margin: 0.75rem 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-.local-nav-text {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 0.02em;
-}
-
-.local-nav-event-name {
-  color: #f87171;
-  font-style: italic;
-}
-
-.local-nav-spaced {
-  letter-spacing: 0.3em;
-  color: rgba(255, 255, 255, 0.9);
-  font-family: var(--font-title);
 }
 
 /* Cards container */

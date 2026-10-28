@@ -1,4 +1,11 @@
 <div class="flow-two-shell">
+  @if (plan(); as plan) {
+    <app-plan-bar class="flow-two-bar" mode="agent" [eventId]="eventId" [name]="plan.name" (rename)="rename($event)" />
+  }
+  @if (renameError()) {
+    <p class="flow-two-error" role="alert">{{ renameError() }}</p>
+  }
+
   <header class="flow-two-header">
     <div>
       <h1 class="flow-two-title">Mission Control</h1>

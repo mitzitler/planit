@@ -50,6 +50,13 @@ export class EventDraftService {
     return null;
   }
 
+  setName(name: string): void {
+    const current = this.plan();
+    if (!current) return;
+    const result = applyTool(current, 'set_basics', { name });
+    if (result.ok) this.update(() => result.plan);
+  }
+
   setPlaces(ids: string[]): void {
     this.update(plan => ({ ...plan, places: ids }));
   }

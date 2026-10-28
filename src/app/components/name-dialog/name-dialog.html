@@ -1,0 +1,27 @@
+<dialog #dialog class="name-dialog" aria-labelledby="name-dialog-title" (cancel)="onEscape($event)" (click)="onClick($event)">
+  <form class="name-body" (submit)="submit($event)">
+    <h2 id="name-dialog-title" class="name-title">Name your event</h2>
+    <label class="name-label" for="name-dialog-input">Event name <span aria-hidden="true">*</span></label>
+    <input
+      id="name-dialog-input"
+      class="name-input"
+      type="text"
+      required
+      autofocus
+      autocomplete="off"
+      placeholder="e.g. Sam's 30th"
+      [attr.maxlength]="maxLength"
+      [value]="name()"
+      (input)="name.set($any($event.target).value)"
+    />
+    @if (error()) {
+      <p class="name-error" role="alert">{{ error() }}</p>
+    }
+    <div class="name-actions">
+      <button class="btn-secondary" type="button" [disabled]="busy()" (click)="cancel.emit()">Cancel</button>
+      <button class="btn-primary" type="submit" [disabled]="busy() || !name().trim()">
+        {{ busy() ? 'Creating…' : 'Create event' }}
+      </button>
+    </div>
+  </form>
+</dialog>

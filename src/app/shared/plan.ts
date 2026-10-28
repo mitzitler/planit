@@ -102,6 +102,16 @@ export function guestConflict(guests: GuestCounts | undefined): string | null {
   return null;
 }
 
+// ── Names ────────────────────────────────────────────────────
+
+export const EVENT_NAME_MAX = 80;
+
+// Trims and collapses runs of whitespace. Angular escapes names when it shows them, so this is
+// about tidiness, not safety.
+function cleanName(name: string): string {
+  return name.trim().replace(/\s+/g, ' ');
+}
+
 // ── Selectable ids ───────────────────────────────────────────
 
 // The wizard lets users pick every option below the top-level categories
@@ -144,7 +154,7 @@ export const PLAN_TOOLS = [
     input_schema: {
       type: 'object',
       properties: {
-        name: { type: 'string', description: 'Short event name, e.g. "Sam\'s 30th".' },
+        name: { type: 'string', maxLength: EVENT_NAME_MAX, description: 'Short event name, e.g. "Sam\'s 30th".' },
         date: { type: 'string', description: 'Event date as YYYY-MM-DD.' },
         guests: {
           type: 'object',
@@ -257,7 +267,9 @@ function setBasics(plan: Plan, input: Input): ToolResult {
 
   if (name !== undefined) {
     if (!isNonEmptyString(name)) return fail('name must be a non-empty string.');
-    next.name = name.trim();
+    const cleaned = cleanName(name);
+    if (cleaned.length > EVENT_NAME_MAX) return fail(`name must be at most ${EVENT_NAME_MAX} characters.`);
+    next.name = cleaned;
   }
   if (date !== undefined) {
     if (!isValidDate(date)) return fail(`date must be a real date as YYYY-MM-DD; got ${JSON.stringify(date)}.`);

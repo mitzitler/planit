@@ -110,6 +110,13 @@ describe('set_basics guests', () => {
   });
 });
 
+describe('set_basics name', () => {
+  it('tidies whitespace and caps the length', () => {
+    expect(expectOk(applyTool(emptyPlan(), 'set_basics', { name: '  Sam\'s   30th \n' })).name).toBe("Sam's 30th");
+    expectError(applyTool(emptyPlan(), 'set_basics', { name: 'x'.repeat(81) }));
+  });
+});
+
 describe('set_basics formality', () => {
   it('stores a guess, then a confirmed level, leaving other fields alone', () => {
     const named = expectOk(applyTool(emptyPlan(), 'set_basics', { name: 'Pizza night' }));

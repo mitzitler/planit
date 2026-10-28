@@ -3,7 +3,14 @@
   display: contents;
 }
 
-/* Place tree */
+/* Each question and its options; the card's own gap separates the sections */
+.place-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Place tree: one spacing step (0.4rem) between every row and chip */
 .place-tree {
   display: flex;
   flex-direction: column;
@@ -13,7 +20,7 @@
 .place-cat {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.4rem;
 }
 
 .place-cat-header {
@@ -47,15 +54,15 @@
 .place-chips {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.15rem 0 0.15rem 0.75rem;
+  gap: 0.4rem;
+  padding-left: 0.75rem;
 }
 
 .place-chip-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .place-chip-btn {
@@ -101,7 +108,7 @@
 .place-subchips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.4rem;
   width: 100%;
   padding-left: 0.4rem;
 }
@@ -112,5 +119,5 @@
 .formality-scale {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }

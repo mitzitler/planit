@@ -1,12 +1,10 @@
-<!-- Local nav bar -->
-<div class="local-nav">
-  <span class="local-nav-text">
-    lets work on...
-    <span class="local-nav-event-name">{{ draftService.snapshot$()?.name ?? 'event name' }}</span>
-    ...
-    <span class="local-nav-spaced">S P A C E !</span>
-  </span>
-</div>
+<app-plan-bar
+  class="wizard-bar"
+  mode="manual"
+  [eventId]="eventId"
+  [name]="draftService.snapshot$()?.name ?? null"
+  (rename)="draftService.setName($event)"
+/>
 
 @if (loadError(); as error) {
   <p class="wizard-message">{{ error }} <a routerLink="/dashboard">Back to your events</a></p>

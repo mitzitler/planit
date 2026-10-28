@@ -2,10 +2,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { EventsService, type EventRow } from '../../services/events.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, ConfirmDialogComponent],
+  imports: [RouterLink, ConfirmDialogComponent, NameDialogComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -17,6 +18,10 @@ export class DashboardComponent implements OnInit {
   loading = signal(true);
   creating = signal(false);
   errorMessage = signal('');
+
+  // Where the new event opens once the name popup is filled in; null while the popup is closed
+  pendingCreate = signal<'manage' | 'plan' | null>(null);
+  createError = signal('');
 
   // The event waiting on "Are you sure?", if any
   pendingDelete = signal<EventRow | null>(null);
@@ -33,16 +38,22 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Creates an empty event and opens it in Mission Control (where the assistant fills it in)
-  // or in the step-by-step wizard
-  async createEvent(open: 'manage' | 'plan' = 'manage') {
+  // Both create buttons ask for a name first, then open the event in Mission Control
+  // (where the assistant fills it in) or in the step-by-step wizard
+  askName(open: 'manage' | 'plan') {
+    this.createError.set('');
+    this.pendingCreate.set(open);
+  }
+
+  async createEvent(name: string) {
+    const open = this.pendingCreate();
+    if (!open) return;
     this.creating.set(true);
-    this.errorMessage.set('');
     try {
-      const id = await this.eventsService.create();
+      const id = await this.eventsService.create(name);
       this.router.navigate(['/events', id, open]);
     } catch {
-      this.errorMessage.set('Could not create the event. Try again.');
+      this.createError.set('Could not create the event. Try again.');
       this.creating.set(false);
     }
   }

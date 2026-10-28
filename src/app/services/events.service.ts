@@ -32,10 +32,10 @@ export class EventsService {
     return data && toRow(data);
   }
 
-  async create(): Promise<string> {
+  async create(name: string): Promise<string> {
     const { data, error } = await this.supabase.client
       .from('events')
-      .insert({ plan: emptyPlan() })
+      .insert({ plan: { ...emptyPlan(), name } })
       .select('id')
       .single();
     if (error) throw error;

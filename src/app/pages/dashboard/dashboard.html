@@ -4,8 +4,8 @@
       <h1 class="dashboard-title">Welcome back, Astronaut. <img class="icon" src="/icons/radar.svg" alt="" /></h1>
       <p class="dashboard-subtitle">Pick up where you left off, or launch something new.</p>
     </div>
-    <button class="btn-primary btn-large" type="button" (click)="createEvent()" [disabled]="creating()">
-      {{ creating() ? 'Creating…' : 'Create event' }}
+    <button class="btn-primary btn-large" type="button" (click)="askName('manage')" [disabled]="creating()">
+      Create event
     </button>
   </header>
 
@@ -19,7 +19,7 @@
     <div class="event-grid">
 
       <!-- Step-by-step wizard -->
-      <button class="event-card event-card--new" type="button" [disabled]="creating()" (click)="createEvent('plan')">
+      <button class="event-card event-card--new" type="button" [disabled]="creating()" (click)="askName('plan')">
         <span class="event-card-new-icon"><img class="icon" src="/icons/jetpack.svg" alt="" /></span>
         <span class="event-card-new-label">Plan step by step</span>
       </button>
@@ -51,6 +51,14 @@
       <p class="dashboard-empty">No events yet. Create one and tell the assistant what you have in mind.</p>
     }
   </section>
+
+  <app-name-dialog
+    [open]="pendingCreate() !== null"
+    [busy]="creating()"
+    [error]="createError()"
+    (save)="createEvent($event)"
+    (cancel)="pendingCreate.set(null)"
+  />
 
   <app-confirm-dialog
     heading="Delete event?"

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase';
-import { emptyPlan, normalizePlan, type Plan } from '../shared/plan';
+import { applyTool, emptyPlan, normalizePlan, type Plan } from '../shared/plan';
 
 export interface EventRow {
   id: string;
@@ -32,10 +32,13 @@ export class EventsService {
     return data && toRow(data);
   }
 
+  // The name goes through set_basics, so it's tidied the same way as a rename
   async create(name: string): Promise<string> {
+    const named = applyTool(emptyPlan(), 'set_basics', { name });
+    if (!named.ok) throw new Error(named.error);
     const { data, error } = await this.supabase.client
       .from('events')
-      .insert({ plan: { ...emptyPlan(), name } })
+      .insert({ plan: named.plan })
       .select('id')
       .single();
     if (error) throw error;

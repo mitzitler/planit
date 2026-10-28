@@ -13,6 +13,7 @@
       [attr.maxlength]="maxLength"
       [value]="name()"
       (input)="name.set($any($event.target).value)"
+      (keydown.enter)="submit($event)"
     />
     @if (error()) {
       <p class="name-error" role="alert">{{ error() }}</p>

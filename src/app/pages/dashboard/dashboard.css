@@ -9,7 +9,6 @@
   margin-top: 1.25rem;
 }
 
-.btn-primary:disabled { opacity: 0.6; cursor: wait; }
 
 /* Event cards with a delete button in the corner */
 .event-card-shell { position: relative; display: grid; }

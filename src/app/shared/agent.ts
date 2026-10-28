@@ -17,6 +17,9 @@ export const MAX_ROUNDS = 6; // model calls per user message
 
 export type AgentEvent =
   | { type: 'text'; delta: string }
+  // A new model call is starting after tool calls. Its text replaces the reply so far,
+  // so notes Claude writes before calling tools don't end up in front of the real answer.
+  | { type: 'round' }
   | { type: 'plan'; plan: Plan }
   // `messages` is this exchange in API form. The browser appends it to its history unchanged
   // and sends it back next time: the thinking blocks inside are only valid if nothing is edited.
@@ -45,6 +48,8 @@ export const SYSTEM_PROMPT = `You are Planit's event-planning assistant. You hel
 
 How to work:
 - Make the changes the user asks for with the tools, then reply in one to three short sentences saying what you changed. Plain text, no markdown, no emoji.
+- Don't write anything before or between tool calls. The user only sees your final reply.
+- In replies, write times the way people say them ("7pm", "8:30pm") and dates like "Saturday, October 31".
 - Places and activities must be ids from the lists below. If nothing fits what the user wants, say so and suggest the closest options rather than picking one silently.
 - choose_places and choose_activities replace the whole list, so include the ids already in the plan that should stay.
 - Dates are YYYY-MM-DD and times are 24-hour HH:MM. Work out relative dates ("next Saturday") from today's date, which is given with each message.
@@ -99,6 +104,7 @@ export async function runAgent(input: AgentRunInput): Promise<AgentRunResult> {
   const result = { stopReason: 'max_rounds', rounds: 0, toolCalls: 0, inputTokens: 0, outputTokens: 0 };
 
   while (result.rounds < maxRounds) {
+    if (result.rounds > 0) emit({ type: 'round' });
     result.rounds++;
     const response = await callModel([...history, ...messages], delta => emit({ type: 'text', delta }));
 

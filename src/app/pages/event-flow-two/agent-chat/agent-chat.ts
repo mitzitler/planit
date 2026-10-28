@@ -48,11 +48,18 @@ export class AgentChatComponent {
     this.lines.update(lines => [...lines, { role: 'user', text: message }, { role: 'assistant', text: '' }]);
     this.scrollToEnd();
 
+    // Set when a new round starts: its first words replace the reply so far
+    let replaceReply = false;
+
     try {
       for await (const event of this.agent.send(this.eventId(), message, this.history)) {
         switch (event.type) {
           case 'text':
-            this.appendToReply(event.delta);
+            this.appendToReply(event.delta, replaceReply);
+            replaceReply = false;
+            break;
+          case 'round':
+            replaceReply = true;
             break;
           case 'plan':
             this.planChange.emit(event.plan);
@@ -83,10 +90,11 @@ export class AgentChatComponent {
     }
   }
 
-  private appendToReply(delta: string) {
+  private appendToReply(delta: string, replace: boolean) {
     this.lines.update(lines => {
       const last = lines.at(-1)!;
-      return [...lines.slice(0, -1), { ...last, text: last.text + delta }];
+      const text = replace ? delta : last.text + delta;
+      return [...lines.slice(0, -1), { ...last, text }];
     });
     this.scrollToEnd();
   }

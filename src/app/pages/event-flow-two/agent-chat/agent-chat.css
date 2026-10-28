@@ -20,6 +20,7 @@
 }
 
 .chat-line {
+  align-self: flex-start;
   max-width: 85%;
   padding: 0.55rem 0.85rem;
   border-radius: var(--radius-md);

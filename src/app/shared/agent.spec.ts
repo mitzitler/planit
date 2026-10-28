@@ -61,6 +61,9 @@ describe('runAgent', () => {
     expect(r.inputTokens).toBe(300); // uncached + cache reads, both rounds
     expect(events.filter(e => e.type === 'plan')).toHaveLength(2);
     expect(events).toContainEqual({ type: 'text', delta: 'Done.' });
+    // One round marker, before the second call's text
+    expect(events.filter(e => e.type === 'round')).toHaveLength(1);
+    expect(events.findIndex(e => e.type === 'round')).toBeLessThan(events.findIndex(e => e.type === 'text'));
 
     // Both tool results go back in one message
     const toolResults = calls[1][2];

@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { EventDraftService } from '../../services/event-draft.service';
 import { SizeCardComponent } from './size-card/size-card';
 import { PlaceCardComponent } from './place-card/place-card';
 import { ActivitiesCardComponent } from './activities-card/activities-card';
@@ -11,11 +13,17 @@ interface Card {
 
 @Component({
   selector: 'app-event-flow-one',
-  imports: [SizeCardComponent, PlaceCardComponent, ActivitiesCardComponent],
+  imports: [RouterLink, SizeCardComponent, PlaceCardComponent, ActivitiesCardComponent],
   templateUrl: './event-flow-one.html',
   styleUrl: './event-flow-one.css',
 })
-export class EventFlowOneComponent {
+export class EventFlowOneComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  draftService = inject(EventDraftService);
+
+  eventId = this.route.snapshot.paramMap.get('id')!;
+  loaded = signal(false);
+  loadError = signal('');
   activeCardIndex = -1;
 
   cards: Card[] = [
@@ -25,6 +33,16 @@ export class EventFlowOneComponent {
     { id: 'cost',       label: 'COST',       icon: '💰' },
     { id: 'extras',     label: 'EXTRAS',     icon: '💬' },
   ];
+
+  // The cards read the plan when they open, so they're only shown once it has loaded
+  async ngOnInit() {
+    try {
+      if (await this.draftService.load(this.eventId)) this.loaded.set(true);
+      else this.loadError.set("This event doesn't exist, or it isn't yours.");
+    } catch {
+      this.loadError.set('Could not load this event. Refresh to try again.');
+    }
+  }
 
   // ── Card layout ───────────────────────────────────────────────
   setActiveCard(index: number): void {

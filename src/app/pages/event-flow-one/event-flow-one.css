@@ -130,3 +130,12 @@
   animation-delay: 0.35s;
   opacity: 0;
 }
+
+.wizard-message {
+  max-width: 40rem;
+  margin: 1rem auto;
+  padding: 0 1rem;
+  color: #fca5a5;
+}
+
+.wizard-message a { color: inherit; }

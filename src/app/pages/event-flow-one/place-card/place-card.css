@@ -105,3 +105,12 @@
   width: 100%;
   padding-left: 0.4rem;
 }
+
+/* Formality */
+.formality-question { font-size: 1rem; }
+
+.formality-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}

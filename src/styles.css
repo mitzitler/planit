@@ -384,12 +384,14 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 .event-card--new {
   align-items: center;
   justify-content: center;
+  font: inherit; /* it's a button */
   border-style: dashed;
   color: var(--color-text-muted);
   min-height: 140px;
 }
 
 .event-card--new:hover { color: var(--color-text); }
+.event-card--new:disabled { cursor: progress; opacity: 0.6; }
 
 .event-card-new-icon { font-size: 2rem; }
 .event-card-new-label { font-weight: 600; font-size: 0.95rem; }

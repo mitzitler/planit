@@ -2,13 +2,21 @@
 <div class="local-nav">
   <span class="local-nav-text">
     lets work on...
-    <span class="local-nav-event-name">event name</span>
+    <span class="local-nav-event-name">{{ draftService.snapshot$()?.name ?? 'event name' }}</span>
     ...
     <span class="local-nav-spaced">S P A C E !</span>
   </span>
 </div>
 
+@if (loadError(); as error) {
+  <p class="wizard-message">{{ error }} <a routerLink="/dashboard">Back to your events</a></p>
+}
+@if (draftService.saveError(); as error) {
+  <p class="wizard-message" role="alert">{{ error }}</p>
+}
+
 <!-- 5-card layout -->
+@if (loaded()) {
 <div class="cards-container">
   @for (card of cards; track card.id; let i = $index) {
     <div
@@ -61,3 +69,4 @@
     </div>
   }
 </div>
+}

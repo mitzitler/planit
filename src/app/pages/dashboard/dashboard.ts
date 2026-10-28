@@ -27,13 +27,14 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Creates an empty event and opens it in Mission Control, where the assistant fills it in
-  async createEvent() {
+  // Creates an empty event and opens it in Mission Control (where the assistant fills it in)
+  // or in the step-by-step wizard
+  async createEvent(open: 'manage' | 'plan' = 'manage') {
     this.creating.set(true);
     this.errorMessage.set('');
     try {
       const id = await this.eventsService.create();
-      this.router.navigate(['/events', id, 'manage']);
+      this.router.navigate(['/events', id, open]);
     } catch {
       this.errorMessage.set('Could not create the event. Try again.');
       this.creating.set(false);

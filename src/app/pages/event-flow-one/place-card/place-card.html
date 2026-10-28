@@ -45,3 +45,18 @@
   of course, if you have <strong>anything specific in mind:</strong>
 </p>
 <input class="card-input" type="text" placeholder="specific venue name or address" [(ngModel)]="specificVenue" />
+
+<h3 class="card-question formality-question">how dressed up is it?</h3>
+<div class="formality-scale" role="radiogroup" aria-label="Formality">
+  @for (level of formalityLevels; track level.id) {
+    <button
+      class="place-chip-btn"
+      type="button"
+      role="radio"
+      [attr.aria-checked]="selectedFormality() === level.id"
+      [class.is-selected]="selectedFormality() === level.id"
+      [title]="level.feelsLike"
+      (click)="selectFormality(level.id)"
+    >{{ level.label }}</button>
+  }
+</div>

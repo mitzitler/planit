@@ -41,6 +41,11 @@ export class EventsService {
     if (error) throw error;
     return data.id;
   }
+
+  async savePlan(id: string, plan: Plan): Promise<void> {
+    const { error } = await this.supabase.client.from('events').update({ plan }).eq('id', id);
+    if (error) throw error;
+  }
 }
 
 function toRow(row: { id: string; plan: Partial<Plan> | null; updated_at: string }): EventRow {

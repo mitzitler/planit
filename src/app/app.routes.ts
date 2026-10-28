@@ -19,8 +19,8 @@ export const routes: Routes = [
   // Protected routes — require a valid session
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
 
-  // Event Flow 1 — event specification (5-card layout)
-  { path: 'events/new', component: EventFlowOneComponent, canActivate: [authGuard] },
+  // Event Flow 1 — event specification (5-card layout), saved into the event as you go
+  { path: 'events/:id/plan', component: EventFlowOneComponent, canActivate: [authGuard] },
 
   // Event Flow 2 — management tools
   {

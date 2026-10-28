@@ -19,10 +19,10 @@
     <div class="event-grid">
 
       <!-- Step-by-step wizard -->
-      <a class="event-card event-card--new" routerLink="/events/new">
+      <button class="event-card event-card--new" type="button" [disabled]="creating()" (click)="createEvent('plan')">
         <span class="event-card-new-icon">🚀</span>
         <span class="event-card-new-label">Plan step by step</span>
-      </a>
+      </button>
 
       @for (event of events(); track event.id) {
         <a class="event-card" [routerLink]="['/events', event.id, 'manage']">

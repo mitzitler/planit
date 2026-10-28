@@ -465,7 +465,49 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
   border-bottom: 2px solid var(--color-primary);
 }
 
-/* Mission Control tabs (Budget, Calendar): shared layout for the summary, item lists and add forms */
+/* Event cards: shared question, copy and input styles (used by the Flow One card components) */
+.card-question {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+}
+
+.card-subquestion {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: -0.75rem 0 0;
+}
+
+.card-copy {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+}
+
+.card-copy strong {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.card-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  outline: none;
+  width: 100%;
+  max-width: 320px;
+  transition: border-color 0.15s;
+}
+
+.card-input:focus { border-color: rgba(255, 255, 255, 0.5); }
+.card-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+
+/* Mission Control tabs (Budget, Calendar): shared layout for the summary, item lists and add forms.
+   After .card-input, so the field widths here win. */
 .tool { display: grid; gap: 1.25rem; font-size: 0.9rem; }
 
 .tool-summary {
@@ -513,44 +555,3 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 
 .tool-remove:hover { color: #fca5a5; border-color: #fca5a5; }
 .tool-remove:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* Event cards: shared question, copy and input styles (used by the Flow One card components) */
-.card-question {
-  font-family: var(--font-title);
-  font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
-}
-
-.card-subquestion {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: -0.75rem 0 0;
-}
-
-.card-copy {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
-}
-
-.card-copy strong {
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.card-input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 0.6rem 1rem;
-  color: white;
-  font-size: 0.9rem;
-  font-family: var(--font-body);
-  outline: none;
-  width: 100%;
-  max-width: 320px;
-  transition: border-color 0.15s;
-}
-
-.card-input:focus { border-color: rgba(255, 255, 255, 0.5); }
-.card-input::placeholder { color: rgba(255, 255, 255, 0.35); }

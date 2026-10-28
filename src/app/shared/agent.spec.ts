@@ -1,6 +1,6 @@
 import type { BetaMessage, BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
 import { SYSTEM_PROMPT, runAgent, type AgentEvent, type CallModel } from './agent';
-import { SELECTABLE_ACTIVITY_IDS, SELECTABLE_PLACE_IDS, emptyPlan } from './plan';
+import { FORMALITY_IDS, SELECTABLE_ACTIVITY_IDS, SELECTABLE_PLACE_IDS, emptyPlan } from './plan';
 
 // Minimal stand-ins for API responses: only the fields the loop reads
 type Block = { type: 'text'; text: string } | { type: 'tool_use'; id: string; name: string; input: unknown };
@@ -46,7 +46,7 @@ describe('runAgent', () => {
   it('applies tool calls, streams plan updates, and stops on end_turn', async () => {
     const { result, events, calls } = run([
       reply('tool_use', [
-        toolUse('t1', 'set_basics', { guestCount: 12 }),
+        toolUse('t1', 'set_basics', { guests: { min: 8, max: 12 } }),
         toolUse('t2', 'choose_places', { ids: ['home-my'] }),
       ]),
       reply('end_turn', [{ type: 'text', text: 'Done.' }]),
@@ -96,6 +96,16 @@ describe('runAgent', () => {
     expect(r.plan.budget).toHaveLength(6);
   });
 
+  it('tells the model about a guest clash in the tool result', async () => {
+    const { result, calls } = run([
+      reply('tool_use', [toolUse('t1', 'set_basics', { guests: { min: 19, preferred: 15 } })]),
+      reply('end_turn', [{ type: 'text', text: 'Heads up.' }]),
+    ]);
+    await result;
+    const [block] = calls[1][2].content as { content: string }[];
+    expect(block.content).toContain('Guest clash: At least 19');
+  });
+
   it('drops a refused turn so the history stays valid', async () => {
     const { result } = run([reply('refusal', [toolUse('t1', 'set_basics', { name: 'x' })])]);
     const r = await result;
@@ -107,7 +117,7 @@ describe('runAgent', () => {
 
   it('drops a turn cut off at max_tokens but keeps earlier rounds', async () => {
     const { result } = run([
-      reply('tool_use', [toolUse('t1', 'set_basics', { guestCount: 4 })]),
+      reply('tool_use', [toolUse('t1', 'set_basics', { guests: { exact: 4 } })]),
       reply('max_tokens', [toolUse('t2', 'choose_places', { ids: ['home'] })]),
     ]);
     const r = await result;
@@ -137,6 +147,12 @@ describe('SYSTEM_PROMPT', () => {
     for (const id of [...SELECTABLE_PLACE_IDS, ...SELECTABLE_ACTIVITY_IDS]) {
       expect(SYSTEM_PROMPT).toContain(`- ${id}: `);
     }
+  });
+
+  it('lists every formality level in order', () => {
+    const positions = FORMALITY_IDS.map(id => SYSTEM_PROMPT.indexOf(`- ${id}: `));
+    expect(positions.every(p => p >= 0)).toBe(true);
+    expect([...positions].sort((x, y) => x - y)).toEqual(positions);
   });
 
   it('marks categories as not selectable', () => {

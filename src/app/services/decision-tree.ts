@@ -20,6 +20,29 @@ export function getSizeBucket(count: number): SizeBucket | undefined {
   );
 }
 
+// ── Formality ────────────────────────────────────────────────
+
+export interface FormalityLevel {
+  id: string;
+  label: string;
+  feelsLike: string; // example events
+  suggests: string;  // what this level changes in the plan
+}
+
+// Ordered from least to most formal; neighbours are what the agent offers when it guesses
+export const FORMALITY_LEVELS: FormalityLevel[] = [
+  { id: 'laidback', label: 'Laid-back', feelsLike: 'game night, pizza on the couch, come as you are',
+    suggests: 'paper plates, takeout, no schedule beyond a start time, invites a few days ahead' },
+  { id: 'casual',   label: 'Casual',    feelsLike: 'birthday at home, backyard BBQ, potluck',
+    suggests: 'simple decorations, a loose schedule, a cake moment, invites 1-2 weeks ahead' },
+  { id: 'polished', label: 'Polished',  feelsLike: 'dinner party, housewarming, baby shower',
+    suggests: 'real plates, a planned menu, a drinks station, an open house works, invites 2-3 weeks ahead' },
+  { id: 'dressy',   label: 'Dressy',    feelsLike: 'engagement party, milestone birthday, cocktail party',
+    suggests: 'cocktail attire, catering or passed food, a venue or private room, invites about a month ahead' },
+  { id: 'formal',   label: 'Formal',    feelsLike: 'wedding reception, gala, black tie',
+    suggests: 'seated dinner, vendors, RSVPs with meal choices, invites 6+ weeks ahead' },
+];
+
 // ── Place ────────────────────────────────────────────────────
 
 export interface PlaceOption {
@@ -81,6 +104,7 @@ export const ACTIVITY_OPTIONS: ActivityOption[] = [
     children: [
       { id: 'eating-home-cooked',   label: 'Home-cooked'    },
       { id: 'eating-out',           label: 'Out on the town' },
+      { id: 'eating-takeout',       label: 'Takeout / delivery' },
       { id: 'eating-potluck',       label: 'Potluck style'  },
       { id: 'eating-buffet',        label: 'Buffet'         },
       { id: 'eating-catering',      label: 'Catering'       },

@@ -9,8 +9,27 @@
     <div>
       <dt>Guests</dt>
       <dd>
-        @if (plan().guestCount) {
-          {{ plan().guestCount }} <span class="plan-muted">({{ plan().size }})</span>
+        @if (guestsLabel(); as label) {
+          {{ label }}
+          @if (plan().size) {
+            <span class="plan-muted">({{ plan().size }})</span>
+          }
+        } @else {
+          —
+        }
+      </dd>
+      @if (guestClash(); as clash) {
+        <p class="plan-warning">{{ clash }}</p>
+      }
+    </div>
+    <div>
+      <dt>Formality</dt>
+      <dd>
+        @if (formality(); as f) {
+          {{ f.label }}
+          @if (f.guess) {
+            <span class="plan-muted">(guess)</span>
+          }
         } @else {
           —
         }
@@ -42,14 +61,21 @@
     Budget
     @if (plan().budgetTotal !== null) {
       <span class="plan-total" [class.is-over]="overBudget()">
-        {{ formatMoney(budgetSpent()) }} of {{ formatMoney(plan().budgetTotal!) }}
+        {{ formatRange(budgetLow(), budgetHigh()) }} of {{ formatMoney(plan().budgetTotal!) }}
       </span>
     }
   </h3>
   @if (plan().budget.length) {
     <ul class="plan-list">
       @for (item of plan().budget; track $index) {
-        <li><span>{{ item.label }}</span><span>{{ formatMoney(item.amount) }}</span></li>
+        <li>
+          <span>{{ item.label }}</span>
+          @if (item.low !== undefined) {
+            <span>{{ formatRange(item.low, item.amount) }} <span class="plan-muted">est.</span></span>
+          } @else {
+            <span>{{ formatMoney(item.amount) }}</span>
+          }
+        </li>
       }
     </ul>
   } @else {

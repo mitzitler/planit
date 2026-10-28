@@ -4,6 +4,7 @@ import {
   SELECTABLE_PLACE_IDS,
   applyTool,
   emptyPlan,
+  guestConflict,
   isValidDate,
   isValidTime,
   normalizePlan,
@@ -39,7 +40,7 @@ describe('selectable ids', () => {
 });
 
 describe('set_basics', () => {
-  it('maps guest count to the right size bucket', () => {
+  it('maps the planning count to the right size bucket', () => {
     const cases: [number, string][] = [
       [1, 'intimate'],
       [8, 'intimate'],
@@ -50,7 +51,7 @@ describe('set_basics', () => {
       [91, 'massive'],
     ];
     for (const [count, size] of cases) {
-      const plan = expectOk(applyTool(emptyPlan(), 'set_basics', { guestCount: count }));
+      const plan = expectOk(applyTool(emptyPlan(), 'set_basics', { guests: { exact: count } }));
       expect(plan.guestCount).toBe(count);
       expect(plan.size).toBe(size);
     }
@@ -64,12 +65,67 @@ describe('set_basics', () => {
 
   it('rejects bad values', () => {
     expectError(applyTool(emptyPlan(), 'set_basics', {}));
-    expectError(applyTool(emptyPlan(), 'set_basics', { guestCount: 0 }));
-    expectError(applyTool(emptyPlan(), 'set_basics', { guestCount: 4.5 }));
+    expectError(applyTool(emptyPlan(), 'set_basics', { guests: { max: 0 } }));
+    expectError(applyTool(emptyPlan(), 'set_basics', { guests: { preferred: 4.5 } }));
     expectError(applyTool(emptyPlan(), 'set_basics', { date: '2026-02-30' }));
     expectError(applyTool(emptyPlan(), 'set_basics', { date: 'next friday' }));
     expectError(applyTool(emptyPlan(), 'set_basics', { budgetTotal: -50 }));
     expectError(applyTool(emptyPlan(), 'set_basics', { name: '   ' }));
+  });
+});
+
+describe('set_basics guests', () => {
+  const guestsPlan = (guests: unknown) => expectOk(applyTool(emptyPlan(), 'set_basics', { guests }));
+
+  it('plans for the exact count, else the top of the range, else preferred but at least min', () => {
+    expect(guestsPlan({ exact: 20, preferred: 18 }).guestCount).toBe(20);
+    expect(guestsPlan({ min: 8, max: 12 }).guestCount).toBe(12);
+    expect(guestsPlan({ min: 8, max: 12 }).size).toBe('cozy'); // sized by 12, not 8
+    expect(guestsPlan({ min: 19, preferred: 15 }).guestCount).toBe(19); // never below the yeses
+    expect(guestsPlan({ min: 8, preferred: 10 }).guestCount).toBe(10);
+    expect(guestsPlan({ min: 19 }).guestCount).toBe(19);
+  });
+
+  it('replaces all guest numbers', () => {
+    const first = guestsPlan({ min: 8, max: 12 });
+    const plan = expectOk(applyTool(first, 'set_basics', { guests: { preferred: 10 } }));
+    expect(plan.guests).toEqual({ preferred: 10 });
+  });
+
+  it('rejects contradictions and unknown fields', () => {
+    expect(expectError(applyTool(emptyPlan(), 'set_basics', { guests: { exact: 20, min: 18 } }))).toContain('exact');
+    expect(expectError(applyTool(emptyPlan(), 'set_basics', { guests: { min: 12, max: 8 } }))).toContain('min');
+    expectError(applyTool(emptyPlan(), 'set_basics', { guests: { count: 12 } }));
+    expectError(applyTool(emptyPlan(), 'set_basics', { guests: {} }));
+    expectError(applyTool(emptyPlan(), 'set_basics', { guests: 12 }));
+  });
+
+  it('describes clashes between the target and the expected count', () => {
+    expect(guestConflict({ min: 19, preferred: 15 })).toContain('At least 19');
+    expect(guestConflict({ max: 10, preferred: 15 })).toContain('At most 10');
+    expect(guestConflict({ exact: 20, preferred: 18 })).toContain('Exactly 20');
+    expect(guestConflict({ min: 8, max: 12, preferred: 10 })).toBeNull();
+    expect(guestConflict({ min: 19 })).toBeNull();
+    expect(guestConflict(undefined)).toBeNull();
+  });
+});
+
+describe('set_basics formality', () => {
+  it('stores a guess, then a confirmed level, leaving other fields alone', () => {
+    const named = expectOk(applyTool(emptyPlan(), 'set_basics', { name: 'Pizza night' }));
+    const guessed = expectOk(applyTool(named, 'set_basics', { formality: { level: 'laidback', confirmed: false } }));
+    expect(guessed.formality).toEqual({ level: 'laidback', confirmed: false });
+    expect(guessed.name).toBe('Pizza night');
+
+    const confirmed = expectOk(applyTool(guessed, 'set_basics', { formality: { level: 'casual', confirmed: true } }));
+    expect(confirmed.formality).toEqual({ level: 'casual', confirmed: true });
+  });
+
+  it('rejects unknown levels and a missing confirmed flag', () => {
+    expect(expectError(applyTool(emptyPlan(), 'set_basics', { formality: { level: 'fancy', confirmed: true } })))
+      .toContain('laidback');
+    expectError(applyTool(emptyPlan(), 'set_basics', { formality: { level: 'casual' } }));
+    expectError(applyTool(emptyPlan(), 'set_basics', { formality: 'casual' }));
   });
 });
 
@@ -100,6 +156,18 @@ describe('add_budget_item', () => {
   it('appends an item', () => {
     const plan = expectOk(applyTool(emptyPlan(), 'add_budget_item', { label: ' Snacks ', amount: 40 }));
     expect(plan.budget).toEqual([{ label: 'Snacks', amount: 40 }]);
+  });
+
+  it('stores an estimate range, with amount at the high end', () => {
+    const plan = expectOk(applyTool(emptyPlan(), 'add_budget_item', { label: 'Pizza', low: 40, high: 70 }));
+    expect(plan.budget).toEqual([{ label: 'Pizza', amount: 70, low: 40, high: 70 }]);
+  });
+
+  it('needs amount, or both low and high, but not both kinds', () => {
+    expectError(applyTool(emptyPlan(), 'add_budget_item', { label: 'Pizza' }));
+    expectError(applyTool(emptyPlan(), 'add_budget_item', { label: 'Pizza', low: 40 }));
+    expectError(applyTool(emptyPlan(), 'add_budget_item', { label: 'Pizza', low: 70, high: 40 }));
+    expectError(applyTool(emptyPlan(), 'add_budget_item', { label: 'Pizza', amount: 50, low: 40, high: 70 }));
   });
 
   it('rejects non-positive or non-numeric amounts', () => {

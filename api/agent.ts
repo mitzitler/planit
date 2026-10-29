@@ -121,10 +121,10 @@ export async function POST(request: Request): Promise<Response> {
           stop_reason: run.stopReason,
         });
 
-        if (JSON.stringify(run.plan) !== JSON.stringify(startPlan)) {
-          const { error } = await db.from('events').update({ plan: run.plan }).eq('id', eventId);
-          if (error) throw new Error(`Saving the plan failed: ${error.message}`);
-        }
+        // The conversation is saved with the plan, so the chat is still there after a reload
+        const chat = [...(history as BetaMessageParam[]), ...run.messages];
+        const { error } = await db.from('events').update({ plan: run.plan, chat }).eq('id', eventId);
+        if (error) throw new Error(`Saving the plan failed: ${error.message}`);
 
         if (run.stopReason === 'refusal') {
           emit({ type: 'error', error: "The assistant can't help with that request." });

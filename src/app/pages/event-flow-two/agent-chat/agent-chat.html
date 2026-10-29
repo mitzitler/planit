@@ -37,4 +37,7 @@
     ></textarea>
     <button class="btn-primary" type="submit" [disabled]="busy() || saving()">Send</button>
   </form>
+  @if (lines().length) {
+    <button class="chat-clear" type="button" [disabled]="busy()" (click)="clear()">Clear chat</button>
+  }
 </section>

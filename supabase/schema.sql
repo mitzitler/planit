@@ -11,6 +11,10 @@ create table if not exists public.events (
   updated_at  timestamptz not null default now()
 );
 
+-- The assistant conversation in API form (api/agent.ts appends each exchange), so it's still there
+-- after a reload. Added after the table was created, hence the separate statement.
+alter table public.events add column if not exists chat jsonb not null default '[]'::jsonb;
+
 create index if not exists events_user_id_idx on public.events (user_id);
 
 alter table public.events enable row level security;

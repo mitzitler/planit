@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import type { BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
 import { SupabaseService } from './supabase';
 import { applyTool, emptyPlan, normalizePlan, type Plan } from '../shared/plan';
 
@@ -6,6 +7,10 @@ export interface EventRow {
   id: string;
   plan: Plan;
   updatedAt: string;
+}
+
+export interface EventWithChat extends EventRow {
+  chat: BetaMessageParam[]; // the assistant conversation, as api/agent.ts saved it
 }
 
 // Reads and writes the `events` table. RLS limits every query to the signed-in user's rows.
@@ -22,14 +27,14 @@ export class EventsService {
     return data.map(toRow);
   }
 
-  async get(id: string): Promise<EventRow | null> {
+  async get(id: string): Promise<EventWithChat | null> {
     const { data, error } = await this.supabase.client
       .from('events')
-      .select('id, plan, updated_at')
+      .select('id, plan, updated_at, chat')
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;
-    return data && toRow(data);
+    return data && { ...toRow(data), chat: Array.isArray(data.chat) ? data.chat : [] };
   }
 
   // The name goes through set_basics, so it's tidied the same way as a rename
@@ -48,6 +53,11 @@ export class EventsService {
   // Agent run logs are kept; their event_id is cleared by the foreign key
   async delete(id: string): Promise<void> {
     const { error } = await this.supabase.client.from('events').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  async clearChat(id: string): Promise<void> {
+    const { error } = await this.supabase.client.from('events').update({ chat: [] }).eq('id', id);
     if (error) throw error;
   }
 

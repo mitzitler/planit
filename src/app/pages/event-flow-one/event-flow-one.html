@@ -57,7 +57,17 @@
             }
 
             @case ('extras') {
-              <span class="card-icon card-icon--placeholder" aria-label="extras not yet designed">✖️</span>
+              <h2 class="card-question">anything else?</h2>
+              <p class="card-copy">jot down anything you want to add before moving to mission control chat</p>
+              <textarea
+                class="card-input card-notes"
+                rows="5"
+                [attr.maxlength]="notesMax"
+                aria-label="Notes for the assistant"
+                placeholder="e.g. two guests are vegetarian, Sam hates surprises"
+                [value]="draftService.snapshot$()?.notes ?? ''"
+                (blur)="draftService.setNotes($any($event.target).value)"
+              ></textarea>
             }
 
           }

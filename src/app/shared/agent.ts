@@ -90,6 +90,7 @@ Rules:
 - choose_places and choose_activities replace the whole list, so include the ids already in the plan that should stay.
 - To change a budget or schedule item, remove it (remove_budget_item or remove_schedule_item, by its position in the current plan's list, starting at 0) and add the corrected one. Positions shift after each removal, so when removing several, start with the highest position.
 - When the user says they've done a to-do, check it off with check_schedule_item.
+- plan.notes are the host's own notes about the event. Take them into account, and don't ask about anything they already answer.
 - The user can also add, remove and check off budget and schedule items themselves, so the plan may have changed since your last turn. Always go by the current plan in their message.
 - Dates are YYYY-MM-DD and times are 24-hour HH:MM. Work out relative dates ("next Saturday") from today's date, which is given with each message.
 - Keep the budget within the total when there is one, counting estimates at their high end. If it would go over, say so.
@@ -130,6 +131,26 @@ export interface AgentRunResult {
 // so they can't close the block early and write outside it.
 export function wrapUserText(text: string): string {
   return `<user_message>\n${text.replace(/<\/?user_message>/gi, '')}\n</user_message>`;
+}
+
+// The chat bubbles for a saved conversation: each user message, then the text of the exchange's
+// last assistant message (earlier rounds' text was replaced on screen too). Tool results are skipped.
+export function chatLines(history: BetaMessageParam[]): { role: 'user' | 'assistant'; text: string }[] {
+  const lines: { role: 'user' | 'assistant'; text: string }[] = [];
+  for (const message of history) {
+    const blocks = typeof message.content === 'string' ? [{ type: 'text', text: message.content }] : message.content;
+    const texts = (blocks ?? []).flatMap(b => (b.type === 'text' ? [b.text] : []));
+    if (message.role === 'user') {
+      // The plan block comes first; the user's own words are the last text block
+      const text = texts.at(-1)?.replace(/^<user_message>\n?|\n?<\/user_message>$/g, '');
+      if (text) lines.push({ role: 'user', text });
+    } else if (texts.join('').trim()) {
+      const reply = { role: 'assistant' as const, text: texts.join('') };
+      if (lines.at(-1)?.role === 'assistant') lines[lines.length - 1] = reply;
+      else lines.push(reply);
+    }
+  }
+  return lines;
 }
 
 export function userMessage(plan: Plan, userText: string, today: string): BetaMessageParam {

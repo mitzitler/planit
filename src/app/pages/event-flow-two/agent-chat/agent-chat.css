@@ -65,6 +65,18 @@
 
 .chat-form { display: flex; gap: 0.5rem; align-items: flex-end; }
 
+.chat-clear {
+  align-self: flex-end;
+  margin-top: -0.25rem;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.chat-clear:hover { color: var(--color-text); }
+
 .chat-input { flex: 1; resize: none; font-size: 0.95rem; }
 
 .btn-primary:disabled { opacity: 0.6; cursor: wait; }

@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { getSizeBucket } from './decision-tree';
 import { EventsService } from './events.service';
-import { applyTool, type Plan } from '../shared/plan';
+import { NOTES_MAX, applyTool, type Plan } from '../shared/plan';
 
 // The plan the step-by-step wizard is editing. Each choice is saved to the event's row straight away,
 // so the assistant in Mission Control sees it and the plan survives a reload or another device.
@@ -68,6 +68,12 @@ export class EventDraftService {
   // Picked by the user, so it's confirmed and the assistant won't ask about it
   setFormality(level: string): void {
     this.update(plan => ({ ...plan, formality: { level, confirmed: true } }));
+  }
+
+  setNotes(text: string): void {
+    const notes = text.trim().slice(0, NOTES_MAX) || null;
+    if (notes === (this.plan()?.notes ?? null)) return;
+    this.update(plan => ({ ...plan, notes }));
   }
 
   // On logout. Also removes the localStorage draft the wizard kept before it saved to the database.

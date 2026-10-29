@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import type { BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
 import { EventsService } from '../../services/events.service';
 import { applyTool, type Plan, type ToolName } from '../../shared/plan';
 
@@ -10,6 +11,7 @@ export class EventPlanStore {
 
   eventId = '';
   plan = signal<Plan | null>(null);
+  chat: BetaMessageParam[] = []; // the saved conversation, set before the plan when the event loads
   // True while the assistant is replying. Its run saves the plan it started from plus its own
   // changes, so edits made by hand meanwhile would be overwritten; the tabs wait instead.
   agentBusy = signal(false);

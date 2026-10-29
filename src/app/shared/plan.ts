@@ -55,7 +55,12 @@ export interface Plan {
   budgetTotal: number | null;
   budget: BudgetItem[];
   schedule: ScheduleItem[];
+  // The host's own notes from the wizard's Extras card. Only the user writes them (there's no
+  // tool for it); the assistant reads them as part of the plan.
+  notes: string | null;
 }
+
+export const NOTES_MAX = 1000;
 
 export function emptyPlan(): Plan {
   return {
@@ -68,6 +73,7 @@ export function emptyPlan(): Plan {
     budgetTotal: null,
     budget: [],
     schedule: [],
+    notes: null,
   };
 }
 

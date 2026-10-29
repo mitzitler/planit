@@ -55,6 +55,12 @@
         }
       </dd>
     </div>
+    @if (plan().notes; as notes) {
+      <div>
+        <dt>Notes</dt>
+        <dd class="plan-notes">{{ notes }}</dd>
+      </div>
+    }
   </dl>
 
   <h3 class="plan-heading">

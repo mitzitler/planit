@@ -39,7 +39,10 @@ export class EventFlowTwoComponent implements OnInit {
     this.store.eventId = this.eventId;
     try {
       const event = await this.eventsService.get(this.eventId);
-      if (event) this.plan.set(event.plan);
+      if (event) {
+        this.store.chat = event.chat;
+        this.plan.set(event.plan);
+      }
       else this.loadError.set('This event doesn’t exist, or it belongs to another account.');
     } catch {
       this.loadError.set('Could not load this event. Refresh to try again.');

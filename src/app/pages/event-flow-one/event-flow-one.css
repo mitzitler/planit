@@ -70,12 +70,6 @@
   font-size: 1.6rem;
 }
 
-.card-icon--placeholder {
-  display: block;
-  margin: auto;
-  font-size: 8rem;
-}
-
 .card-label-vertical {
   writing-mode: vertical-rl;
   text-orientation: mixed;
@@ -113,3 +107,6 @@
 }
 
 .wizard-message a { color: inherit; }
+
+/* Extras card: free-form notes the assistant reads */
+.card-notes { width: 100%; resize: vertical; font-family: var(--font-body); line-height: 1.6; }

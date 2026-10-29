@@ -25,6 +25,7 @@ export class EventFlowOneComponent implements OnInit {
 
   eventId = this.route.snapshot.paramMap.get('id')!;
   loaded = signal(false);
+  renameError = signal('');
   notesMax = NOTES_MAX;
   loadError = signal('');
   activeCardIndex = -1;

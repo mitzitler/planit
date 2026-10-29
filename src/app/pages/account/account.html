@@ -1,0 +1,59 @@
+<div class="account">
+  <h1 class="account-title">Account</h1>
+
+  <form class="account-section" (ngSubmit)="saveProfile()">
+    <h2 class="account-heading">Profile</h2>
+    <div class="form-field">
+      <label for="account-name">Display name</label>
+      <input id="account-name" type="text" name="name" [attr.maxlength]="nameMax" placeholder="What should we call you?"
+        [ngModel]="name()" (ngModelChange)="name.set($event)" autocomplete="nickname" />
+    </div>
+
+    <fieldset class="account-avatars">
+      <legend>Picture</legend>
+      @for (icon of avatars; track icon) {
+        <label class="account-avatar" [class.is-selected]="avatar() === icon">
+          <input type="radio" name="avatar" [value]="icon" [checked]="avatar() === icon" (change)="avatar.set(icon)" />
+          <img [src]="'/icons/' + icon + '.svg'" [alt]="icon.replace('icon_', '').replaceAll('_', ' ')" />
+        </label>
+      }
+    </fieldset>
+
+    @if (profileMessage(); as m) {
+      <p [class]="m.ok ? 'auth-success' : 'auth-error'" role="status">{{ m.text }}</p>
+    }
+    <button class="btn-primary" type="submit" [disabled]="busy()">Save profile</button>
+  </form>
+
+  <form class="account-section" (ngSubmit)="saveEmail()">
+    <h2 class="account-heading">Email</h2>
+    <p class="account-muted">Currently {{ currentEmail }}</p>
+    <div class="form-field">
+      <label for="account-email">New email</label>
+      <input id="account-email" type="email" name="email" placeholder="you@example.com"
+        [ngModel]="email()" (ngModelChange)="email.set($event)" autocomplete="email" />
+    </div>
+    @if (emailMessage(); as m) {
+      <p [class]="m.ok ? 'auth-success' : 'auth-error'" role="status">{{ m.text }}</p>
+    }
+    <button class="btn-primary" type="submit" [disabled]="busy()">Change email</button>
+  </form>
+
+  <form class="account-section" (ngSubmit)="savePassword()">
+    <h2 class="account-heading">Password</h2>
+    <div class="form-field">
+      <label for="account-password">New password</label>
+      <input id="account-password" type="password" name="password" [attr.minlength]="passwordMin"
+        [ngModel]="password()" (ngModelChange)="password.set($event)" autocomplete="new-password" />
+    </div>
+    <div class="form-field">
+      <label for="account-password-confirm">Confirm new password</label>
+      <input id="account-password-confirm" type="password" name="confirmPassword"
+        [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" autocomplete="new-password" />
+    </div>
+    @if (passwordMessage(); as m) {
+      <p [class]="m.ok ? 'auth-success' : 'auth-error'" role="status">{{ m.text }}</p>
+    }
+    <button class="btn-primary" type="submit" [disabled]="busy()">Change password</button>
+  </form>
+</div>

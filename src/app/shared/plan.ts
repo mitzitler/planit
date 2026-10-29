@@ -9,6 +9,7 @@ import {
   type ActivityOption,
   type PlaceOption,
 } from '../services/decision-tree';
+import { isNameAllowed } from './profanity';
 
 // ── Plan shape (frozen 2026-10-28; extend only with optional fields) ──
 
@@ -124,6 +125,7 @@ export function budgetRange(budget: BudgetItem[]): { low: number; high: number }
 // ── Names ────────────────────────────────────────────────────
 
 export const EVENT_NAME_MAX = 80;
+export const NAME_NOT_ALLOWED = "That name isn't allowed. Try something else.";
 
 // Trims and collapses runs of whitespace. Angular escapes names when it shows them, so this is
 // about tidiness, not safety.
@@ -339,6 +341,7 @@ function setBasics(plan: Plan, input: Input): ToolResult {
     if (!isNonEmptyString(name)) return fail('name must be a non-empty string.');
     const cleaned = cleanName(name);
     if (cleaned.length > EVENT_NAME_MAX) return fail(`name must be at most ${EVENT_NAME_MAX} characters.`);
+    if (!isNameAllowed(cleaned)) return fail(NAME_NOT_ALLOWED);
     next.name = cleaned;
   }
   if (date !== undefined) {

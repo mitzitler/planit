@@ -3,6 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { EventsService, type EventRow } from '../../services/events.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
+import { NAME_NOT_ALLOWED } from '../../shared/plan';
+import { isNameAllowed } from '../../shared/profanity';
 
 // "Welcome back, <title>." cycles through these
 const TITLES = [
@@ -68,6 +70,7 @@ export class DashboardComponent implements OnInit {
   async createEvent(name: string) {
     const open = this.pendingCreate();
     if (!open) return;
+    if (!isNameAllowed(name)) return this.createError.set(NAME_NOT_ALLOWED);
     this.creating.set(true);
     try {
       const id = await this.eventsService.create(name);

@@ -2,9 +2,12 @@
   mode="manual"
   [eventId]="eventId"
   [name]="draftService.snapshot$()?.name ?? null"
-  (rename)="draftService.setName($event)"
+  (rename)="renameError.set(draftService.setName($event) ?? '')"
 />
 
+@if (renameError(); as error) {
+  <p class="wizard-message" role="alert">{{ error }}</p>
+}
 @if (loadError(); as error) {
   <p class="wizard-message">{{ error }} <a routerLink="/dashboard">Back to your events</a></p>
 }

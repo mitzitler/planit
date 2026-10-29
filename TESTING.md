@@ -20,8 +20,8 @@ Angular runs the tests with Vitest in JSDOM. The planning logic is plain TypeScr
 
 | File | Tests | What it covers |
 |---|---|---|
-| `src/app/shared/plan.spec.ts` | 29 | The 8 tools in `applyTool`: every input is validated, ids must be selectable, and guest ranges, clashes, formality, budget estimates, all-day to-dos, checking off and index-based removal all work. |
-| `src/app/shared/agent.spec.ts` | 10 | The agent loop in `runAgent`, run against a **fake model** (see below), plus checks on the system prompt. |
+| `src/app/shared/plan.spec.ts` | 31 | The 8 tools in `applyTool`: every input is validated, ids must be selectable, and guest ranges, clashes, formality, budget estimates, all-day to-dos, checking off and index-based removal all work. Event names with slurs or strong profanity are refused, mild words are allowed. |
+| `src/app/shared/agent.spec.ts` | 12 | The agent loop in `runAgent`, run against a **fake model** (see below), plus checks on the system prompt, the `<user_message>` wrapping, and rebuilding the chat from a saved conversation. |
 | `src/app/shared/format.spec.ts` | 2 | Display formatting: `19:00` → `7pm`, and money ranges like `$12.50–1,200`. |
 | `src/app/shared/dates.spec.ts` | 2 | Calendar-day math for the Calendar tab: adding days across month ends, and the Monday-to-Sunday weeks it draws. |
 | `src/app/app.spec.ts` | 1 | The app component is created. |

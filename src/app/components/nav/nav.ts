@@ -1,9 +1,12 @@
 import { Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import type { User } from '@supabase/supabase-js';
 import { RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase';
 import { EventDraftService } from '../../services/event-draft.service';
+import { randomAvatar } from '../../shared/avatars';
 
 // Keeps the logout overlay up long enough to read instead of flashing
 const MIN_LOGOUT_MS = 600;
@@ -32,6 +35,25 @@ export class NavComponent {
 
   private avatarButton = viewChild<ElementRef<HTMLButtonElement>>('avatarButton');
   private firstMenuItem = viewChild<ElementRef<HTMLElement>>('firstMenuItem');
+
+  constructor() {
+    // Everyone gets a picture: users without one are given a random space icon, once
+    let assignedFor: string | null = null;
+    this.session$.pipe(takeUntilDestroyed()).subscribe(session => {
+      const user = session?.user;
+      if (!user || this.avatar(user) || assignedFor === user.id) return;
+      assignedFor = user.id;
+      this.supabase.updateProfile({ avatar: randomAvatar() });
+    });
+  }
+
+  displayName(user: User): string {
+    return user.user_metadata?.['name'] || (user.email ?? '').split('@')[0];
+  }
+
+  avatar(user: User): string | null {
+    return user.user_metadata?.['avatar'] ?? null;
+  }
 
   getInitials(email: string): string {
     const username = email.split('@')[0];

@@ -17,6 +17,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
 
+  {
+    path: 'account',
+    loadComponent: () => import('./pages/account/account').then(m => m.AccountComponent),
+    canActivate: [authGuard],
+  },
+
   // Event Flow 1 — event specification (5-card layout), saved into the event as you go
   {
     path: 'events/:id/plan',

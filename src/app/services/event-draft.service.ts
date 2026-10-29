@@ -50,11 +50,14 @@ export class EventDraftService {
     return null;
   }
 
-  setName(name: string): void {
+  // Returns an error message for a name that isn't allowed, or null
+  setName(name: string): string | null {
     const current = this.plan();
-    if (!current) return;
+    if (!current) return null;
     const result = applyTool(current, 'set_basics', { name });
-    if (result.ok) this.update(() => result.plan);
+    if (!result.ok) return result.error;
+    this.update(() => result.plan);
+    return null;
   }
 
   setPlaces(ids: string[]): void {

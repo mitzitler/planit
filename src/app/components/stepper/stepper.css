@@ -1,0 +1,59 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 1.5rem;
+}
+
+.stepper-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stepper-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+
+.stepper-item.is-active .stepper-circle {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.stepper-item.is-complete .stepper-circle {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.stepper-label {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.stepper-item.is-active .stepper-label { color: var(--color-text); }
+.stepper-item.is-complete .stepper-label { color: var(--color-accent); }
+
+.stepper-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--color-border);
+  min-width: 48px;
+  margin-bottom: 1.2rem;
+  transition: background 0.2s;
+}
+.stepper-connector.is-complete { background: var(--color-accent); }

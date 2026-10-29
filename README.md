@@ -35,6 +35,8 @@ Mission Control has a planning assistant. You describe the event in plain words,
 
 ![The assistant planning a birthday](docs/agent-demo.gif)
 
+To retake the GIF after UI changes, run `/demo-gif` in [Claude Code](https://claude.ai/code). The steps are in `.claude/skills/demo-gif/SKILL.md`. It records the same prompt on the Vercel preview with Claude in Chrome, so only the UI changes between takes.
+
 **How it works**
 - The browser posts the message to `api/agent.ts`, a Vercel function. It checks the user's Supabase login and loads the event **as that user**, so row-level security applies.
 - `runAgent` (`src/app/shared/agent.ts`) sends the plan and the message to Claude (`claude-opus-5-5`, low effort) with **7 tools**: `set_basics`, `choose_places`, `choose_activities`, `add_budget_item`, `remove_budget_item`, `add_schedule_item` and `remove_schedule_item`.

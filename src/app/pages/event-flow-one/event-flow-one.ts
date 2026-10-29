@@ -5,6 +5,7 @@ import { PlanBarComponent } from '../../components/plan-bar/plan-bar';
 import { SizeCardComponent } from './size-card/size-card';
 import { PlaceCardComponent } from './place-card/place-card';
 import { ActivitiesCardComponent } from './activities-card/activities-card';
+import { NOTES_MAX } from '../../shared/plan';
 
 interface Card {
   id: 'size' | 'place' | 'activities' | 'cost' | 'extras';
@@ -24,6 +25,8 @@ export class EventFlowOneComponent implements OnInit {
 
   eventId = this.route.snapshot.paramMap.get('id')!;
   loaded = signal(false);
+  renameError = signal('');
+  notesMax = NOTES_MAX;
   loadError = signal('');
   activeCardIndex = -1;
 

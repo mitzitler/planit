@@ -1,7 +1,9 @@
-import { Component, ElementRef, inject, input, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
 import { AgentService } from '../../../services/agent.service';
+import { EventsService } from '../../../services/events.service';
+import { chatLines } from '../../../shared/agent';
 import { EventPlanStore } from '../event-plan.store';
 
 interface ChatLine {
@@ -20,9 +22,10 @@ const SUGGESTIONS = [
   templateUrl: './agent-chat.html',
   styleUrl: './agent-chat.css',
 })
-export class AgentChatComponent {
+export class AgentChatComponent implements OnInit {
   private agent = inject(AgentService);
   private store = inject(EventPlanStore);
+  private eventsService = inject(EventsService);
 
   eventId = input.required<string>();
 
@@ -35,9 +38,27 @@ export class AgentChatComponent {
 
   private log = viewChild<ElementRef<HTMLElement>>('log');
 
-  // The conversation in API form, sent back on every request. Kept in memory only:
-  // a reload starts a fresh conversation, but the plan itself is saved on the server.
+  // The conversation in API form, sent back on every request. api/agent.ts saves it with the event,
+  // so it's loaded again from there.
   private history: BetaMessageParam[] = [];
+
+  ngOnInit() {
+    this.history = this.store.chat;
+    this.lines.set(chatLines(this.history));
+    this.scrollToEnd();
+  }
+
+  async clear() {
+    if (this.busy()) return;
+    try {
+      await this.eventsService.clearChat(this.eventId());
+      this.history = this.store.chat = [];
+      this.lines.set([]);
+      this.errorMessage.set('');
+    } catch {
+      this.errorMessage.set("Couldn't clear the chat. Try again.");
+    }
+  }
 
   async send(text = this.draft) {
     const message = text.trim();
@@ -66,7 +87,7 @@ export class AgentChatComponent {
             this.store.plan.set(event.plan);
             break;
           case 'done':
-            this.history = [...this.history, ...event.messages];
+            this.history = this.store.chat = [...this.history, ...event.messages];
             this.store.plan.set(event.plan);
             break;
           case 'error':

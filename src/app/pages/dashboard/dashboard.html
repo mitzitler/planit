@@ -1,7 +1,12 @@
 <div class="dashboard">
   <header class="dashboard-header">
     <div>
-      <h1 class="dashboard-title">Welcome back, Astronaut. <img class="icon" src="/icons/radar.svg" alt="" /></h1>
+      <h1 class="dashboard-title">
+        Welcome back,
+        <!-- The icon comes before the word, so it doesn't move when the word changes length -->
+        <img class="icon" src="/icons/radar.svg" alt="" />
+        <em class="dashboard-title-word" [class.is-hidden]="titleHidden()">{{ title() }}</em>
+      </h1>
       <p class="dashboard-subtitle">Pick up where you left off, or launch something new.</p>
     </div>
     <button class="btn-primary btn-large" type="button" (click)="askName('manage')" [disabled]="creating()">

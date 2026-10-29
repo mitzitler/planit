@@ -32,7 +32,7 @@
 }
 
 .nav-username {
-  color: #f87171;
+  color: var(--color-star);
 }
 
 .nav-avatar {
@@ -51,6 +51,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.nav-avatar-img { width: 24px; height: 24px; }
 
 .nav-avatar:hover {
   background: rgba(255, 255, 255, 0.25);

@@ -10,7 +10,7 @@ export function makeCallModel(onRound?: (message: Anthropic.Beta.BetaMessage) =>
   return async (messages, onText) => {
     const stream = anthropic.beta.messages.stream({
       model: AGENT_MODEL,
-      max_tokens: 16000,
+      max_tokens: 8000, // replies are short; this caps a runaway one
       output_config: { effort: 'low' },
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',

@@ -1,7 +1,7 @@
 /* ── Design tokens ─────────────────────────────────────────── */
 :root {
   --font-title: 'Audiowide', sans-serif;
-  --font-body:  'Michroma', system-ui, sans-serif;
+  --font-body:  'Exo 2', system-ui, sans-serif;
   --font-alt:   'Zen Dots', sans-serif;
 
   --color-bg:           #150e52;
@@ -22,6 +22,7 @@
   --radius-lg:  20px;
 
   --nav-height: 64px;
+  --page-top-space: 0.75rem;     /* the same gap under the nav on every page */
   --page-bottom-space: 10rem; /* nothing runs to the bottom of the window */
 }
 
@@ -44,6 +45,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 /* ── App shell ─────────────────────────────────────────────── */
 .page-content {
   min-height: calc(100vh - var(--nav-height));
+  padding-top: var(--page-top-space);
   padding-bottom: var(--page-bottom-space);
   display: flow-root; /* keeps a page's top margin inside, so it doesn't push the page past the window */
   position: relative;

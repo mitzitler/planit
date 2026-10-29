@@ -65,4 +65,18 @@ export class SupabaseService {
   signOut() {
     return this.supabase.auth.signOut();
   }
+
+  // Profile fields live in the user's metadata: { name?: string, avatar?: string (a public/icons name) }
+  updateProfile(data: { name?: string | null; avatar?: string }) {
+    return this.supabase.auth.updateUser({ data });
+  }
+
+  // Supabase emails a confirmation link; the address changes once it's clicked
+  updateEmail(email: string) {
+    return this.supabase.auth.updateUser({ email }, { emailRedirectTo: `${window.location.origin}/account` });
+  }
+
+  updatePassword(password: string) {
+    return this.supabase.auth.updateUser({ password });
+  }
 }

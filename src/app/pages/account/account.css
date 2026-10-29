@@ -1,0 +1,48 @@
+.account { max-width: 36rem; margin: 0 auto; padding: 0 1rem; display: grid; gap: 1.25rem; }
+
+.account-title { font-size: 1.8rem; font-weight: 800; }
+
+.account-section {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.account-section .form-field { width: 100%; }
+
+.account-heading { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+.account-muted { color: var(--color-text-muted); font-size: 0.9rem; }
+
+.account-avatars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border: none;
+}
+
+.account-avatars legend { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.5rem; }
+
+.account-avatar {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface-alt);
+  cursor: pointer;
+}
+
+.account-avatar img { width: 2rem; height: 2rem; }
+
+/* The radio stays focusable for keyboards, but the picture is what shows */
+.account-avatar input { position: absolute; opacity: 0; pointer-events: none; }
+
+.account-avatar:hover { border-color: var(--color-text-muted); }
+.account-avatar.is-selected { border-color: var(--color-star); }
+.account-avatar:focus-within { outline: 2px solid var(--color-primary); outline-offset: 2px; }

@@ -1,17 +1,15 @@
-.flow-two-shell { max-width: 56rem; margin: 1.5rem auto 0; }
+.flow-two-shell { max-width: 56rem; margin: 0.75rem auto 0; }
 
 .flow-two-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.flow-two-title { font-size: 2rem; font-weight: 800; }
-
-.flow-two-subtitle { color: var(--color-text-muted); margin-top: 0.25rem; }
+.flow-two-title { font-size: 1.6rem; font-weight: 800; }
 
 .flow-two-tabs {
   display: flex;
@@ -35,17 +33,21 @@
   border-bottom: 2px solid var(--color-primary);
 }
 
-/* Chat on the left, live plan on the right; stacked on narrow screens */
+/* Chat on the left, live plan on the right, both one fixed height that fits the window
+   (the chat log and the plan scroll inside it); stacked at their natural height on narrow screens */
 .flow-two-agent {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   gap: 1rem;
-  align-items: start;
+  height: clamp(26rem, calc(100vh - var(--nav-height) - 12rem), 44rem);
   margin-bottom: 2rem;
 }
 
+.flow-two-agent > app-agent-chat,
+.flow-two-agent > app-plan-card { display: block; min-height: 0; }
+
 @media (max-width: 720px) {
-  .flow-two-agent { grid-template-columns: minmax(0, 1fr); }
+  .flow-two-agent { grid-template-columns: minmax(0, 1fr); height: auto; }
 }
 
 .flow-two-error { color: #fca5a5; margin-bottom: 2rem; }

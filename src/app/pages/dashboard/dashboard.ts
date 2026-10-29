@@ -1,8 +1,27 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { EventsService, type EventRow } from '../../services/events.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
+import { NAME_NOT_ALLOWED } from '../../shared/plan';
+import { isNameAllowed } from '../../shared/profanity';
+
+// "Welcome back, <title>" starts with the first, then picks the others at random
+const TITLES = [
+  'Astronaut', 'Space Cadet', 'Captain', 'Traveler', 'Starfarer',
+  'Scientist', 'Navigator', 'Pilot', 'Commander', 'Explorer',
+  'Voyager', 'Stargazer', 'Cosmonaut', 'Pioneer', 'Ranger',
+  'Engineer', 'Spacefarer', 'Comet Chaser', 'Moonwalker', 'Mission Specialist',
+  'Flight Director', 'Orbiter', 'Wayfinder', 'Rocketeer', 'Nebula Hopper',
+];
+const TITLE_MS = 6250; // how long each title shows
+const FADE_MS = 600; // matches .dashboard-title-word's transition
+
+// Any title except the one showing, so it never repeats twice in a row
+function nextTitle(current: string): string {
+  const others = TITLES.filter(t => t !== current);
+  return others[Math.floor(Math.random() * others.length)];
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -13,6 +32,10 @@ import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
 export class DashboardComponent implements OnInit {
   private eventsService = inject(EventsService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
+  title = signal(TITLES[0]);
+  titleHidden = signal(false); // fades the word out before it changes
 
   events = signal<EventRow[]>([]);
   loading = signal(true);
@@ -29,6 +52,22 @@ export class DashboardComponent implements OnInit {
   deleteError = signal('');
 
   async ngOnInit() {
+    // Stays on the first title for people who've asked their system for less motion
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let swap: ReturnType<typeof setTimeout> | undefined;
+      const timer = setInterval(() => {
+        this.titleHidden.set(true);
+        swap = setTimeout(() => {
+          this.title.set(nextTitle(this.title()));
+          this.titleHidden.set(false);
+        }, FADE_MS);
+      }, TITLE_MS);
+      this.destroyRef.onDestroy(() => {
+        clearInterval(timer);
+        clearTimeout(swap);
+      });
+    }
+
     try {
       this.events.set(await this.eventsService.list());
     } catch {
@@ -48,6 +87,7 @@ export class DashboardComponent implements OnInit {
   async createEvent(name: string) {
     const open = this.pendingCreate();
     if (!open) return;
+    if (!isNameAllowed(name)) return this.createError.set(NAME_NOT_ALLOWED);
     this.creating.set(true);
     try {
       const id = await this.eventsService.create(name);

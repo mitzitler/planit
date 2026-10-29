@@ -9,6 +9,16 @@
 }
 
 .dashboard-title { font-size: 1.8rem; font-weight: 800; }
+
+.dashboard-title .icon { margin-right: 0.35em; }
+
+.dashboard-title-word {
+  display: inline-block;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.dashboard-title-word.is-hidden { opacity: 0; transform: translateY(0.2em); }
+
 .dashboard-subtitle { color: var(--color-text-muted); margin-top: 0.25rem; }
 
 .dashboard-section-title {

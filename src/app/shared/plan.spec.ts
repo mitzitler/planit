@@ -1,4 +1,5 @@
 import {
+  NAME_NOT_ALLOWED,
   PLAN_TOOLS,
   SELECTABLE_ACTIVITY_IDS,
   SELECTABLE_PLACE_IDS,
@@ -277,5 +278,21 @@ describe('helpers', () => {
     expect(isValidDate('2026-02-29')).toBe(false);
     expect(isValidTime('00:00')).toBe(true);
     expect(isValidTime('9:00')).toBe(false);
+  });
+});
+
+describe('event names', () => {
+  const rename = (name: string) => applyTool(emptyPlan(), 'set_basics', { name });
+
+  it('blocks slurs and strong profanity, including disguised spellings', () => {
+    for (const name of ['fuck this party', 'fuuuck night', 'b1tch brunch', 'dick pics']) {
+      expect(rename(name)).toEqual({ ok: false, error: NAME_NOT_ALLOWED });
+    }
+  });
+
+  it('allows mild words and ordinary names', () => {
+    for (const name of ['Shit Show Saturday', 'Crap Gift Swap', "Sam's 30th", 'Scunthorpe reunion', 'Essex trip']) {
+      expect(rename(name).ok).toBe(true);
+    }
   });
 });

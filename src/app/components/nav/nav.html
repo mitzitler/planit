@@ -13,7 +13,7 @@
   <!-- Right: user area -->
   <div class="nav-right">
     @if (session$ | async; as session) {
-      <span class="nav-ready">ready to plan, <span class="nav-username">{{ (session.user.email ?? '').split('@')[0] }}</span>?</span>
+      <span class="nav-ready">ready to plan, <span class="nav-username">{{ displayName(session.user) }}</span>?</span>
 
       <div class="nav-account">
         <button
@@ -26,7 +26,11 @@
           aria-controls="account-menu"
           title="Account"
         >
-          {{ getInitials(session.user.email ?? '') }}
+          @if (avatar(session.user); as icon) {
+            <img class="nav-avatar-img" [src]="'/icons/' + icon + '.svg'" alt="" />
+          } @else {
+            {{ getInitials(session.user.email ?? '') }}
+          }
         </button>
 
         @if (menuOpen()) {
@@ -40,6 +44,7 @@
             <a #firstMenuItem class="nav-menu-item" role="menuitem" routerLink="/dashboard" (click)="closeMenu()">
               Dashboard
             </a>
+            <a class="nav-menu-item" role="menuitem" routerLink="/account" (click)="closeMenu()">Account</a>
             <button class="nav-menu-item nav-menu-item--logout" role="menuitem" type="button" (click)="signOut()">
               Log out
             </button>

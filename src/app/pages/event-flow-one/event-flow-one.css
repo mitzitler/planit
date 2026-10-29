@@ -1,46 +1,20 @@
-/* Local nav */
-.local-nav {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  margin: 0.75rem 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-.local-nav-text {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 0.02em;
-}
-
-.local-nav-event-name {
-  color: #f87171;
-  font-style: italic;
-}
-
-.local-nav-spaced {
-  letter-spacing: 0.3em;
-  color: rgba(255, 255, 255, 0.9);
-  font-family: var(--font-title);
-}
-
-/* Cards container */
+/* Cards container; the height leaves room for the plan bar (48px plus its 0.75rem margins) */
 .cards-container {
   display: flex;
   gap: 10px;
   padding: 0 1rem 1rem;
-  height: calc(100vh - var(--nav-height) - 48px - 1.75rem);
+  height: calc(100vh - var(--nav-height) - 48px - 1.75rem - var(--page-bottom-space));
   position: relative;
   z-index: 1;
 }
 
 /* Individual card */
 .event-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  color: var(--color-text);
   flex-grow: 1;
   flex-shrink: 0;
   flex-basis: 0;
@@ -96,6 +70,12 @@
   font-size: 1.6rem;
 }
 
+.card-icon--placeholder {
+  display: block;
+  margin: auto;
+  font-size: 8rem;
+}
+
 .card-label-vertical {
   writing-mode: vertical-rl;
   text-orientation: mixed;
@@ -125,128 +105,11 @@
   opacity: 0;
 }
 
-.card-question {
-  font-family: var(--font-title);
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
+.wizard-message {
+  max-width: 40rem;
+  margin: 1rem auto;
+  padding: 0 1rem;
+  color: #fca5a5;
 }
 
-.card-subquestion {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: -0.75rem 0 0;
-}
-
-.card-copy {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
-}
-
-.card-copy strong {
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.card-input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 0.6rem 1rem;
-  color: white;
-  font-size: 0.9rem;
-  font-family: var(--font-body);
-  outline: none;
-  width: 100%;
-  max-width: 320px;
-  transition: border-color 0.15s;
-}
-
-.card-input:focus { border-color: rgba(255, 255, 255, 0.5); }
-.card-input::placeholder { color: rgba(255, 255, 255, 0.35); }
-
-/* Bucket buttons */
-.bucket-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.bucket-grid {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  gap: 0.75rem;
-  width: fit-content;
-}
-
-.bucket-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  padding: 0.65rem 1.1rem;
-  background: #c9a432;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
-  font-family: var(--font-body);
-}
-
-.bucket-btn:hover {
-  background: #d4af3a;
-  transform: translateY(-1px);
-}
-
-.bucket-btn.is-selected {
-  background: #e8c040;
-  border-color: white;
-}
-
-.bucket-label {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: #1a1400;
-}
-
-.bucket-sublabel {
-  font-size: 0.72rem;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-/* Activity columns */
-.activity-columns {
-  display: flex;
-  gap: 1.5rem;
-  flex: 1;
-  overflow-x: auto;
-}
-
-.activity-column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  min-width: 120px;
-}
-
-.activity-category-label {
-  font-family: var(--font-title);
-  font-size: 0.8rem;
-  color: #c9a432;
-  margin-bottom: 0.35rem;
-  letter-spacing: 0.05em;
-}
-
-.activity-option {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.75);
-  cursor: pointer;
-}
-
-.activity-option input[type="checkbox"] {
-  accent-color: #c9a432;
-  cursor: pointer;
-}
+.wizard-message a { color: inherit; }

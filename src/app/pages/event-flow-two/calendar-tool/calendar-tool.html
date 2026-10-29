@@ -1,1 +1,111 @@
-<p>calendar-tool works!</p>
+@if (plan(); as plan) {
+  <section class="tool" aria-label="Calendar">
+    <div class="tool-summary">
+      <p class="tool-figure">
+        @if (plan.date) {
+          {{ formatDate(plan.date) }}
+        } @else {
+          <span class="tool-muted">No event date yet</span>
+        }
+      </p>
+      <form class="tool-inline" (ngSubmit)="setEventDate()">
+        <label class="tool-muted" for="calendar-event-date">{{ plan.date ? 'Move the event to' : 'Set the event date' }}</label>
+        <input id="calendar-event-date" class="card-input tool-input-sm" type="date" name="eventDate"
+          [(ngModel)]="eventDate" [disabled]="locked()" />
+        <button class="btn-secondary" type="submit" [disabled]="locked()">Save</button>
+      </form>
+    </div>
+
+    <div class="calendar-split">
+      <!-- Event day -->
+      <div class="calendar-panel">
+        <h3 class="calendar-heading">
+          Event day
+          @if (plan.date) {
+            <span class="calendar-tag">{{ formatDate(plan.date) }}</span>
+          }
+        </h3>
+        @if (!plan.date) {
+          <p class="tool-muted">Set the event date to see the day's schedule.</p>
+        } @else {
+          <ul class="calendar-day-list">
+            @for (entry of eventDay(); track entry.index) {
+              <li class="calendar-day-item" [class.is-done]="entry.item.done">
+                <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
+                  (change)="check(entry, $any($event.target).checked)" [attr.aria-label]="'Done: ' + entry.item.title" />
+                <span class="calendar-time">{{ entry.item.time ? formatTime(entry.item.time) : 'To do' }}</span>
+                <span class="calendar-title">{{ entry.item.title }}</span>
+                <button class="calendar-x" type="button" [disabled]="locked()" (click)="remove(entry.index)"
+                  [attr.aria-label]="'Remove ' + entry.item.title">×</button>
+              </li>
+            } @empty {
+              <li class="tool-muted">Nothing planned for the day yet.</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Week-by-week to-dos leading up to it -->
+      <div class="calendar-panel">
+        <h3 class="calendar-heading">Leading up</h3>
+        @if (weeks().length) {
+          <div class="calendar-scroll">
+            <div class="calendar-grid" role="grid" aria-label="To-dos by week">
+              @for (day of weekdays; track day) {
+                <div class="calendar-weekday" role="columnheader">{{ day }}</div>
+              }
+              @for (week of weeks(); track week[0].date) {
+                @for (cell of week; track cell.date) {
+                  <div class="calendar-cell" role="gridcell" [class.is-event]="cell.isEvent" [class.is-today]="cell.isToday"
+                    [attr.aria-label]="formatDate(cell.date)">
+                    <span class="calendar-date">
+                      {{ cell.label }}
+                      @if (cell.isEvent) { <span class="calendar-event-mark">Event</span> }
+                    </span>
+                    @for (entry of cell.entries; track entry.index) {
+                      <div class="calendar-todo" [class.is-done]="entry.item.done">
+                        <label>
+                          <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
+                            (change)="check(entry, $any($event.target).checked)" />
+                          <span>
+                            @if (entry.item.time) { <span class="calendar-time">{{ formatTime(entry.item.time) }}</span> }
+                            {{ entry.item.title }}
+                          </span>
+                        </label>
+                        <button class="calendar-x" type="button" [disabled]="locked()" (click)="remove(entry.index)"
+                          [attr.aria-label]="'Remove ' + entry.item.title">×</button>
+                      </div>
+                    }
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        } @else {
+          <p class="tool-muted">Set the event date, or add a to-do below.</p>
+        }
+      </div>
+    </div>
+
+    <form class="tool-form" (ngSubmit)="add()">
+      <input class="card-input tool-input-sm" type="date" name="date" aria-label="Date (defaults to the event date)"
+        [(ngModel)]="date" [disabled]="locked()" />
+      <input class="card-input tool-input-sm" type="time" name="time" aria-label="Time (optional)"
+        [(ngModel)]="time" [disabled]="locked()" />
+      <input class="card-input tool-grow" type="text" name="title" maxlength="80" aria-label="What happens or what to do"
+        placeholder="e.g. Guests arrive, Order the cake" [(ngModel)]="title" [disabled]="locked()" />
+      <button class="btn-primary" type="submit" [disabled]="locked()">Add</button>
+    </form>
+    <p class="tool-muted tool-hint">
+      @if (plan.date) { Leave the date empty for the event day. }
+      Leave the time empty for a to-do.
+    </p>
+
+    @if (locked()) {
+      <p class="tool-muted">The assistant is working. You can edit again once it replies.</p>
+    }
+    @if (error()) {
+      <p class="tool-error" role="alert">{{ error() }}</p>
+    }
+  </section>
+}

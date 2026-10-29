@@ -1,0 +1,63 @@
+.plan-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  font-size: 0.85rem;
+}
+
+.plan-name { font-size: 1.15rem; margin-bottom: 1rem; }
+
+.plan-facts { display: grid; gap: 0.75rem; margin-bottom: 1.25rem; }
+
+.plan-facts dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.plan-facts dd { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.plan-chip {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+}
+
+.plan-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 1rem 0 0.5rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
+}
+
+.plan-total {
+  font-family: var(--font-body);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
+}
+
+.plan-total.is-over { color: #fca5a5; }
+
+.plan-list { list-style: none; display: grid; gap: 0.35rem; }
+
+.plan-list li { display: flex; justify-content: space-between; gap: 0.75rem; }
+
+.plan-time { color: var(--color-star); font-variant-numeric: tabular-nums; }
+
+.plan-grow { flex: 1; }
+
+.plan-muted { color: var(--color-text-muted); }
+
+.plan-warning { color: #fca5a5; font-size: 0.8rem; margin-top: 0.25rem; }
+
+.plan-done .plan-grow { text-decoration: line-through; color: var(--color-text-muted); }

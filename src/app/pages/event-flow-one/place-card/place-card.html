@@ -1,0 +1,69 @@
+<section class="place-section">
+<h2 class="card-question">where do you see this happening?</h2>
+<div class="place-tree">
+  @for (category of placeOptions; track category.id) {
+    <div class="place-cat">
+      <button class="place-cat-header" type="button" (click)="togglePlaceExpand(category.id)">
+        <span>{{ category.label }}</span>
+        <span class="place-caret">{{ isPlaceExpanded(category.id) ? '▾' : '▸' }}</span>
+      </button>
+      @if (isPlaceExpanded(category.id)) {
+        <div class="place-chips">
+          @for (option of category.children; track option.id) {
+            <div class="place-chip-row">
+              <button
+                class="place-chip-btn"
+                type="button"
+                [class.is-selected]="isPlaceSelected(option.id)"
+                (click)="togglePlaceSelect(option.id)"
+              >{{ option.label }}</button>
+              @if (option.children?.length) {
+                <button class="place-sub-expand" type="button" (click)="togglePlaceExpand(option.id)">
+                  {{ isPlaceExpanded(option.id) ? '▾' : '▸' }}
+                </button>
+              }
+              @if (option.children?.length && isPlaceExpanded(option.id)) {
+                <div class="place-subchips">
+                  @for (sub of option.children!; track sub.id) {
+                    <button
+                      class="place-chip-btn place-chip-btn--sub"
+                      type="button"
+                      [class.is-selected]="isPlaceSelected(sub.id)"
+                      (click)="togglePlaceSelect(sub.id)"
+                    >{{ sub.label }}</button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
+</section>
+
+<section class="place-section">
+<h3 class="card-question formality-question">how dressed up is it?</h3>
+<div class="formality-scale" role="radiogroup" aria-label="Formality">
+  @for (level of formalityLevels; track level.id) {
+    <button
+      class="place-chip-btn"
+      type="button"
+      role="radio"
+      [attr.aria-checked]="selectedFormality() === level.id"
+      [class.is-selected]="selectedFormality() === level.id"
+      [title]="level.feelsLike"
+      (click)="selectFormality(level.id)"
+    >{{ level.label }}</button>
+  }
+</div>
+</section>
+
+<section class="place-section">
+<p class="card-copy">
+  knowing the type of venue will help specify planning opportunities, and avoid possible pitfalls!
+  of course, if you have <strong>anything specific in mind:</strong>
+</p>
+<input class="card-input" type="text" placeholder="specific venue name or address" [(ngModel)]="specificVenue" />
+</section>

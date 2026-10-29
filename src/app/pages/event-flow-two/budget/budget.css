@@ -1,0 +1,23 @@
+/* Spend against the total; turns red once the high end of the estimates is over */
+.budget-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.budget-bar span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 0.3s;
+}
+
+.budget-bar.is-over span { background: #dc2626; }
+
+.budget-left { font-size: 0.85rem; color: var(--color-text-muted); }
+.budget-left.is-over { color: #fca5a5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .budget-bar span { transition: none; }
+}

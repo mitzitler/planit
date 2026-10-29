@@ -1,1 +1,62 @@
-<p>budget works!</p>
+@if (plan(); as plan) {
+  <section class="tool" aria-label="Budget">
+    <div class="tool-summary">
+      @if (plan.budgetTotal !== null) {
+        <p class="tool-figure">
+          {{ formatRange(range().low, range().high) }}
+          <span class="tool-muted">of {{ formatMoney(plan.budgetTotal) }}</span>
+        </p>
+        <div class="budget-bar" [class.is-over]="over()" role="presentation">
+          <span [style.width.%]="percent()"></span>
+        </div>
+        <p class="budget-left" [class.is-over]="over()">{{ remaining() }}</p>
+      } @else {
+        <p class="tool-figure">
+          {{ formatRange(range().low, range().high) }}
+          <span class="tool-muted">planned, no total budget yet</span>
+        </p>
+      }
+      <form class="tool-inline" (ngSubmit)="setTotal()">
+        <label class="tool-muted" for="budget-total">{{ plan.budgetTotal === null ? 'Set a total' : 'Change the total' }}</label>
+        <input id="budget-total" class="card-input tool-input-sm" type="number" name="total" min="1" step="any"
+          placeholder="$" [(ngModel)]="total" [disabled]="locked()" />
+        <button class="btn-secondary" type="submit" [disabled]="locked()">Save</button>
+      </form>
+    </div>
+
+    <ul class="tool-list">
+      @for (item of plan.budget; track $index) {
+        <li class="tool-item">
+          <span class="tool-grow">{{ item.label }}</span>
+          @if (item.low !== undefined) {
+            <span>{{ formatRange(item.low, item.amount) }} <span class="tool-muted">est.</span></span>
+          } @else {
+            <span>{{ formatMoney(item.amount) }}</span>
+          }
+          <button class="tool-remove" type="button" [disabled]="locked()" (click)="remove($index)"
+            [attr.aria-label]="'Remove ' + item.label">Remove</button>
+        </li>
+      } @empty {
+        <li class="tool-muted">No budget items yet. Add one below, or ask the assistant.</li>
+      }
+    </ul>
+
+    <form class="tool-form" (ngSubmit)="add()">
+      <input class="card-input tool-grow" type="text" name="label" maxlength="80" aria-label="What it's for"
+        placeholder="What it's for, e.g. Snacks" [(ngModel)]="label" [disabled]="locked()" />
+      <input class="card-input tool-input-sm" type="number" name="cost" min="1" step="any" aria-label="Cost in dollars"
+        placeholder="Cost $" [(ngModel)]="cost" [disabled]="locked()" />
+      <input class="card-input tool-input-sm" type="number" name="upTo" min="1" step="any"
+        aria-label="Up to, in dollars, for an estimate (optional)" placeholder="Up to $ (est.)"
+        [(ngModel)]="upTo" [disabled]="locked()" />
+      <button class="btn-primary" type="submit" [disabled]="locked()">Add</button>
+    </form>
+
+    @if (locked()) {
+      <p class="tool-muted">The assistant is working. You can edit again once it replies.</p>
+    }
+    @if (error()) {
+      <p class="tool-error" role="alert">{{ error() }}</p>
+    }
+  </section>
+}

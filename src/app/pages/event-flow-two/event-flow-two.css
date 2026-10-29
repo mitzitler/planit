@@ -1,0 +1,52 @@
+.flow-two-shell { max-width: 56rem; margin: 1.5rem auto 0; }
+
+.flow-two-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.flow-two-title { font-size: 2rem; font-weight: 800; }
+
+.flow-two-subtitle { color: var(--color-text-muted); margin-top: 0.25rem; }
+
+.flow-two-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 2rem;
+}
+
+.flow-two-tab {
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color 0.15s, background 0.15s;
+}
+
+.flow-two-tab:hover { color: var(--color-text); }
+
+.flow-two-tab.is-active {
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+/* Chat on the left, live plan on the right; stacked on narrow screens */
+.flow-two-agent {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 720px) {
+  .flow-two-agent { grid-template-columns: minmax(0, 1fr); }
+}
+
+.flow-two-error { color: #fca5a5; margin-bottom: 2rem; }
+

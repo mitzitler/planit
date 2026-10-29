@@ -1,0 +1,132 @@
+/* Event day (1/4) beside the week-by-week calendar (3/4); stacked on narrow screens */
+.calendar-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .calendar-split { grid-template-columns: minmax(0, 1fr); }
+}
+
+.calendar-panel {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.calendar-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.calendar-tag {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  padding: 0.05rem 0.55rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.calendar-time {
+  color: var(--color-star);
+  font-variant-numeric: tabular-nums;
+}
+
+.is-done .calendar-title,
+.is-done label { text-decoration: line-through; color: var(--color-text-muted); }
+
+input[type='checkbox'] { accent-color: var(--color-primary); flex-shrink: 0; }
+
+.calendar-x {
+  margin-left: auto;
+  padding: 0 0.3rem;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.calendar-x:hover { color: #fca5a5; }
+.calendar-x:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Event day list */
+.calendar-day-list { list-style: none; display: grid; gap: 0.5rem; }
+
+.calendar-day-item {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+/* Calendar grid; scrolls sideways inside its panel on narrow screens */
+.calendar-scroll { overflow-x: auto; }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  min-width: 34rem;
+}
+
+.calendar-weekday {
+  padding: 0 0.3rem 0.25rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.calendar-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-height: 4.5rem;
+  padding: 0.35rem;
+  background: var(--color-surface-alt);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.calendar-cell.is-today { border-color: var(--color-text-muted); }
+.calendar-cell.is-event { border-color: var(--color-primary); background: rgba(124, 90, 245, 0.18); }
+
+.calendar-date { color: var(--color-text-muted); }
+.is-event .calendar-date { color: var(--color-text); }
+
+.calendar-event-mark { margin-left: 0.25rem; color: var(--color-accent); }
+
+.calendar-todo { display: flex; align-items: flex-start; gap: 0.1rem; }
+
+.calendar-todo label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  min-width: 0;
+  overflow-wrap: break-word;
+  cursor: pointer;
+}
+
+.calendar-todo .calendar-time { display: block; }
+
+.calendar-todo input { margin-top: 0.15em; }
+
+/* The remove button shows on hover or focus in the small cells, always on touch screens */
+.calendar-todo .calendar-x { opacity: 0; padding: 0 0.15rem; }
+.calendar-todo:hover .calendar-x,
+.calendar-todo:focus-within .calendar-x { opacity: 1; }
+@media (hover: none) {
+  .calendar-todo .calendar-x { opacity: 1; }
+}

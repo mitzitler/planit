@@ -1,0 +1,15 @@
+<dialog #dialog class="confirm-dialog" aria-labelledby="confirm-title" (cancel)="onEscape($event)" (click)="onClick($event)">
+  <div class="confirm-body">
+    <h2 id="confirm-title" class="confirm-title">{{ heading() }}</h2>
+    <p class="confirm-message"><ng-content /></p>
+    @if (error()) {
+      <p class="confirm-error" role="alert">{{ error() }}</p>
+    }
+    <div class="confirm-actions">
+      <button class="btn-secondary" type="button" autofocus [disabled]="busy()" (click)="cancel.emit()">Cancel</button>
+      <button class="btn-danger" type="button" [disabled]="busy()" (click)="confirm.emit()">
+        {{ busy() ? 'Deleting…' : confirmLabel() }}
+      </button>
+    </div>
+  </div>
+</dialog>

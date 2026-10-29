@@ -1,7 +1,7 @@
 <nav class="nav">
   <!-- Left: logo -->
   <a class="nav-logo" routerLink="/">
-    <span class="nav-logo-icon">🪐</span>
+    <span class="nav-logo-icon"><img class="icon" src="/icons/planet.svg" alt="" /></span>
     <span class="nav-logo-text">planit</span>
   </a>
 
@@ -14,12 +14,49 @@
   <div class="nav-right">
     @if (session$ | async; as session) {
       <span class="nav-ready">ready to plan, <span class="nav-username">{{ (session.user.email ?? '').split('@')[0] }}</span>?</span>
-      <button class="nav-avatar" (click)="signOut()" title="Sign out">
-        {{ getInitials(session.user.email ?? '') }}
-      </button>
+
+      <div class="nav-account">
+        <button
+          #avatarButton
+          class="nav-avatar"
+          type="button"
+          (click)="toggleMenu()"
+          aria-haspopup="menu"
+          [attr.aria-expanded]="menuOpen()"
+          aria-controls="account-menu"
+          title="Account"
+        >
+          {{ getInitials(session.user.email ?? '') }}
+        </button>
+
+        @if (menuOpen()) {
+          <div class="nav-menu" id="account-menu" role="menu" aria-label="Account">
+            <p class="nav-menu-email">{{ session.user.email }}</p>
+
+            @if (logoutError()) {
+              <p class="nav-menu-error" role="alert">{{ logoutError() }}</p>
+            }
+
+            <a #firstMenuItem class="nav-menu-item" role="menuitem" routerLink="/dashboard" (click)="closeMenu()">
+              Dashboard
+            </a>
+            <button class="nav-menu-item nav-menu-item--logout" role="menuitem" type="button" (click)="signOut()">
+              Log out
+            </button>
+          </div>
+        }
+      </div>
     } @else {
       <a class="nav-link" routerLink="/login">Log in</a>
       <a class="btn-primary" routerLink="/signup">Sign up</a>
     }
   </div>
 </nav>
+
+@if (loggingOut()) {
+  <div class="logout-overlay" [class.is-leaving]="overlayLeaving()" role="status" aria-live="polite">
+    <div class="logout-spinner" aria-hidden="true"></div>
+    <p class="logout-title">logging you out…</p>
+    <p class="logout-subtitle">see you back in orbit soon</p>
+  </div>
+}

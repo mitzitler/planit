@@ -1,89 +1,57 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { EventDraftService } from '../../services/event-draft.service';
+import { PlanBarComponent } from '../../components/plan-bar/plan-bar';
+import { SizeCardComponent } from './size-card/size-card';
+import { PlaceCardComponent } from './place-card/place-card';
+import { ActivitiesCardComponent } from './activities-card/activities-card';
 
 interface Card {
   id: 'size' | 'place' | 'activities' | 'cost' | 'extras';
   label: string;
-  icon: string;
-}
-
-interface Bucket {
-  id: string;
-  label: string;
-  sublabel?: string;
-}
-
-interface ActivityCategory {
-  id: string;
-  label: string;
-  options: string[];
+  icon: string; // file name in public/icons
 }
 
 @Component({
   selector: 'app-event-flow-one',
-  imports: [FormsModule],
+  imports: [RouterLink, PlanBarComponent, SizeCardComponent, PlaceCardComponent, ActivitiesCardComponent],
   templateUrl: './event-flow-one.html',
   styleUrl: './event-flow-one.css',
 })
-export class EventFlowOneComponent {
+export class EventFlowOneComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  draftService = inject(EventDraftService);
+
+  eventId = this.route.snapshot.paramMap.get('id')!;
+  loaded = signal(false);
+  loadError = signal('');
   activeCardIndex = -1;
 
   cards: Card[] = [
-    { id: 'size',       label: 'SIZE',       icon: '👥' },
-    { id: 'place',      label: 'PLACE',      icon: '🏠' },
-    { id: 'activities', label: 'ACTIVITIES', icon: '🎲' },
-    { id: 'cost',       label: 'COST',       icon: '💰' },
-    { id: 'extras',     label: 'EXTRAS',     icon: '💬' },
+    { id: 'size',       label: 'SIZE',       icon: 'people'     },
+    { id: 'place',      label: 'PLACE',      icon: 'place'      },
+    { id: 'activities', label: 'ACTIVITIES', icon: 'activities' },
+    { id: 'cost',       label: 'COST',       icon: 'money'      },
+    { id: 'extras',     label: 'EXTRAS',     icon: 'wormhole'   },
   ];
 
-  // SIZE
-  sizeBuckets: Bucket[] = [
-    { id: 'intimate', label: 'intimate',  sublabel: '8 or less' },
-    { id: 'mixer',    label: 'mixer',     sublabel: '9 - 20' },
-    { id: 'large',    label: 'large',     sublabel: '21 - 50' },
-    { id: 'rager',    label: 'rager',     sublabel: '51 - 90' },
-    { id: 'massive',  label: 'massive',   sublabel: '91+' },
-  ];
-  selectedSize: string | null = null;
-  exactGuestCount = '';
+  // The cards read the plan when they open, so they're only shown once it has loaded
+  async ngOnInit() {
+    try {
+      if (await this.draftService.load(this.eventId)) this.loaded.set(true);
+      else this.loadError.set("This event doesn't exist, or it isn't yours.");
+    } catch {
+      this.loadError.set('Could not load this event. Refresh to try again.');
+    }
+  }
 
-  // PLACE
-  placeBuckets: Bucket[] = [
-    { id: 'my-house',      label: 'my house!' },
-    { id: 'restaurant',    label: 'a restaurant?' },
-    { id: 'public-park',   label: 'a public park?' },
-    { id: 'friends-house', label: "or a friend's house?" },
-    { id: 'bar',           label: 'a bar?' },
-    { id: 'event-venue',   label: 'an event venue?' },
-  ];
-  selectedPlace: string | null = null;
-  specificVenue = '';
-
-  // ACTIVITIES
-  activityCategories: ActivityCategory[] = [
-    { id: 'eating',      label: 'eating...',   options: ['brunch', 'dinner', 'potluck', 'cooking', 'etc'] },
-    { id: 'drinking',    label: 'drinking',    options: ['tea time', 'cocktails', 'wine bar', 'kegger', 'etc'] },
-    { id: 'playing',     label: 'playing',     options: ['board games', 'sports', 'charades', 'video games', 'etc'] },
-    { id: 'relaxing',    label: 'relaxing',    options: ['hiking', 'picnic', 'spa day', 'study date', 'etc'] },
-    { id: 'celebrating', label: 'celebrating', options: ['graduation', 'birthday', 'housewarming', 'engagement', 'wedding', 'finals', 'etc'] },
-  ];
-  selectedActivities: Set<string> = new Set();
-
-  setActiveCard(index: number) {
+  // ── Card layout ───────────────────────────────────────────────
+  setActiveCard(index: number): void {
     this.activeCardIndex = this.activeCardIndex === index ? -1 : index;
   }
 
-  // Returns 0-4 for CSS class binding
   getOverlayDistance(index: number): number {
     if (this.activeCardIndex === -1) return 0;
     return Math.abs(index - this.activeCardIndex);
-  }
-
-  toggleActivity(option: string) {
-    if (this.selectedActivities.has(option)) {
-      this.selectedActivities.delete(option);
-    } else {
-      this.selectedActivities.add(option);
-    }
   }
 }

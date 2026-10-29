@@ -11,12 +11,16 @@ export class SupabaseService {
   private sessionSubject = new BehaviorSubject<Session | null>(null);
   session$ = this.sessionSubject.asObservable();
 
+  // Resolves once the stored session has been read; guards await this before checking
+  readonly ready: Promise<Session | null>;
+
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
 
     // Hydrate session on startup (handles page refresh)
-    this.supabase.auth.getSession().then(({ data }) => {
+    this.ready = this.supabase.auth.getSession().then(({ data }) => {
       this.sessionSubject.next(data.session);
+      return data.session;
     });
 
     // Keep session in sync on login/logout/token refresh
@@ -34,7 +38,24 @@ export class SupabaseService {
   }
 
   signUp(email: string, password: string) {
-    return this.supabase.auth.signUp({ email, password });
+    return this.supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: this.confirmRedirectUrl },
+    });
+  }
+
+  resendConfirmation(email: string) {
+    return this.supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: this.confirmRedirectUrl },
+    });
+  }
+
+  // Confirmation links land back on this deployment's login page
+  private get confirmRedirectUrl() {
+    return `${window.location.origin}/login?confirmed=1`;
   }
 
   signIn(email: string, password: string) {

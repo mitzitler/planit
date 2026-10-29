@@ -1,51 +1,67 @@
 <div class="auth-shell">
   <div class="auth-card">
-    <div class="auth-logo">🪐</div>
-    <h1 class="auth-title">Create your account</h1>
-    <p class="auth-subtitle">Let's get you into orbit.</p>
+    <div class="auth-logo"><img class="icon" src="/icons/planet.svg" alt="" /></div>
 
-    <form class="auth-form" (ngSubmit)="onSubmit()">
-      <div class="form-field">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          [(ngModel)]="email"
-          name="email"
-          placeholder="you@example.com"
-          required
-          autocomplete="email"
-        />
-      </div>
+    @if (sentTo(); as email) {
+      <h1 class="auth-title">Check your inbox</h1>
+      <p class="auth-subtitle">
+        We sent a confirmation link to <strong>{{ email }}</strong>. Click it to finish setting up your account.
+      </p>
 
-      <div class="form-field">
-        <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          [(ngModel)]="password"
-          name="password"
-          placeholder="••••••••"
-          required
-          autocomplete="new-password"
-        />
-      </div>
-
-      @if (errorMessage) {
-        <p class="auth-error">{{ errorMessage }}</p>
+      @if (resendMessage()) {
+        <p class="auth-success">{{ resendMessage() }}</p>
       }
 
-      @if (successMessage) {
-        <p class="auth-success">{{ successMessage }}</p>
-      }
-
-      <button class="btn-primary btn-full" type="submit" [disabled]="loading">
-        {{ loading ? 'Creating account…' : 'Sign up' }}
+      <button class="btn-secondary btn-full" type="button" (click)="resend()" [disabled]="resendCooldown() > 0">
+        {{ resendCooldown() > 0 ? 'Resend in ' + resendCooldown() + 's' : 'Resend email' }}
       </button>
-    </form>
 
-    <p class="auth-switch">
-      Already have an account? <a routerLink="/login">Log in</a>
-    </p>
+      <p class="auth-switch">
+        Already confirmed? <a routerLink="/login">Log in</a>
+      </p>
+    } @else {
+      <h1 class="auth-title">Create your account</h1>
+      <p class="auth-subtitle">Let's get you into orbit.</p>
+
+      <form class="auth-form" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••"
+            required
+            autocomplete="new-password"
+          />
+        </div>
+
+        @if (errorMessage()) {
+          <p class="auth-error">{{ errorMessage() }}</p>
+        }
+
+        <button class="btn-primary btn-full" type="submit" [disabled]="loading()">
+          {{ loading() ? 'Creating account…' : 'Sign up' }}
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Already have an account? <a routerLink="/login">Log in</a>
+      </p>
+    }
   </div>
 </div>

@@ -6,7 +6,7 @@ import {
   type ActivityOption,
   type PlaceOption,
 } from '../../../services/decision-tree';
-import { formatDate, formatMoney, formatRange, formatTime } from '../../../shared/format';
+import { formatDate, formatMoney, formatRange, formatShortDate, formatTime } from '../../../shared/format';
 import { budgetRange, guestConflict, type Plan } from '../../../shared/plan';
 
 // id → label for every place and activity
@@ -64,6 +64,7 @@ export class PlanCardComponent {
 
   formatDate = formatDate;
   formatTime = formatTime;
+  formatShortDate = formatShortDate;
   formatMoney = formatMoney;
   formatRange = formatRange;
 }

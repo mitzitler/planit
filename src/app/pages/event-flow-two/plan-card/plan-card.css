@@ -59,3 +59,5 @@
 .plan-muted { color: var(--color-text-muted); }
 
 .plan-warning { color: #fca5a5; font-size: 0.8rem; margin-top: 0.25rem; }
+
+.plan-done .plan-grow { text-decoration: line-through; color: var(--color-text-muted); }

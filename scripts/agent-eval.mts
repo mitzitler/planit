@@ -165,6 +165,31 @@ const CASES: Case[] = [
     ],
   },
   {
+    name: 'cake-lead-up',
+    message: "Birthday for 12 at my place on Saturday, November 14. I'll get the cake from a bakery.",
+    checks: [
+      ['date is Nov 14', plan => plan.date === '2026-11-14'],
+      [
+        'a cake to-do days before the party',
+        plan => plan.schedule.some(i => /cake/i.test(i.title) && i.date < '2026-11-14'),
+      ],
+      ['picking up the cake on the day', plan => plan.schedule.some(i => /cake/i.test(i.title) && /pick/i.test(i.title) && i.date === '2026-11-14')],
+    ],
+  },
+  {
+    name: 'check-off-todo',
+    start: [
+      ['set_basics', { name: 'Birthday', date: '2026-11-14' }],
+      ['add_schedule_item', { date: '2026-11-07', title: 'Order the cake' }],
+      ['add_schedule_item', { time: '19:00', title: 'Guests arrive' }],
+    ],
+    message: 'I ordered the cake today.',
+    checks: [
+      ['ordering the cake is checked off', plan => plan.schedule.some(i => /order/i.test(i.title) && i.done === true)],
+      ['nothing else is checked off', plan => plan.schedule.filter(i => i.done).length === 1],
+    ],
+  },
+  {
     name: 'tight-budget',
     message: 'Catered dinner for 40 people, and my budget is $200.',
     checks: [

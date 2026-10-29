@@ -1,4 +1,4 @@
-// The event plan and the 7 tools that change it.
+// The event plan and the 8 tools that change it.
 // Pure TypeScript with no Angular imports: the Angular app and api/agent.ts both use this file,
 // so the wizard, the agent and the validation can never disagree about what a valid plan is.
 import {
@@ -34,10 +34,13 @@ export interface Formality {
   confirmed: boolean;
 }
 
+// Both what happens at the event and the host's to-dos leading up to it (order the cake a week
+// ahead); the date decides which. An item without a time is an all-day to-do.
 export interface ScheduleItem {
   date: string; // YYYY-MM-DD
-  time: string; // HH:MM, 24-hour
+  time?: string; // HH:MM, 24-hour
   title: string;
+  done?: boolean; // checked off
 }
 
 export interface Plan {
@@ -151,7 +154,8 @@ export type ToolName =
   | 'add_budget_item'
   | 'remove_budget_item'
   | 'add_schedule_item'
-  | 'remove_schedule_item';
+  | 'remove_schedule_item'
+  | 'check_schedule_item';
 
 export type ToolResult = { ok: true; plan: Plan } | { ok: false; error: string };
 
@@ -248,15 +252,17 @@ export const PLAN_TOOLS = [
   },
   {
     name: 'add_schedule_item',
-    description: 'Add one item to the schedule. Date defaults to the event date.',
+    description:
+      'Add one item to the schedule: something that happens at the event, or a to-do for the host on the ' +
+      'event day or any day before it (e.g. "Order the cake" a week ahead). Date defaults to the event date.',
     input_schema: {
       type: 'object',
       properties: {
         date: { type: 'string', description: 'YYYY-MM-DD. Omit to use the event date.' },
-        time: { type: 'string', description: '24-hour time as HH:MM, e.g. "19:30".' },
-        title: { type: 'string', description: 'What happens, e.g. "Guests arrive".' },
+        time: { type: 'string', description: '24-hour time as HH:MM, e.g. "19:30". Omit for an all-day to-do.' },
+        title: { type: 'string', description: 'What happens or what to do, e.g. "Guests arrive", "Pick up the cake".' },
       },
-      required: ['time', 'title'],
+      required: ['title'],
     },
   },
   {
@@ -270,6 +276,20 @@ export const PLAN_TOOLS = [
         index: { type: 'integer', minimum: 0, description: 'Position in plan.schedule, starting at 0.' },
       },
       required: ['index'],
+    },
+  },
+  {
+    name: 'check_schedule_item',
+    description:
+      'Mark one schedule item done or not done, by its position in the current plan\'s schedule list ' +
+      '(0 is the first). Use it when the user says they did something, e.g. "I ordered the cake".',
+    input_schema: {
+      type: 'object',
+      properties: {
+        index: { type: 'integer', minimum: 0, description: 'Position in plan.schedule, starting at 0.' },
+        done: { type: 'boolean', description: 'true when it is done, false to uncheck it.' },
+      },
+      required: ['index', 'done'],
     },
   },
 ] as const;
@@ -293,7 +313,9 @@ export function applyTool(plan: Plan, name: string, input: Input): ToolResult {
     case 'add_schedule_item':
       return addScheduleItem(plan, input);
     case 'remove_schedule_item':
-      return removeAt(plan, input, 'schedule', item => `${item.date} ${item.time} ${item.title}`);
+      return removeAt(plan, input, 'schedule', describeScheduleItem);
+    case 'check_schedule_item':
+      return checkScheduleItem(plan, input);
     default:
       return fail(`Unknown tool "${name}".`);
   }
@@ -425,13 +447,30 @@ function addScheduleItem(plan: Plan, input: Input): ToolResult {
 
   if (date === null) return fail('No date given and the event has no date yet. Pass date, or call set_basics first.');
   if (!isValidDate(date)) return fail(`date must be a real date as YYYY-MM-DD; got ${JSON.stringify(date)}.`);
-  if (!isValidTime(time)) return fail(`time must be 24-hour HH:MM; got ${JSON.stringify(time)}.`);
+  if (time !== undefined && !isValidTime(time)) {
+    return fail(`time must be 24-hour HH:MM, or left out for an all-day to-do; got ${JSON.stringify(time)}.`);
+  }
   if (!isNonEmptyString(title)) return fail('title must be a non-empty string.');
 
-  const schedule = [...plan.schedule, { date, time, title: title.trim() }].sort((a, b) =>
-    `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`),
+  const item: ScheduleItem = { date, ...(time === undefined ? {} : { time }), title: title.trim() };
+  // By date, then time; all-day to-dos come first on their day
+  const schedule = [...plan.schedule, item].sort((a, b) =>
+    `${a.date} ${a.time ?? ''}`.localeCompare(`${b.date} ${b.time ?? ''}`),
   );
   return { ok: true, plan: { ...plan, schedule } };
+}
+
+function checkScheduleItem(plan: Plan, input: Input): ToolResult {
+  const { index, done } = input;
+  if (typeof done !== 'boolean') return fail(`done must be true or false; got ${JSON.stringify(done)}.`);
+  const error = indexError(plan.schedule, index, 'schedule', describeScheduleItem);
+  if (error) return fail(error);
+  const schedule = plan.schedule.map((item, i) => (i === index ? { ...item, done } : item));
+  return { ok: true, plan: { ...plan, schedule } };
+}
+
+function describeScheduleItem(item: ScheduleItem): string {
+  return `${item.date} ${item.time ?? 'all day'} ${item.title}${item.done ? ' (done)' : ''}`;
 }
 
 // Removes plan[field][index]. The error lists the items with their positions, so the model can
@@ -444,12 +483,17 @@ function removeAt<F extends 'budget' | 'schedule'>(
 ): ToolResult {
   const list = plan[field] as Plan[F][number][];
   const { index } = input;
-  if (!list.length) return fail(`The ${field} is empty; there is nothing to remove.`);
-  if (!Number.isInteger(index) || (index as number) < 0 || (index as number) >= list.length) {
-    const items = list.map((item, i) => `${i}: ${describe(item)}`).join('; ');
-    return fail(`index must be a whole number from 0 to ${list.length - 1}; got ${JSON.stringify(index)}. The ${field} is: ${items}.`);
-  }
+  const error = indexError(list, index, field, describe);
+  if (error) return fail(error);
   return { ok: true, plan: { ...plan, [field]: list.filter((_, i) => i !== index) } };
+}
+
+// null if index points at an item in list
+function indexError<T>(list: T[], index: unknown, field: string, describe: (item: T) => string): string | null {
+  if (!list.length) return `The ${field} is empty; there is no item ${JSON.stringify(index)}.`;
+  if (Number.isInteger(index) && (index as number) >= 0 && (index as number) < list.length) return null;
+  const items = list.map((item, i) => `${i}: ${describe(item)}`).join('; ');
+  return `index must be a whole number from 0 to ${list.length - 1}; got ${JSON.stringify(index)}. The ${field} is: ${items}.`;
 }
 
 // ── Validators ───────────────────────────────────────────────

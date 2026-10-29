@@ -86,11 +86,11 @@
   @if (plan().schedule.length) {
     <ul class="plan-list">
       @for (item of plan().schedule; track $index) {
-        <li>
-          <span class="plan-time">{{ formatTime(item.time) }}</span>
+        <li [class.plan-done]="item.done">
+          <span class="plan-time">{{ item.time ? formatTime(item.time) : 'To do' }}</span>
           <span class="plan-grow">{{ item.title }}</span>
           @if (item.date !== plan().date) {
-            <span class="plan-muted">{{ formatDate(item.date) }}</span>
+            <span class="plan-muted">{{ formatShortDate(item.date) }}</span>
           }
         </li>
       }

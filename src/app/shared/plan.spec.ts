@@ -198,6 +198,38 @@ describe('add_schedule_item', () => {
     expectError(applyTool(emptyPlan(), 'add_schedule_item', { date: '2026-11-14', time: '7pm', title: 'Arrive' }));
     expectError(applyTool(emptyPlan(), 'add_schedule_item', { date: '2026-11-14', time: '24:00', title: 'Arrive' }));
   });
+
+  it('adds an all-day to-do without a time, first on its day', () => {
+    const dated = expectOk(applyTool(emptyPlan(), 'set_basics', { date: '2026-11-14' }));
+    const a = expectOk(applyTool(dated, 'add_schedule_item', { time: '10:00', title: 'Pick up the cake' }));
+    const b = expectOk(applyTool(a, 'add_schedule_item', { title: 'Clean the living room' }));
+    const plan = expectOk(applyTool(b, 'add_schedule_item', { date: '2026-11-07', title: 'Order the cake' }));
+    expect(plan.schedule.map(s => s.title)).toEqual(['Order the cake', 'Clean the living room', 'Pick up the cake']);
+    expect(plan.schedule[0]).toEqual({ date: '2026-11-07', title: 'Order the cake' }); // no time key
+  });
+});
+
+describe('check_schedule_item', () => {
+  const plan: Plan = {
+    ...emptyPlan(),
+    schedule: [
+      { date: '2026-11-07', title: 'Order the cake' },
+      { date: '2026-11-14', time: '19:00', title: 'Guests arrive' },
+    ],
+  };
+
+  it('checks an item off and back on', () => {
+    const done = expectOk(applyTool(plan, 'check_schedule_item', { index: 0, done: true }));
+    expect(done.schedule[0].done).toBe(true);
+    expect(done.schedule[1]).toBe(plan.schedule[1]);
+    expect(expectOk(applyTool(done, 'check_schedule_item', { index: 0, done: false })).schedule[0].done).toBe(false);
+  });
+
+  it('needs a valid index and a boolean', () => {
+    expect(expectError(applyTool(plan, 'check_schedule_item', { index: 5, done: true }))).toContain('0: 2026-11-07 all day Order the cake');
+    expectError(applyTool(plan, 'check_schedule_item', { index: 0, done: 'yes' }));
+    expectError(applyTool(plan, 'check_schedule_item', { index: 0 }));
+  });
 });
 
 describe('remove_budget_item / remove_schedule_item', () => {

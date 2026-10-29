@@ -6,7 +6,7 @@ Planit is tested in three layers. Each layer is cheaper and faster than the one 
 |---|---|---|---|---|
 | Unit tests | `npm test` | No (fake model) | Free | A few seconds |
 | Smoke run | `npx tsx --env-file=.env.local scripts/agent-smoke.mts "..."` | Yes, one turn | A few cents | About 10 s |
-| Agent eval | `npm run eval` | Yes, 12 scripted cases | About $0.65 | About 30 s |
+| Agent eval | `npm run eval` | Yes, 14 scripted cases | About $0.75 | About 30 s |
 
 The unit tests check that the code is correct. The eval checks that the agent behaves well. A model's answers vary from run to run, so the eval can't be an ordinary unit test. It runs on demand, not on every change.
 
@@ -20,9 +20,10 @@ Angular runs the tests with Vitest in JSDOM. The planning logic is plain TypeScr
 
 | File | Tests | What it covers |
 |---|---|---|
-| `src/app/shared/plan.spec.ts` | 26 | The 7 tools in `applyTool`: every input is validated, ids must be selectable, and guest ranges, clashes, formality, budget estimates and index-based removal all work. |
+| `src/app/shared/plan.spec.ts` | 29 | The 8 tools in `applyTool`: every input is validated, ids must be selectable, and guest ranges, clashes, formality, budget estimates, all-day to-dos, checking off and index-based removal all work. |
 | `src/app/shared/agent.spec.ts` | 10 | The agent loop in `runAgent`, run against a **fake model** (see below), plus checks on the system prompt. |
 | `src/app/shared/format.spec.ts` | 2 | Display formatting: `19:00` → `7pm`, and money ranges like `$12.50–1,200`. |
+| `src/app/shared/dates.spec.ts` | 2 | Calendar-day math for the Calendar tab: adding days across month ends, and the Monday-to-Sunday weeks it draws. |
 | `src/app/app.spec.ts` | 1 | The app component is created. |
 
 ### The fake model
@@ -47,10 +48,10 @@ Runs one real agent turn from the terminal and prints the reply, each round's st
 
 Needs `ANTHROPIC_API_KEY` in `.env.local`.
 
-## 3. Agent eval (12 scripted cases)
+## 3. Agent eval (14 scripted cases)
 
 ```bash
-npm run eval                              # all 12 cases
+npm run eval                              # all 14 cases
 npm run eval -- guest-clash tight-budget  # only these cases
 npm run eval -- --dry                     # no model, free: checks the checks
 ```
@@ -77,6 +78,8 @@ It exits with code 1 if any case fails.
 | `drop-budget-item` | Pizza, decorations, plates | Drop the decorations | Decorations gone, the other two kept |
 | `move-schedule-item` | 6pm setup, 7pm dinner | Move dinner to 8pm | Dinner at 8pm, nothing at 7pm, setup unchanged |
 | `keep-existing-choices` | Home, board games | Add video games too | Video games added, existing choices kept |
+| `cake-lead-up` | Empty | Birthday on Nov 14, cake from a bakery | A cake to-do days before, and picking it up on the day |
+| `check-off-todo` | Order-the-cake to-do, 7pm arrival | I ordered the cake today | That to-do is checked off, nothing else |
 | `no-matching-place` | Empty | Let's have it on a yacht | No place picked, and the reply mentions the yacht |
 | `tight-budget` | Empty | Catered dinner for 40 on $200 | Items stay within $200, or the reply warns |
 
@@ -114,6 +117,7 @@ Then run `npm run eval -- --dry` to confirm it fails without the model, and `npm
 | Date | Result | Tool calls | Cost |
 |---|---|---|---|
 | 2026-10-28 | 12/12 | 38 | ≤ $0.65 |
+| 2026-10-28 | 4/4 (the 2 new to-do cases + the 2 schedule cases) | 16 | ≤ $0.24 |
 
 A single run can be lucky. Run it two or three times after a prompt change, and record the lowest score.
 

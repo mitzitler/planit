@@ -39,7 +39,8 @@ To retake the GIF after UI changes, run `/demo-gif` in [Claude Code](https://cla
 
 **How it works**
 - The browser posts the message to `api/agent.ts`, a Vercel function. It checks the user's Supabase login and loads the event **as that user**, so row-level security applies.
-- `runAgent` (`src/app/shared/agent.ts`) sends the plan and the message to Claude (`claude-opus-5-5`, low effort) with **7 tools**: `set_basics`, `choose_places`, `choose_activities`, `add_budget_item`, `remove_budget_item`, `add_schedule_item` and `remove_schedule_item`.
+- `runAgent` (`src/app/shared/agent.ts`) sends the plan and the message to Claude (`claude-opus-5-5`, low effort) with **8 tools**: `set_basics`, `choose_places`, `choose_activities`, `add_budget_item`, `remove_budget_item`, `add_schedule_item`, `remove_schedule_item` and `check_schedule_item`.
+- The schedule holds both the event day's timeline and the host's to-dos leading up to it (order the cake a week ahead, pick it up the morning of). The Calendar tab shows the event day beside a week-by-week calendar, with a checkbox on every item.
 - Every tool call goes through `applyTool` (`src/app/shared/plan.ts`), which validates it. A bad call, such as an id that isn't in the list, goes back to the model as an error it can fix, and the plan only changes on success. Edits made by hand in the tabs go through the same tools.
 - The reply and each plan change stream back to the browser as they happen, and the final plan is saved to Supabase.
 
@@ -49,7 +50,7 @@ To retake the GIF after UI changes, run `/demo-gif` in [Claude Code](https://cla
 - Every run is logged with its tokens, tool calls, stop reason, latency and any error.
 - The system prompt is cached and stays the same between requests. Today's date and the current plan go in the user message instead.
 
-**Evaluated** with 12 scripted cases against the real model: **12/12 passed** (Oct 28, 2026). See [TESTING.md](TESTING.md).
+**Evaluated** with scripted cases against the real model: **12/12 passed** on Oct 28, 2026, before 2 cases for to-dos were added (both pass). See [TESTING.md](TESTING.md).
 
 ## Development
 

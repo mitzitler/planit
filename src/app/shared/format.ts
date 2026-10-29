@@ -11,6 +11,16 @@ export function formatDate(date: string): string {
   });
 }
 
+// "Sat, Nov 14", for dates near the event
+export function formatShortDate(date: string): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
 // "7pm", "8:30pm", "12am", from 24-hour "HH:MM"
 export function formatTime(time: string): string {
   const [h, m] = time.split(':').map(Number);

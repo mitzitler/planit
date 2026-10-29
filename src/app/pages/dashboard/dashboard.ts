@@ -6,7 +6,7 @@ import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
 import { NAME_NOT_ALLOWED } from '../../shared/plan';
 import { isNameAllowed } from '../../shared/profanity';
 
-// "Welcome back, <title>." starts with the first, then picks the others at random
+// "Welcome back, <title>" starts with the first, then picks the others at random
 const TITLES = [
   'Astronaut', 'Space Cadet', 'Captain', 'Traveler', 'Starfarer',
   'Scientist', 'Navigator', 'Pilot', 'Commander', 'Explorer',

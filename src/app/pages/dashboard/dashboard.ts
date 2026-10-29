@@ -14,7 +14,7 @@ const TITLES = [
   'Engineer', 'Spacefarer', 'Comet Chaser', 'Moonwalker', 'Mission Specialist',
   'Flight Director', 'Orbiter', 'Wayfinder', 'Rocketeer', 'Nebula Hopper',
 ];
-const TITLE_MS = 10000; // how long each title shows
+const TITLE_MS = 6250; // how long each title shows
 const FADE_MS = 600; // matches .dashboard-title-word's transition
 
 @Component({

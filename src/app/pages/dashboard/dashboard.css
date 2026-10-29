@@ -10,6 +10,8 @@
 
 .dashboard-title { font-size: 1.8rem; font-weight: 800; }
 
+.dashboard-title .icon { margin-right: 0.35em; }
+
 .dashboard-title-word {
   display: inline-block;
   transition: opacity 0.6s ease, transform 0.6s ease;

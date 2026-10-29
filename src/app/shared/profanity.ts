@@ -5,7 +5,7 @@ import { DataSet, RegExpMatcher, englishDataset, englishRecommendedTransformers 
 
 // Mild words that are fine in a party name ("Shit Show Saturday"). Words from obscenity's list only;
 // words that aren't on it ("crap", "damn") are already allowed.
-export const ALLOWED_WORDS = ['shit', 'dick', 'piss', 'ass', 'arse', 'turd'];
+export const ALLOWED_WORDS = ['shit'];
 
 const matcher = new RegExpMatcher({
   ...new DataSet<{ originalWord: string }>()

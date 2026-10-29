@@ -1,7 +1,12 @@
 <div class="dashboard">
   <header class="dashboard-header">
     <div>
-      <h1 class="dashboard-title">Welcome back, Astronaut. <img class="icon" src="/icons/radar.svg" alt="" /></h1>
+      <h1 class="dashboard-title">
+        Welcome back,
+        <!-- A new element per title, so the fade-in replays -->
+        @for (word of [title()]; track word) {<em class="dashboard-title-word">{{ word }}</em>}.
+        <img class="icon" src="/icons/radar.svg" alt="" />
+      </h1>
       <p class="dashboard-subtitle">Pick up where you left off, or launch something new.</p>
     </div>
     <button class="btn-primary btn-large" type="button" (click)="askName('manage')" [disabled]="creating()">

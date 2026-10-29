@@ -32,7 +32,7 @@
 }
 
 .nav-username {
-  color: #f87171;
+  color: var(--color-star);
 }
 
 .nav-avatar {

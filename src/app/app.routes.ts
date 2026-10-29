@@ -36,11 +36,6 @@ export const routes: Routes = [
         path: 'calendar',
         loadComponent: () => import('./pages/event-flow-two/calendar-tool/calendar-tool').then(m => m.CalendarToolComponent),
       },
-      {
-        path: 'communication',
-        loadComponent: () =>
-          import('./pages/event-flow-two/communication/communication').then(m => m.CommunicationComponent),
-      },
     ],
   },
 

@@ -1,9 +1,9 @@
-/* Cards container; the height leaves room for the plan bar (48px plus its 0.75rem margins) */
+/* Cards container; the height leaves room for the plan bar (48px plus the gaps above and below it) */
 .cards-container {
   display: flex;
   gap: 10px;
   padding: 0 1rem 1rem;
-  height: calc(100vh - var(--nav-height) - 48px - 1.75rem - var(--page-bottom-space));
+  height: calc(100vh - var(--nav-height) - var(--page-top-space) - 48px - 1rem - var(--page-bottom-space));
   position: relative;
   z-index: 1;
 }

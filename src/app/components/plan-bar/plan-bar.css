@@ -1,6 +1,6 @@
 /* The bar places itself, so the wizard and Mission Control show it in the same spot:
-   full width, just under the nav */
-:host { display: block; margin: 0.75rem 1rem; }
+   full width, just under the nav (.page-content adds the gap above it) */
+:host { display: block; margin: 0 1rem 0.75rem; }
 
 .plan-bar {
   display: grid;
@@ -33,7 +33,7 @@
   max-width: 100%;
   font: inherit;
   font-style: italic;
-  color: #f87171;
+  color: var(--color-star);
 }
 
 .plan-bar-name {

@@ -84,7 +84,7 @@
 
   <h3 class="plan-heading">Schedule</h3>
   @if (plan().schedule.length) {
-    <ul class="plan-list">
+    <ul class="plan-list plan-schedule">
       @for (item of plan().schedule; track $index) {
         <li [class.plan-done]="item.done">
           <span class="plan-time">{{ item.time ? formatTime(item.time) : 'To do' }}</span>

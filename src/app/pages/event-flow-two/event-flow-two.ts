@@ -32,7 +32,7 @@ export class EventFlowTwoComponent implements OnInit {
   tabs = [
     { label: 'Budget',        icon: 'money',         path: 'budget' },
     { label: 'Calendar',      icon: 'calendar',      path: 'calendar' },
-    { label: 'Communication', icon: 'communication', path: 'communication' },
+    // Communication comes back once it has something in it (pages/event-flow-two/communication)
   ];
 
   async ngOnInit() {

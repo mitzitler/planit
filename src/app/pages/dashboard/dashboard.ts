@@ -1,8 +1,18 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { EventsService, type EventRow } from '../../services/events.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
+
+// "Welcome back, <title>." cycles through these
+const TITLES = [
+  'Astronaut', 'Space Cadet', 'Captain', 'Traveler', 'Starfarer',
+  'Scientist', 'Navigator', 'Pilot', 'Commander', 'Explorer',
+  'Voyager', 'Stargazer', 'Cosmonaut', 'Pioneer', 'Ranger',
+  'Engineer', 'Spacefarer', 'Comet Chaser', 'Moonwalker', 'Mission Specialist',
+  'Flight Director', 'Orbiter', 'Wayfinder', 'Rocketeer', 'Nebula Hopper',
+];
+const TITLE_MS = 2500;
 
 @Component({
   selector: 'app-dashboard',
@@ -13,6 +23,9 @@ import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
 export class DashboardComponent implements OnInit {
   private eventsService = inject(EventsService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
+  title = signal(TITLES[0]);
 
   events = signal<EventRow[]>([]);
   loading = signal(true);
@@ -29,6 +42,13 @@ export class DashboardComponent implements OnInit {
   deleteError = signal('');
 
   async ngOnInit() {
+    // Stays on the first title for people who've asked their system for less motion
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let i = 0;
+      const timer = setInterval(() => this.title.set(TITLES[++i % TITLES.length]), TITLE_MS);
+      this.destroyRef.onDestroy(() => clearInterval(timer));
+    }
+
     try {
       this.events.set(await this.eventsService.list());
     } catch {

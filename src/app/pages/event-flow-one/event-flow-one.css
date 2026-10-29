@@ -1,10 +1,4 @@
-/* Plan bar: same height and margins as the old local nav, so the cards' height calc still fits */
-.wizard-bar {
-  display: block;
-  margin: 0.75rem 1rem;
-}
-
-/* Cards container */
+/* Cards container; the height leaves room for the plan bar (48px plus its 0.75rem margins) */
 .cards-container {
   display: flex;
   gap: 10px;

@@ -45,6 +45,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 .page-content {
   min-height: calc(100vh - var(--nav-height));
   padding-bottom: var(--page-bottom-space);
+  display: flow-root; /* keeps a page's top margin inside, so it doesn't push the page past the window */
   position: relative;
   z-index: 1;
 }
@@ -103,6 +104,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
   gap: 0.4rem;
   padding: 0.6rem 1.25rem;
   border-radius: var(--radius-sm);
+  font-family: var(--font-body); /* buttons don't inherit the page font */
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;

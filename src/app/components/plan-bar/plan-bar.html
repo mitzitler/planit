@@ -16,7 +16,7 @@
       />
     } @else {
       <button class="plan-bar-name" type="button" title="Rename this event" (click)="startEditing()">
-        {{ name() ?? 'name your event' }}
+        {{ displayName() }}
       </button>
     }
     <span class="plan-bar-spaced" aria-hidden="true">.. S P A C E !</span>

@@ -28,7 +28,7 @@ const tools = PLAN_TOOLS as unknown as Anthropic.Beta.BetaTool[];
 const callModel: CallModel = async (messages, onText) => {
   const stream = anthropic.beta.messages.stream({
     model: AGENT_MODEL,
-    max_tokens: 16000,
+    max_tokens: 8000, // replies are short; this caps a runaway one
     output_config: { effort: 'low' }, // picking from fixed lists doesn't need deep reasoning
     // A request the safety classifiers decline is retried server-side on the recommended model
     betas: ['server-side-fallback-2026-07-01'],

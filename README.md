@@ -45,12 +45,13 @@ To retake the GIF after UI changes, run `/demo-gif` in [Claude Code](https://cla
 - The reply and each plan change stream back to the browser as they happen, and the final plan is saved to Supabase.
 
 **Guardrails**
+- The assistant only plans the event: the user's words are wrapped as data, and requests to ignore its instructions, reveal its prompt or do unrelated things get a one-line redirect.
 - At most 6 model rounds per message, messages under 2,000 characters, and a cap on conversation length.
 - **20 runs per user per day**, counted from the `agent_runs` log. Users can read their own rows there but can't write or delete them.
 - Every run is logged with its tokens, tool calls, stop reason, latency and any error.
 - The system prompt is cached and stays the same between requests. Today's date and the current plan go in the user message instead.
 
-**Evaluated** with 14 scripted cases against the real model: **14/14 passed** on Oct 29, 2026. See [TESTING.md](TESTING.md).
+**Evaluated** with 16 scripted cases against the real model, including off-topic and prompt-leak attempts: **16/16 passed** on Oct 29, 2026. See [TESTING.md](TESTING.md).
 
 ## Development
 
@@ -74,7 +75,7 @@ Build artifacts go to `dist/`.
 
 ```bash
 ng test          # unit tests
-npm run eval     # agent eval against the real model (about $0.80)
+npm run eval     # agent eval against the real model (about $0.85)
 ```
 
 See [TESTING.md](TESTING.md) for what each layer covers and how the agent eval works.

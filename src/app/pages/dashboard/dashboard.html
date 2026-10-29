@@ -3,9 +3,9 @@
     <div>
       <h1 class="dashboard-title">
         Welcome back,
-        <!-- A new element per title, so the fade-in replays -->
-        @for (word of [title()]; track word) {<em class="dashboard-title-word">{{ word }}</em>}.
+        <!-- The icon comes before the word, so it doesn't move when the word changes length -->
         <img class="icon" src="/icons/radar.svg" alt="" />
+        <em class="dashboard-title-word" [class.is-hidden]="titleHidden()">{{ title() }}</em>.
       </h1>
       <p class="dashboard-subtitle">Pick up where you left off, or launch something new.</p>
     </div>

@@ -12,16 +12,11 @@
 
 .dashboard-title-word {
   display: inline-block;
-  animation: title-in 0.4s ease-out;
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-@keyframes title-in {
-  from { opacity: 0; transform: translateY(0.2em); }
-}
+.dashboard-title-word.is-hidden { opacity: 0; transform: translateY(0.2em); }
 
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-title-word { animation: none; }
-}
 .dashboard-subtitle { color: var(--color-text-muted); margin-top: 0.25rem; }
 
 .dashboard-section-title {

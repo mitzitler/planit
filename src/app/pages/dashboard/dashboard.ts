@@ -14,7 +14,8 @@ const TITLES = [
   'Engineer', 'Spacefarer', 'Comet Chaser', 'Moonwalker', 'Mission Specialist',
   'Flight Director', 'Orbiter', 'Wayfinder', 'Rocketeer', 'Nebula Hopper',
 ];
-const TITLE_MS = 2500;
+const TITLE_MS = 10000; // how long each title shows
+const FADE_MS = 600; // matches .dashboard-title-word's transition
 
 @Component({
   selector: 'app-dashboard',
@@ -28,6 +29,7 @@ export class DashboardComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   title = signal(TITLES[0]);
+  titleHidden = signal(false); // fades the word out before it changes
 
   events = signal<EventRow[]>([]);
   loading = signal(true);
@@ -47,8 +49,18 @@ export class DashboardComponent implements OnInit {
     // Stays on the first title for people who've asked their system for less motion
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       let i = 0;
-      const timer = setInterval(() => this.title.set(TITLES[++i % TITLES.length]), TITLE_MS);
-      this.destroyRef.onDestroy(() => clearInterval(timer));
+      let swap: ReturnType<typeof setTimeout> | undefined;
+      const timer = setInterval(() => {
+        this.titleHidden.set(true);
+        swap = setTimeout(() => {
+          this.title.set(TITLES[++i % TITLES.length]);
+          this.titleHidden.set(false);
+        }, FADE_MS);
+      }, TITLE_MS);
+      this.destroyRef.onDestroy(() => {
+        clearInterval(timer);
+        clearTimeout(swap);
+      });
     }
 
     try {

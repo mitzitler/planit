@@ -6,7 +6,7 @@ Planit is tested in three layers. Each layer is cheaper and faster than the one 
 |---|---|---|---|---|
 | Unit tests | `npm test` | No (fake model) | Free | A few seconds |
 | Smoke run | `npx tsx --env-file=.env.local scripts/agent-smoke.mts "..."` | Yes, one turn | A few cents | About 10 s |
-| Agent eval | `npm run eval` | Yes, 14 scripted cases | About $0.75 | About 30 s |
+| Agent eval | `npm run eval` | Yes, 14 scripted cases | About $0.80 | About 30 s |
 
 The unit tests check that the code is correct. The eval checks that the agent behaves well. A model's answers vary from run to run, so the eval can't be an ordinary unit test. It runs on demand, not on every change.
 
@@ -59,7 +59,7 @@ npm run eval -- --dry                     # no model, free: checks the checks
 `scripts/agent-eval.mts` sends one message per case to the real model with the real tools. Some cases start from a prepared plan. The script then checks the resulting plan and the reply text. It runs 3 cases at a time, prints the failures with the reply and the plan, and ends with a summary:
 
 ```
-12/12 passed · 38 tool calls · cost <= $0.65
+14/14 passed · 47 tool calls · cost <= $0.79
 ```
 
 It exits with code 1 if any case fails.
@@ -118,6 +118,7 @@ Then run `npm run eval -- --dry` to confirm it fails without the model, and `npm
 |---|---|---|---|
 | 2026-10-28 | 12/12 | 38 | ≤ $0.65 |
 | 2026-10-28 | 4/4 (the 2 new to-do cases + the 2 schedule cases) | 16 | ≤ $0.24 |
+| 2026-10-29 | 14/14 | 47 | ≤ $0.79 |
 
 A single run can be lucky. Run it two or three times after a prompt change, and record the lowest score.
 

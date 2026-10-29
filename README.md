@@ -50,7 +50,7 @@ To retake the GIF after UI changes, run `/demo-gif` in [Claude Code](https://cla
 - Every run is logged with its tokens, tool calls, stop reason, latency and any error.
 - The system prompt is cached and stays the same between requests. Today's date and the current plan go in the user message instead.
 
-**Evaluated** with scripted cases against the real model: **12/12 passed** on Oct 28, 2026, before 2 cases for to-dos were added (both pass). See [TESTING.md](TESTING.md).
+**Evaluated** with 14 scripted cases against the real model: **14/14 passed** on Oct 29, 2026. See [TESTING.md](TESTING.md).
 
 ## Development
 
@@ -74,7 +74,7 @@ Build artifacts go to `dist/`.
 
 ```bash
 ng test          # unit tests
-npm run eval     # agent eval against the real model (about $0.65)
+npm run eval     # agent eval against the real model (about $0.80)
 ```
 
 See [TESTING.md](TESTING.md) for what each layer covers and how the agent eval works.

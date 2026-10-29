@@ -1,15 +1,8 @@
 <section class="chat" aria-label="Planning assistant">
   <div class="chat-log" #log aria-live="polite">
     @for (line of lines(); track $index) {
-      <p class="chat-line" [class.is-user]="line.role === 'user'">
-        @if (line.text) {
-          {{ line.text }}
-        } @else {
-          <span class="chat-typing" aria-label="Assistant is working">
-            <span></span><span></span><span></span>
-          </span>
-        }
-      </p>
+      <!-- No whitespace around the text: .chat-line keeps it (pre-wrap), so it would show as a leading space -->
+      <p class="chat-line" [class.is-user]="line.role === 'user'">@if (line.text) {<span>{{ line.text }}</span>} @else {<span class="chat-typing" aria-label="Assistant is working"><span></span><span></span><span></span></span>}</p>
     } @empty {
       <div class="chat-empty">
         <p>Tell me about your event and I'll fill in the plan.</p>

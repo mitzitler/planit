@@ -59,7 +59,7 @@ npm run eval -- --dry                     # no model, free: checks the checks
 `scripts/agent-eval.mts` sends one message per case to the real model with the real tools. Some cases start from a prepared plan. The script then checks the resulting plan and the reply text. It runs 3 cases at a time, prints the failures with the reply and the plan, and ends with a summary:
 
 ```
-16/16 passed · 43 tool calls · cost <= $0.85
+16/16 passed · 41 tool calls · cost <= $0.88
 ```
 
 It exits with code 1 if any case fails.
@@ -85,7 +85,7 @@ It exits with code 1 if any case fails.
 | `no-matching-place` | Empty | Let's have it on a yacht | No place picked, and the reply mentions the yacht |
 | `tight-budget` | Empty | Catered dinner for 40 on $200 | Items stay within $200, or the reply warns |
 
-Every reply is also checked against the system prompt's rules. The reply is not empty and asks at most two questions. It has no markdown and no emoji, and is 600 characters or fewer. The turn must also end normally (`end_turn`), not at the round or token cap.
+Every reply is also checked against the system prompt's rules. The reply is not empty and asks at most two questions. It has no markdown and no emoji, and is at most 3 sentences and 70 words. The turn must also end normally (`end_turn`), not at the round or token cap.
 
 ### How it's designed
 
@@ -122,6 +122,7 @@ Then run `npm run eval -- --dry` to confirm it fails without the model, and `npm
 | 2026-10-28 | 4/4 (the 2 new to-do cases + the 2 schedule cases) | 16 | ≤ $0.24 |
 | 2026-10-29 | 14/14 | 47 | ≤ $0.79 |
 | 2026-10-29 | 16/16 (after the stay-on-task and shorter-reply prompt changes) | 43 | ≤ $0.85 |
+| 2026-10-29 | 16/16 (replies capped at 3 sentences / about 50 words, checked at 70) | 41 | ≤ $0.88 |
 
 A single run can be lucky. Run it two or three times after a prompt change, and record the lowest score.
 

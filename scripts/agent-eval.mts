@@ -33,13 +33,17 @@ const budgetWithin = (total: number): Check => [
   plan => budgetRange(plan.budget).high <= total,
 ];
 
+// Sentence ends: . ! or ? followed by a space or the end ("$12.50" and "7:30" don't count)
+const sentences = (reply: string) => (reply.trim().match(/[.!?]+(?=\s|$)/g) ?? []).length;
+
 // Every reply has to follow the system prompt's house rules
 const RULES: Check[] = [
   ['reply is not empty', (_, reply) => reply.trim().length > 0],
   ['asks at most two questions', (_, reply) => (reply.match(/\?/g) ?? []).length <= 2],
   ['no markdown', (_, reply) => !/\*\*|^#+ |^\s*[-*] /m.test(reply)],
   ['no emoji', (_, reply) => !/\p{Extended_Pictographic}/u.test(reply)],
-  ['short reply (600 characters at most)', (_, reply) => reply.trim().length <= 600],
+  ['at most 3 sentences', (_, reply) => sentences(reply) <= 3],
+  ['at most 70 words', (_, reply) => reply.trim().split(/\s+/).length <= 70],
 ];
 
 const STEERS_BACK: Check = ['steers back to the event', (_, reply) => /event|party|plan|game night/i.test(reply)];

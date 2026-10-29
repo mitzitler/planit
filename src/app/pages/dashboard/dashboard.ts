@@ -6,7 +6,7 @@ import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
 import { NAME_NOT_ALLOWED } from '../../shared/plan';
 import { isNameAllowed } from '../../shared/profanity';
 
-// "Welcome back, <title>." cycles through these
+// "Welcome back, <title>." starts with the first, then picks the others at random
 const TITLES = [
   'Astronaut', 'Space Cadet', 'Captain', 'Traveler', 'Starfarer',
   'Scientist', 'Navigator', 'Pilot', 'Commander', 'Explorer',
@@ -16,6 +16,12 @@ const TITLES = [
 ];
 const TITLE_MS = 6250; // how long each title shows
 const FADE_MS = 600; // matches .dashboard-title-word's transition
+
+// Any title except the one showing, so it never repeats twice in a row
+function nextTitle(current: string): string {
+  const others = TITLES.filter(t => t !== current);
+  return others[Math.floor(Math.random() * others.length)];
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -48,12 +54,11 @@ export class DashboardComponent implements OnInit {
   async ngOnInit() {
     // Stays on the first title for people who've asked their system for less motion
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      let i = 0;
       let swap: ReturnType<typeof setTimeout> | undefined;
       const timer = setInterval(() => {
         this.titleHidden.set(true);
         swap = setTimeout(() => {
-          this.title.set(TITLES[++i % TITLES.length]);
+          this.title.set(nextTitle(this.title()));
           this.titleHidden.set(false);
         }, FADE_MS);
       }, TITLE_MS);

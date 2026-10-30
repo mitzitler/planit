@@ -38,7 +38,7 @@
   cursor: pointer;
 }
 
-.account-avatar img { width: 2rem; height: 2rem; }
+.account-avatar img { width: 2.5rem; height: 2.5rem; }
 
 /* The radio stays focusable for keyboards, but the picture is what shows */
 .account-avatar input { position: absolute; opacity: 0; pointer-events: none; }

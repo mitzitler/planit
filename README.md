@@ -24,7 +24,7 @@ An event planning app built to help users organize, budget, and communicate arou
 
 ### Design
 - **Figma** — UI/UX design and flow mockups
-- **Icons** — the SVGs in `public/icons/` are from Moonpunch Studio's [Sci-Fi Icons](https://moonpunchstudio.itch.io/scifi-icons) pack on itch.io
+- **Icons** — the `orbit-*.svg` icons in `public/icons/` are from fraheat's [ORBIT Space UI](https://fraheat.itch.io/orbit-space-ui) pack on itch.io, recoloured. The older SVGs there are from Moonpunch Studio's [Sci-Fi Icons](https://moonpunchstudio.itch.io/scifi-icons) pack.
 
 ### AI Assistance
 - **Claude (Anthropic)** — used throughout development for code generation, architecture decisions, and iterative UI building via [Claude Code](https://claude.ai/code)

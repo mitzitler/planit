@@ -52,7 +52,7 @@
   justify-content: center;
 }
 
-.nav-avatar-img { width: 24px; height: 24px; }
+.nav-avatar-img { width: 30px; height: 30px; }
 
 .nav-avatar:hover {
   background: rgba(255, 255, 255, 0.25);

@@ -1,5 +1,5 @@
-<nav class="plan-bar" aria-label="Event">
-  <div class="plan-bar-half">
+<nav class="plan-bar pill" aria-label="Event">
+  <div class="pill-half">
     @if (editing()) {
       <label class="plan-bar-sr" for="plan-bar-name">Event name</label>
       <input
@@ -22,5 +22,5 @@
     <span class="plan-bar-spaced" aria-hidden="true">.. S P A C E !</span>
   </div>
 
-  <a class="plan-bar-half plan-bar-switch" [routerLink]="switchLink()">{{ switchLabel() }}</a>
+  <a class="pill-half pill-link" [routerLink]="switchLink()">{{ switchLabel() }}</a>
 </nav>

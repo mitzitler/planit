@@ -20,7 +20,7 @@
 <div class="cards-container">
   @for (card of cards; track card.id; let i = $index) {
     <div
-      class="event-card"
+      class="event-card glass-card"
       [class.is-active]="activeCardIndex === i"
       [class.is-collapsed]="activeCardIndex !== -1 && activeCardIndex !== i"
       (click)="setActiveCard(i)"

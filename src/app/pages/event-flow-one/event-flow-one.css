@@ -19,17 +19,10 @@
   flex-shrink: 0;
   flex-basis: 0;
   min-width: 52px;
-  border-radius: 20px;
   position: relative;
   cursor: pointer;
   overflow: hidden;
   transition: flex-grow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Glass effect */
-  background: rgba(255, 255, 255, 0.015);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border: 3px solid rgba(200, 180, 255, 0.4);
 }
 
 .event-card.is-active {

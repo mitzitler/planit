@@ -3,7 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { EventsService, type EventRow } from '../../services/events.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
-import { NAME_NOT_ALLOWED } from '../../shared/plan';
+import { NAME_NOT_ALLOWED, budgetRange, type Plan } from '../../shared/plan';
+import { formatDate, formatMoney, formatRange } from '../../shared/format';
 import { isNameAllowed } from '../../shared/profanity';
 
 // "Welcome back, <title>" starts with the first, then picks the others at random
@@ -118,13 +119,24 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Plan dates are YYYY-MM-DD; formatted in UTC so the day doesn't shift with the time zone
-  formatDate(date: string) {
-    return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      timeZone: 'UTC',
-    });
+  formatDate = formatDate;
+
+  // "12 planned", or "8–12, planning for 12" for a range. RSVPs aren't tracked yet, so there's no "confirmed".
+  guestsText(plan: Plan): string {
+    if (plan.guestCount === null) return 'not set yet';
+    const { min, max } = plan.guests ?? {};
+    if (min !== undefined && max !== undefined && min !== max) return `${min}–${max}, planning for ${plan.guestCount}`;
+    return `${plan.guestCount} planned`;
+  }
+
+  // "$300 planned / $210–260 estimated": the host's total, then the line items' estimates
+  budgetText(plan: Plan): string {
+    const parts: string[] = [];
+    if (plan.budgetTotal !== null) parts.push(`${formatMoney(plan.budgetTotal)} planned`);
+    if (plan.budget.length) {
+      const { low, high } = budgetRange(plan.budget);
+      parts.push(`${formatRange(low, high)} estimated`);
+    }
+    return parts.join(' / ') || 'not set yet';
   }
 }

@@ -1,17 +1,17 @@
 // Profile pictures users can pick from public/icons. New users get a random one.
 export const AVATARS = [
-  'icon_astronaut_helmet',
-  'icon_satellite',
-  'icon_ufo',
-  'icon_reactor',
-  'icon_chip',
-  'icon_energy_shield',
-  'icon_battery',
-  'icon_wrench_tech',
-  'planet',
-  'radar',
-  'wormhole',
-  'jetpack',
+  'orbit-satellite',
+  'orbit-moon',
+  'orbit-sun',
+  'orbit-shield',
+  'orbit-oxygen',
+  'orbit-battery',
+  'orbit-fuel',
+  'orbit-wrench',
+  'orbit-signal',
+  'orbit-flag',
+  'orbit-planet',
+  'orbit-rocket',
 ];
 
 export function randomAvatar(): string {

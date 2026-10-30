@@ -80,9 +80,9 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 /* Illustrated icons from public/icons; they size to the surrounding font size */
 .icon {
   display: inline-block;
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.15em;
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.25em;
 }
 
 .nav-logo-icon { font-size: 1.6rem; }
@@ -132,6 +132,61 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 .btn-primary:disabled, .btn-danger:disabled, .btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-large { padding: 0.85rem 2rem; font-size: 1.05rem; border-radius: var(--radius-md); }
+
+/* ── Pill ──────────────────────────────────────────────────── */
+/* A rounded bar split into halves: the plan bar, and the dashboard's create buttons */
+.pill {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  min-height: 48px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pill-half {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.4rem 1.25rem;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.pill-half + .pill-half { border-left: 1px solid rgba(255, 255, 255, 0.12); }
+
+/* A half that's a link or button */
+.pill-link {
+  background: none;
+  border: none; /* .pill-half + .pill-half still draws the divider */
+  font-family: var(--font-title);
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pill-link:hover,
+.pill-link:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.pill-link:disabled { cursor: progress; opacity: 0.6; }
+
+/* ── Glass card ────────────────────────────────────────────── */
+/* The see-through card: the wizard's cards and the dashboard's events */
+.glass-card {
+  background: rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 3px solid rgba(200, 180, 255, 0.4);
+  border-radius: var(--radius-lg);
+}
 
 /* ── Auth (login / signup) ─────────────────────────────────── */
 .auth-shell {

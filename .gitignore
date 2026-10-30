@@ -53,3 +53,10 @@ TODO.md
 figma-mockups/
 .vercel
 .env*
+
+# Paid ORBIT icon pack: the licence forbids sharing the raw files, so only the icons in use (public/icons/orbit-*.svg) are committed
+public/Buyer-Download/
+public/Buyer-Download.zip
+public/Free-Sample/
+public/icons/collection_icons.jpeg
+public/*.ai

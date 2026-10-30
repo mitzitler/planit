@@ -14,7 +14,7 @@
       @for (icon of avatars; track icon) {
         <label class="account-avatar" [class.is-selected]="avatar() === icon">
           <input type="radio" name="avatar" [value]="icon" [checked]="avatar() === icon" (change)="avatar.set(icon)" />
-          <img [src]="'/icons/' + icon + '.svg'" [alt]="icon.replace('icon_', '').replaceAll('_', ' ')" />
+          <img [src]="'/icons/' + icon + '.svg'" [alt]="icon.replace('orbit-', '').replace('icon_', '').replaceAll('_', ' ')" />
         </label>
       }
     </fieldset>

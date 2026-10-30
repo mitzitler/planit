@@ -30,8 +30,8 @@ export class EventFlowTwoComponent implements OnInit {
   deleteError = signal('');
 
   tabs = [
-    { label: 'Budget',        icon: 'money',         path: 'budget' },
-    { label: 'Calendar',      icon: 'calendar',      path: 'calendar' },
+    { label: 'Budget',        icon: 'orbit-crystal', path: 'budget' },
+    { label: 'Calendar',      icon: 'orbit-clock',   path: 'calendar' },
     // Communication comes back once it has something in it (pages/event-flow-two/communication)
   ];
 

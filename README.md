@@ -48,14 +48,14 @@ To retake the GIF after UI changes, run `/demo-gif` in [Claude Code](https://cla
 **Guardrails**
 - The assistant only plans the event: the user's words are wrapped as data (fake system or assistant tags are stripped), and requests to ignore its instructions, reveal its prompt or do unrelated things get a one-line redirect.
 - Asked to write the invite, it gives a short starting point from the plan and hands it back: the invite should be in the host's own voice.
-- Profanity aimed at it, or a profane event name, gets one line, "I can't engage with profanity.", and nothing else. No alcohol is planned for under-21 events.
+- Profanity aimed at it, or a profane event name, gets one line, "I can't engage with profanity.", and nothing else. Swearing in an otherwise normal request is planned as usual.
 - Event names (and display names) with slurs or strong profanity are refused, for the user and the assistant alike.
 - At most 6 model rounds per message, messages under 2,000 characters, and a cap on conversation length.
 - **20 runs per user per day**, counted from the `agent_runs` log. After that the chat replies "This agent is tired, please come back later!" Users can read their own rows there but can't write or delete them.
 - Every run is logged with its tokens, tool calls, stop reason, latency and any error.
 - The system prompt is cached and stays the same between requests. Today's date and the current plan go in the user message instead.
 
-**Evaluated** with 24 scripted cases against the real model, including 8 adversarial ones (prompt injection, a fake system tag, a profane name, alcohol at a sweet 16, an impossible date): **23/24 passed** on Oct 30, 2026. See [TESTING.md](TESTING.md).
+**Evaluated** with 26 scripted cases against the real model, including 10 adversarial ones (prompt injection, a fake system tag, a profane name, casual swearing, an impossible date): see [TESTING.md](TESTING.md) for the latest results. See [TESTING.md](TESTING.md).
 
 ## Development
 
@@ -79,7 +79,7 @@ Build artifacts go to `dist/`.
 
 ```bash
 ng test          # unit tests
-npm run eval     # agent eval against the real model (about $1.45)
+npm run eval     # agent eval against the real model (about $1.55)
 ```
 
 See [TESTING.md](TESTING.md) for what each layer covers and how the agent eval works.

@@ -1,4 +1,4 @@
-import { addDays, weekday, weeksCovering } from './dates';
+import { addDays, todayIn, weekday, weeksCovering } from './dates';
 
 describe('addDays', () => {
   it('crosses month and year ends', () => {
@@ -14,5 +14,21 @@ describe('weeksCovering', () => {
     const weeks = weeksCovering('2026-10-21', '2026-10-31');
     expect(weeks.map(w => w[0])).toEqual(['2026-10-19', '2026-10-26']);
     expect(weeks[1][6]).toBe('2026-11-01');
+  });
+});
+
+describe('todayIn', () => {
+  // 11pm on Oct 30 in New York is already Oct 31 in UTC
+  const lateEvening = new Date('2026-10-31T03:00:00Z');
+
+  it("uses the user's time zone", () => {
+    expect(todayIn('America/New_York', lateEvening)).toBe('2026-10-30');
+    expect(todayIn('Asia/Tokyo', lateEvening)).toBe('2026-10-31');
+  });
+
+  it('falls back to UTC for a missing or unknown zone', () => {
+    expect(todayIn(undefined, lateEvening)).toBe('2026-10-31');
+    expect(todayIn('Not/A_Zone', lateEvening)).toBe('2026-10-31');
+    expect(todayIn(42, lateEvening)).toBe('2026-10-31');
   });
 });

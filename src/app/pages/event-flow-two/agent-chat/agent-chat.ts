@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
-import { AgentService } from '../../../services/agent.service';
+import { AgentError, AgentService } from '../../../services/agent.service';
 import { EventsService } from '../../../services/events.service';
 import { chatLines } from '../../../shared/agent';
 import { EventPlanStore } from '../event-plan.store';
@@ -96,7 +96,9 @@ export class AgentChatComponent implements OnInit {
         }
       }
     } catch (err) {
-      this.errorMessage.set(err instanceof Error ? err.message : 'Something went wrong. Try again.');
+      // The daily limit reads as a reply from the assistant; it isn't saved to the conversation
+      if (err instanceof AgentError && err.status === 429) this.appendToReply(err.message, true);
+      else this.errorMessage.set(err instanceof Error ? err.message : 'Something went wrong. Try again.');
     } finally {
       // Drop the reply bubble if nothing was written into it
       this.lines.update(lines => (lines.at(-1)?.text === '' ? lines.slice(0, -1) : lines));

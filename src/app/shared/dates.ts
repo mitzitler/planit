@@ -25,3 +25,15 @@ export function localToday(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
+
+// Today in an IANA time zone ("America/New_York"), as YYYY-MM-DD. The server uses this with the
+// zone the browser sends, so "next Friday" is counted from the user's day, not UTC's.
+// A missing or unknown zone falls back to UTC.
+export function todayIn(timeZone: unknown, now = new Date()): string {
+  try {
+    if (typeof timeZone === 'string' && timeZone) return now.toLocaleDateString('en-CA', { timeZone });
+  } catch {
+    // RangeError for a zone Intl doesn't know
+  }
+  return now.toISOString().slice(0, 10);
+}

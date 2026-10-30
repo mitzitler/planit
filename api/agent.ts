@@ -1,7 +1,8 @@
 // POST /api/agent — runs the planning agent on one of the signed-in user's events.
 //
 // Request:  Authorization: Bearer <Supabase access token>
-//           { eventId, message, history }   (history = earlier `done.messages`, concatenated)
+//           { eventId, message, history, timeZone }   (history = earlier `done.messages`, concatenated;
+//           timeZone = the browser's IANA zone, so relative dates count from the user's day)
 // Response: newline-delimited JSON AgentEvents (src/app/shared/agent.ts), streamed.
 //
 // Reads and saves the event as the user, so row-level security applies. Only the agent_runs
@@ -14,6 +15,7 @@ import type { BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages
 import { createClient } from '@supabase/supabase-js';
 import { AGENT_MODEL, SYSTEM_PROMPT, runAgent, type AgentEvent, type CallModel } from '../src/app/shared/agent';
 import { PLAN_TOOLS, normalizePlan } from '../src/app/shared/plan';
+import { todayIn } from '../src/app/shared/dates';
 
 const MAX_MESSAGE_CHARS = 2000;
 const MAX_HISTORY_BYTES = 200_000; // the whole history is resent (and billed) on every call
@@ -63,13 +65,13 @@ export async function POST(request: Request): Promise<Response> {
   if (!user) return json(401, { error: 'Your session has expired. Log in again.' });
 
   // ── What they sent ──
-  let body: { eventId?: unknown; message?: unknown; history?: unknown };
+  let body: { eventId?: unknown; message?: unknown; history?: unknown; timeZone?: unknown };
   try {
     body = await request.json();
   } catch {
     return json(400, { error: 'Body must be JSON.' });
   }
-  const { eventId, message, history = [] } = body;
+  const { eventId, message, history = [], timeZone } = body;
   if (typeof eventId !== 'string' || !UUID.test(eventId)) return json(400, { error: 'eventId must be a UUID.' });
   if (typeof message !== 'string' || !message.trim()) return json(400, { error: 'message is required.' });
   if (message.length > MAX_MESSAGE_CHARS) {
@@ -89,7 +91,8 @@ export async function POST(request: Request): Promise<Response> {
     .gte('created_at', since);
   if (countError) return json(500, { error: 'Could not check your assistant usage. Try again.' });
   if ((count ?? 0) >= RUNS_PER_DAY) {
-    return json(429, { error: `You've used the assistant ${RUNS_PER_DAY} times today. Try again tomorrow.` });
+    // The chat shows a 429's message as the assistant's reply, not as an error
+    return json(429, { error: 'This agent is tired, please come back later!' });
   }
 
   // ── Their event (RLS returns nothing for someone else's) ──
@@ -111,7 +114,7 @@ export async function POST(request: Request): Promise<Response> {
           plan: startPlan,
           history: history as BetaMessageParam[],
           userText: message.trim(),
-          today: new Date().toISOString().slice(0, 10),
+          today: todayIn(timeZone),
           emit,
         });
         Object.assign(log, {

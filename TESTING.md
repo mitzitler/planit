@@ -143,6 +143,7 @@ Then run `npm run eval -- --dry` to confirm it fails without the model, and `npm
 | 2026-10-30 | 6/8 (the 8 new adversarial cases; both failures fixed: a one-sentence formality question, and a budget check that allows a warning) | 40 | ≤ $0.54 |
 | 2026-10-30 | 23/24 (`tight-budget` ran to 4 sentences; it passed on a rerun) | 80 | ≤ $1.44 |
 | 2026-10-30 | 7/7 (after the PR review: the cases the prompt changes touch, plus 3 new ones: `invite-no-date`, `kids-birthday`, `casual-swearing`) | 33 | ≤ $0.40 |
+| 2026-10-31 | 3/3 (after the Calendar tab reminder: `cake-lead-up`, the new `calendar-ask`, and `big-demo-prompt` for reply length) | 30 | ≤ $0.27 |
 
 A single run can be lucky. Run it two or three times after a prompt change, and record the lowest score.
 

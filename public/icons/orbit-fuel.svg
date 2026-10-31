@@ -2,8 +2,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
     <g>
-        <rect x="19" y="15" width="26" height="41" style="fill:rgb(0,145,147);"/>
-        <rect x="24" y="7" width="16" height="8" style="fill:rgb(255,126,121);"/>
-        <path d="M24,7L40,7L40,15L24,15L24,7ZM19,15L45,15L45,56L19,56L19,15ZM25,24L39,24L39,36L25,36M45,22L51,22L51,44C55,48 57,47.333 57,42L57,19L51,13" style="fill:none;fill-rule:nonzero;stroke:rgb(234,240,238);stroke-width:2.5px;"/>
+        <rect x="19" y="15" width="26" height="41" style="fill:rgb(115,17,18);"/>
+        <rect x="24" y="7" width="16" height="8" style="fill:rgb(233,96,103);"/>
+        <path d="M24,7L40,7L40,15L24,15L24,7ZM19,15L45,15L45,56L19,56L19,15ZM25,24L39,24L39,36L25,36M45,22L51,22L51,44C55,48 57,47.333 57,42L57,19L51,13" style="fill:none;fill-rule:nonzero;stroke:rgb(251,191,36);stroke-width:2.5px;"/>
     </g>
 </svg>

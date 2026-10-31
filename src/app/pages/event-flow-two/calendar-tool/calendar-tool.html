@@ -101,6 +101,40 @@
       Leave the time empty for a to-do.
     </p>
 
+    <div class="calendar-panel calendar-export">
+      <h3 class="calendar-heading">Add to your calendar</h3>
+      <div class="calendar-export-options">
+        <div class="calendar-export-option">
+          <p><strong>Download</strong> <span class="tool-muted">A one-time copy, added instantly. Download again after changes.</span></p>
+          <div class="tool-inline">
+            <button class="btn-secondary" type="button" [disabled]="!canExport()" (click)="download()">Download .ics</button>
+          </div>
+        </div>
+        <div class="calendar-export-option">
+          <p>
+            <strong>Subscribe</strong>
+            <span class="tool-muted">Stays updated. Google Calendar checks for changes every 12 to 24 hours; Apple Calendar lets you choose how often.</span>
+          </p>
+          @if (feed(); as feed) {
+            <div class="tool-inline">
+              <a class="btn-secondary" [href]="feed.apple">Apple Calendar</a>
+              <a class="btn-secondary" [href]="feed.google" target="_blank" rel="noopener">Google Calendar</a>
+              <button class="btn-secondary" type="button" (click)="copy(feed.https)">{{ copied() ? 'Copied' : 'Copy link' }}</button>
+            </div>
+            <p class="tool-muted calendar-export-note">
+              Anyone with this link can see the event's name, date and schedule, but not the budget or guests.
+              <button class="calendar-text-btn" type="button" [disabled]="linkBusy()" (click)="newLink()">Reset link</button>
+              <button class="calendar-text-btn" type="button" [disabled]="linkBusy()" (click)="setLink(null)">Turn off</button>
+            </p>
+          } @else {
+            <div class="tool-inline">
+              <button class="btn-secondary" type="button" [disabled]="linkBusy()" (click)="newLink()">Make a subscribe link</button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
     @if (locked()) {
       <p class="tool-muted">The assistant is working. You can edit again once it replies.</p>
     }

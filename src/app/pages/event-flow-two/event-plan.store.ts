@@ -12,6 +12,7 @@ export class EventPlanStore {
   eventId = '';
   plan = signal<Plan | null>(null);
   chat: BetaMessageParam[] = []; // the saved conversation, set before the plan when the event loads
+  calendarToken = signal<string | null>(null); // the Calendar tab's subscribe link secret
   // True while the assistant is replying. Its run saves the plan it started from plus its own
   // changes, so edits made by hand meanwhile would be overwritten; the tabs wait instead.
   agentBusy = signal(false);

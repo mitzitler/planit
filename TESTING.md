@@ -24,6 +24,7 @@ Angular runs the tests with Vitest in JSDOM. The planning logic is plain TypeScr
 | `src/app/shared/agent.spec.ts` | 13 | The agent loop in `runAgent`, run against a **fake model** (see below), plus checks on the system prompt, the `<user_message>` wrapping (including stripping fake system or assistant tags the user types), and rebuilding the chat from a saved conversation. |
 | `src/app/shared/format.spec.ts` | 2 | Display formatting: `19:00` → `7pm`, and money ranges like `$12.50–1,200`. |
 | `src/app/shared/dates.spec.ts` | 4 | Calendar-day math for the Calendar tab: adding days across month ends, and the Monday-to-Sunday weeks it draws. `todayIn`: today's date in the user's time zone, with a UTC fallback for a missing or unknown zone. |
+| `src/app/shared/ics.spec.ts` | 7 | The calendar file for the download and the subscribed feed: the event day and every schedule item, stable entry IDs (exact repeats stay separate), all-day and timed entries (an hour long, across midnight, with or without a time zone), RFC 5545 escaping and line folding, and the feed's refresh hint. |
 | `src/app/app.spec.ts` | 1 | The app component is created. |
 
 ### The fake model
@@ -146,7 +147,7 @@ A single run can be lucky. Run it two or three times after a prompt change, and 
 
 ## Testing by hand
 
-The unit tests and the eval don't touch the UI, Supabase or the Vercel function. After a UI or API change, check it in the browser:
-- **Local:** `ng serve`. `/api/agent` only runs on Vercel, so the chat panel needs the preview deployment.
+The unit tests and the eval don't touch the UI, Supabase or the Vercel functions. After a UI or API change, check it in the browser:
+- **Local:** `ng serve`. `/api/agent` and `/api/calendar` only run on Vercel, so the chat panel and the subscribed calendar feed need a deployment. The feed has to be on production: Google and Apple can't get past the preview's Vercel login.
 - **Preview:** each push to `feat/agent` deploys to the Vercel preview URL (behind Vercel login).
 - **Run log:** every agent run on the server writes a row to the `agent_runs` table in Supabase, with tokens, tool calls, stop reason, latency and any error. Check there when a run behaves oddly.

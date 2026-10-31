@@ -57,6 +57,16 @@ To retake the GIF after UI changes, run `/demo-gif` in [Claude Code](https://cla
 
 **Evaluated** with 26 scripted cases against the real model, including 10 adversarial ones (prompt injection, a fake system tag, a profane name, casual swearing, an impossible date): see [TESTING.md](TESTING.md) for the latest results. See [TESTING.md](TESTING.md).
 
+## Calendar
+
+The Calendar tab can put the plan on the host's own calendar: the event day, its schedule, and the to-dos leading up to it. There are two ways, side by side:
+- **Download** an `.ics` file. It's built in the browser and added instantly, but it's a one-time copy: download again after changes. Each entry keeps the same ID between downloads, so re-importing updates entries instead of duplicating them.
+- **Subscribe** to a feed that stays updated. The host makes a private link, then adds it to Apple Calendar, Google Calendar or anything else that takes a calendar URL. `api/calendar.ts` serves the latest plan each time the calendar app checks, so the delay is up to that app: Google checks every 12 to 24 hours, and Apple lets the user choose. The link is a random secret the host can reset or turn off. The feed holds only the name, date and schedule, never the budget, guests or notes.
+
+Both are built by `src/app/shared/ics.ts`, so they always match.
+
+**In progress: live Google Calendar sync.** Connecting a Google account would put changes on the host's calendar within seconds, instead of waiting for Google's refresh. It needs Google sign-in with calendar access, and Google has to verify the app before more than 100 test users can use it. Work is on the `feat/google-calendar` branch, and the design is in [docs/google-calendar-sync.md](docs/google-calendar-sync.md).
+
 ## Development
 
 Start the local dev server:

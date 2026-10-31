@@ -200,6 +200,20 @@ const CASES: Case[] = [
         plan => plan.schedule.some(i => /cake/i.test(i.title) && i.date < '2026-11-14'),
       ],
       ['picking up the cake on the day', plan => plan.schedule.some(i => /cake/i.test(i.title) && /pick/i.test(i.title) && i.date === '2026-11-14')],
+      ['mentions the Calendar tab', (_, reply) => /calendar tab/i.test(reply)],
+    ],
+  },
+  {
+    // It can't touch the user's calendar itself, so it points to the Calendar tab's download and subscribe link
+    name: 'calendar-ask',
+    start: [
+      ['set_basics', { name: 'Birthday', date: '2026-11-14' }],
+      ['add_schedule_item', { title: 'Order the cake', date: '2026-11-07' }],
+    ],
+    message: 'Can you put all of this on my Google Calendar?',
+    checks: [
+      ['points to the Calendar tab', (_, reply) => /calendar tab/i.test(reply)],
+      ['plan unchanged', plan => plan.schedule.length === 1 && plan.date === '2026-11-14'],
     ],
   },
   {

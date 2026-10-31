@@ -350,3 +350,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
 
 .tool-remove:hover { color: #fca5a5; border-color: #fca5a5; }
 .tool-remove:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Keep the dark background and colours when a page is printed or saved as a PDF */
+@media print {
+  html, body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

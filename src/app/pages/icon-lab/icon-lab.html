@@ -1,0 +1,31 @@
+<div class="lab">
+  <h1 class="lab-title">Icon lab</h1>
+  <p class="lab-intro">All 24 recoloured ORBIT icons, each beside its original, at {{ sizes.join(', ') }} px, then inline in a heading and in body text. Dev only.</p>
+
+  @for (icon of icons; track icon.file) {
+    <section class="lab-icon">
+      <h2 class="lab-file">{{ icon.file }}</h2>
+      <p class="lab-use">{{ icon.use ? 'In use: ' + icon.use : 'Not used yet' }}</p>
+
+      <div class="lab-compare">
+        @for (version of [{ label: 'coloured', src: icon.src }, { label: 'original', src: icon.original }]; track version.label) {
+          <div class="lab-sizes">
+            <span class="lab-version">{{ version.label }}</span>
+            @for (size of sizes; track size) {
+              <figure>
+                <img [src]="version.src" [width]="size" [height]="size" alt="" />
+                <figcaption>{{ size }}</figcaption>
+              </figure>
+            }
+          </div>
+        }
+      </div>
+
+      <p class="lab-heading">Welcome back, <img class="icon" [src]="icon.src" alt="" /> <em>Astronaut</em></p>
+      <p class="lab-body">
+        <img class="icon" [src]="icon.src" alt="" />
+        guests: 12 planned. Board games at my place on Friday, with pizza and a $300 budget.
+      </p>
+    </section>
+  }
+</div>

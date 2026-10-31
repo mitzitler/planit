@@ -1,3 +1,4 @@
+import { isDevMode } from '@angular/core';
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home';
 import { LoginComponent } from './pages/login/login';
@@ -51,6 +52,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/event-flow-three/event-flow-three').then(m => m.EventFlowThreeComponent),
     canActivate: [authGuard],
   },
+
+  // Icon lab: every recoloured icon at several sizes. Dev only, as it reads the gitignored icon pack.
+  ...(isDevMode()
+    ? [{ path: 'icon-lab', loadComponent: () => import('./pages/icon-lab/icon-lab').then(m => m.IconLabComponent) }]
+    : []),
 
   // Fallback
   { path: '**', redirectTo: '' },

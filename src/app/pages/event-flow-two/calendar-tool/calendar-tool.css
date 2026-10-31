@@ -1,4 +1,4 @@
-/* Event day (1/4) beside the week-by-week calendar (3/4); stacked on narrow screens */
+/* Event day and Add to your calendar (1/4) beside the week-by-week calendar (3/4); stacked on narrow screens */
 .calendar-split {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
@@ -9,6 +9,8 @@
 @media (max-width: 720px) {
   .calendar-split { grid-template-columns: minmax(0, 1fr); }
 }
+
+.calendar-side { display: grid; gap: 1rem; align-content: start; }
 
 .calendar-panel {
   display: grid;
@@ -131,24 +133,18 @@ input[type='checkbox'] { accent-color: var(--color-primary); flex-shrink: 0; }
   .calendar-todo .calendar-x { opacity: 1; }
 }
 
-/* Add to your calendar: download and subscribe side by side, stacked on narrow screens */
-.calendar-export-options {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1.25rem;
-}
+/* Add to your calendar: download, then subscribe, in the side column */
+.calendar-export-options { display: grid; gap: 1rem; font-size: 0.8rem; }
 
-@media (max-width: 720px) {
-  .calendar-export-options { grid-template-columns: minmax(0, 1fr); }
-}
+.calendar-export-option { display: grid; gap: 0.5rem; align-content: start; }
 
-.calendar-export-option { display: grid; gap: 0.6rem; align-content: start; }
+.calendar-export-option .btn-secondary { font-size: 0.8rem; padding: 0.35rem 0.75rem; }
 
 .calendar-export-option strong { margin-right: 0.35rem; }
 
 .calendar-export-option a.btn-secondary { text-decoration: none; }
 
-.calendar-export-note { font-size: 0.8rem; }
+.calendar-export-note { font-size: 0.75rem; }
 
 .calendar-text-btn {
   margin-left: 0.5rem;
@@ -163,3 +159,26 @@ input[type='checkbox'] { accent-color: var(--color-primary); flex-shrink: 0; }
 
 .calendar-text-btn:hover { color: var(--color-text); }
 .calendar-text-btn:disabled { cursor: progress; opacity: 0.6; }
+
+/* Long to-dos show 2 lines in the grid until their day is expanded; the full title is in the tooltip */
+.calendar-todo-text.is-clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.calendar-more {
+  align-self: flex-start;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+span.calendar-more { text-decoration: none; cursor: default; }
+button.calendar-more:hover { color: var(--color-text); }

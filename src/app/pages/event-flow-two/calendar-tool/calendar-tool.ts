@@ -84,6 +84,20 @@ export class CalendarToolComponent {
     return { https, apple: webcal, google: `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcal)}` };
   });
 
+  // Grid cells show CELL_LIMIT items until the day is expanded, so one busy day doesn't stretch every week
+  readonly CELL_LIMIT = 3;
+  expanded = signal(new Set<string>());
+
+  shown(cell: Cell): Entry[] {
+    return this.expanded().has(cell.date) ? cell.entries : cell.entries.slice(0, this.CELL_LIMIT);
+  }
+
+  toggleDay(date: string) {
+    const next = new Set(this.expanded());
+    if (!next.delete(date)) next.add(date);
+    this.expanded.set(next);
+  }
+
   formatDate = formatDate;
   formatTime = formatTime;
 

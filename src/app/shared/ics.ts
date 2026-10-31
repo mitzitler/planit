@@ -19,7 +19,7 @@ export interface IcsOptions {
 }
 
 const DOMAIN = 'planitevents.space';
-const TIMED_MINUTES = 60; // schedule items have a start time only
+const TIMED_MINUTES = 60;
 
 // The event itself as an all-day entry, then every schedule item. Done to-dos stay, marked done.
 export function calendarEntries(plan: Plan, eventId: string): CalendarEntry[] {
@@ -60,11 +60,8 @@ export function toIcs(entries: CalendarEntry[], options: IcsOptions): string {
     lines.push('BEGIN:VEVENT', `UID:${entry.uid}`, `DTSTAMP:${stamp}`);
     if (entry.time) {
       const zone = timeZone ? `;TZID=${timeZone}` : '';
-      const [hours, minutes] = entry.time.split(':').map(Number);
-      const end = hours * 60 + minutes + TIMED_MINUTES; // may run past midnight
-      const endDate = addDays(entry.date, Math.floor(end / 1440));
-      const endTime = `${pad(Math.floor((end % 1440) / 60))}:${pad(end % 60)}`;
-      lines.push(`DTSTART${zone}:${dateTime(entry.date, entry.time)}`, `DTEND${zone}:${dateTime(endDate, endTime)}`);
+      const end = timedEnd(entry.date, entry.time);
+      lines.push(`DTSTART${zone}:${dateTime(entry.date, entry.time)}`, `DTEND${zone}:${dateTime(end.date, end.time)}`);
     } else {
       // All-day entries don't mark the host as busy
       lines.push(`DTSTART;VALUE=DATE:${compact(entry.date)}`, `DTEND;VALUE=DATE:${compact(addDays(entry.date, 1))}`, 'TRANSP:TRANSPARENT');
@@ -74,6 +71,13 @@ export function toIcs(entries: CalendarEntry[], options: IcsOptions): string {
 
   lines.push('END:VCALENDAR');
   return lines.map(fold).join('\r\n') + '\r\n';
+}
+
+// Schedule items have a start time only, so a timed entry lasts TIMED_MINUTES, possibly past midnight
+export function timedEnd(date: string, time: string): { date: string; time: string } {
+  const [hours, minutes] = time.split(':').map(Number);
+  const end = hours * 60 + minutes + TIMED_MINUTES;
+  return { date: addDays(date, Math.floor(end / 1440)), time: `${pad(Math.floor((end % 1440) / 60))}:${pad(end % 60)}` };
 }
 
 // A zone name Intl knows, or undefined (the feed's tz comes from the link, so it's untrusted)

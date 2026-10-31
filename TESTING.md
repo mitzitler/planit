@@ -25,6 +25,7 @@ Angular runs the tests with Vitest in JSDOM. The planning logic is plain TypeScr
 | `src/app/shared/format.spec.ts` | 2 | Display formatting: `19:00` → `7pm`, and money ranges like `$12.50–1,200`. |
 | `src/app/shared/dates.spec.ts` | 4 | Calendar-day math for the Calendar tab: adding days across month ends, and the Monday-to-Sunday weeks it draws. `todayIn`: today's date in the user's time zone, with a UTC fallback for a missing or unknown zone. |
 | `src/app/shared/ics.spec.ts` | 7 | The calendar file for the download and the subscribed feed: the event day and every schedule item, stable entry IDs (exact repeats stay separate), all-day and timed entries (an hour long, across midnight, with or without a time zone), RFC 5545 escaping and line folding, and the feed's refresh hint. |
+| `src/app/shared/google-calendar.spec.ts` | 5 | Live Google Calendar sync, the pure part (in progress): all-day and timed Google events, stable event ids in Google's allowed characters, and the inserts, updates and deletes a sync sends. |
 | `src/app/app.spec.ts` | 1 | The app component is created. |
 
 ### The fake model

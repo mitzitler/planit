@@ -41,6 +41,7 @@ export class EventFlowTwoComponent implements OnInit {
       const event = await this.eventsService.get(this.eventId);
       if (event) {
         this.store.chat = event.chat;
+        this.store.calendarToken.set(event.calendarToken);
         this.plan.set(event.plan);
       }
       else this.loadError.set('This event doesn’t exist, or it belongs to another account.');

@@ -15,6 +15,10 @@ create table if not exists public.events (
 -- after a reload. Added after the table was created, hence the separate statement.
 alter table public.events add column if not exists chat jsonb not null default '[]'::jsonb;
 
+-- The secret in the event's subscribed calendar link (api/calendar.ts). Null until the host makes
+-- a link on the Calendar tab; resetting it gives a new value, turning it off sets it back to null.
+alter table public.events add column if not exists calendar_token uuid unique;
+
 create index if not exists events_user_id_idx on public.events (user_id);
 
 alter table public.events enable row level security;

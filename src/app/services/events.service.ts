@@ -11,6 +11,7 @@ export interface EventRow {
 
 export interface EventWithChat extends EventRow {
   chat: BetaMessageParam[]; // the assistant conversation, as api/agent.ts saved it
+  calendarToken: string | null; // the secret in its subscribed calendar link, if the host made one
 }
 
 // Reads and writes the `events` table. RLS limits every query to the signed-in user's rows.
@@ -30,11 +31,15 @@ export class EventsService {
   async get(id: string): Promise<EventWithChat | null> {
     const { data, error } = await this.supabase.client
       .from('events')
-      .select('id, plan, updated_at, chat')
+      .select('id, plan, updated_at, chat, calendar_token')
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;
-    return data && { ...toRow(data), chat: Array.isArray(data.chat) ? data.chat : [] };
+    return data && {
+      ...toRow(data),
+      chat: Array.isArray(data.chat) ? data.chat : [],
+      calendarToken: data.calendar_token ?? null,
+    };
   }
 
   // The name goes through set_basics, so it's tidied the same way as a rename
@@ -58,6 +63,12 @@ export class EventsService {
 
   async clearChat(id: string): Promise<void> {
     const { error } = await this.supabase.client.from('events').update({ chat: [] }).eq('id', id);
+    if (error) throw error;
+  }
+
+  // A new token resets the calendar link (old subscriptions stop updating); null turns it off
+  async setCalendarToken(id: string, token: string | null): Promise<void> {
+    const { error } = await this.supabase.client.from('events').update({ calendar_token: token }).eq('id', id);
     if (error) throw error;
   }
 

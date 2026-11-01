@@ -90,17 +90,26 @@ export class CalendarToolComponent {
   });
 
   // The grid shows WEEKS_SHOWN weeks at a time; the arrows move it a week. Until they're used it
-  // starts at this week, or ends at the event's week if today is outside the plan's range.
+  // starts at this week, else at the week of the next unfinished to-do, else ends at the event's week.
   readonly WEEKS_SHOWN = 5;
   private weekStart = signal<number | null>(null);
   firstWeek = computed(() => {
     const weeks = this.weeks();
     const last = Math.max(0, weeks.length - this.WEEKS_SHOWN);
     const todayWeek = weeks.findIndex(week => week.some(cell => cell.isToday));
-    const start = this.weekStart() ?? (todayWeek >= 0 ? todayWeek : last);
+    const today = localToday();
+    const nextWeek = weeks.findIndex(week =>
+      week.some(cell => cell.date >= today && cell.entries.some(e => !e.item.done)),
+    );
+    const start = this.weekStart() ?? (todayWeek >= 0 ? todayWeek : nextWeek >= 0 ? nextWeek : last);
     return Math.min(Math.max(start, 0), last);
   });
-  shownWeeks = computed(() => this.weeks().slice(this.firstWeek(), this.firstWeek() + this.WEEKS_SHOWN));
+  // The first cell shown carries its month, like the first of each month
+  shownWeeks = computed(() =>
+    this.weeks()
+      .slice(this.firstWeek(), this.firstWeek() + this.WEEKS_SHOWN)
+      .map((week, w) => (w === 0 ? [{ ...week[0], label: this.monthDay(week[0].date) }, ...week.slice(1)] : week)),
+  );
   hasEarlier = computed(() => this.firstWeek() > 0);
   hasLater = computed(() => this.firstWeek() + this.WEEKS_SHOWN < this.weeks().length);
   // Items in the weeks out of view, shown on the arrows
@@ -192,6 +201,18 @@ export class CalendarToolComponent {
       this.time.set('');
       this.title.set('');
     }
+  }
+
+  // The day panel's own add box: a to-do on the day it shows
+  dayTitle = signal('');
+
+  async addToDay() {
+    const title = this.dayTitle().trim();
+    const date = this.day();
+    if (!date || !title) return;
+    const error = await this.store.apply('add_schedule_item', { title, date });
+    this.error.set(error ?? '');
+    if (!error) this.dayTitle.set('');
   }
 
   async check(entry: Entry, done: boolean) {

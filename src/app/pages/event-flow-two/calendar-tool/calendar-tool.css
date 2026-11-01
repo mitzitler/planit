@@ -158,8 +158,10 @@ input[type='checkbox'] { accent-color: var(--color-primary); flex-shrink: 0; }
 .calendar-cell:hover { border-color: var(--color-border); }
 .calendar-cell.is-selected { border-color: var(--color-star); }
 
-/* The first of each month is a shade lighter, so months are easy to tell apart */
-.calendar-cell.is-month-start { background: rgba(255, 255, 255, 0.09); }
+/* The first of each month shows its month in the accent colour, so months are easy to tell apart */
+.is-month-start .calendar-date { color: var(--color-accent); }
+
+.calendar-day-input { min-width: 0; font-size: 0.8rem; }
 
 button.calendar-date {
   align-self: flex-start;

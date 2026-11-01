@@ -51,6 +51,12 @@
                 <li class="tool-muted">Nothing planned for this day yet.</li>
               }
             </ul>
+            <form class="tool-inline" (ngSubmit)="addToDay()">
+              <input class="card-input tool-grow calendar-day-input" type="text" name="dayTitle" maxlength="80"
+                [attr.aria-label]="'Add to ' + formatDate(day()!)" placeholder="Add to this day"
+                [(ngModel)]="dayTitle" [disabled]="locked()" />
+              <button class="btn-secondary" type="submit" [disabled]="locked() || !dayTitle().trim()">Add</button>
+            </form>
           }
         </div>
 

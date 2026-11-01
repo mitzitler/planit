@@ -6,6 +6,7 @@ import { NameDialogComponent } from '../../components/name-dialog/name-dialog';
 import { NAME_NOT_ALLOWED, budgetRange, type Plan } from '../../shared/plan';
 import { formatDate, formatMoney, formatRange } from '../../shared/format';
 import { isNameAllowed } from '../../shared/profanity';
+import { eventIcon } from '../../shared/avatars';
 
 // "Welcome back, <title>" starts with the first, then picks the others at random
 const TITLES = [
@@ -34,6 +35,8 @@ export class DashboardComponent implements OnInit {
   private eventsService = inject(EventsService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+
+  eventIcon = eventIcon;
 
   title = signal(TITLES[0]);
   titleHidden = signal(false); // fades the word out before it changes

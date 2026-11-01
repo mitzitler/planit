@@ -33,7 +33,10 @@
       <!-- The delete button sits beside the link, not inside it: a button can't be inside a link -->
       <div class="event-card-shell">
         <a class="event-card glass-card" [routerLink]="['/events', event.id, 'manage']">
-          <h2 class="event-card-name">{{ event.plan.name ?? 'Untitled event' }}</h2>
+          <h2 class="event-card-name">
+            <img class="icon" [src]="'/icons/' + eventIcon(event.id) + '.svg'" alt="" />
+            {{ event.plan.name ?? 'Untitled event' }}
+          </h2>
           <p class="event-card-fact event-card-date">
             <img class="icon" src="/icons/orbit-clock.svg" alt="" />
             <span><span class="event-card-label">date:</span> {{ event.plan.date ? formatDate(event.plan.date) : 'not set yet' }}</span>
@@ -48,7 +51,7 @@
           </p>
         </a>
         <button
-          class="event-card-delete"
+          class="event-card-delete btn-quiet-danger"
           type="button"
           [attr.aria-label]="'Delete ' + (event.plan.name ?? 'Untitled event')"
           (click)="askDelete(event)"

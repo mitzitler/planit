@@ -88,6 +88,8 @@
 
 .event-card-fact .icon { font-size: 1.3rem; flex-shrink: 0; }
 
+.event-card-name .icon { margin-right: 0.3em; }
+
 .event-card-label { color: var(--color-text-muted); }
 
 /* No events yet: one dashed card that starts the steps */
@@ -109,28 +111,7 @@
 
 .event-card-shell .event-card { padding-right: 6rem; }
 
-.event-card-delete {
-  position: absolute;
-  top: 0.9rem;
-  right: 1.1rem;
-  padding: 0.15rem 0.6rem;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  color: var(--color-text-muted);
-  font: inherit;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-}
-
-.event-card-delete:hover,
-.event-card-delete:focus-visible {
-  color: #fca5a5;
-  border-color: rgba(248, 113, 113, 0.6);
-  background: rgba(220, 38, 38, 0.15);
-  outline: none;
-}
+.event-card-delete { position: absolute; top: 0.9rem; right: 1.1rem; }
 
 /* Narrow screens: create buttons under the welcome, card columns stacked */
 @media (max-width: 720px) {

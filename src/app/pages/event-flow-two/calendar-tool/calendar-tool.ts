@@ -18,6 +18,7 @@ interface Cell {
   entries: Entry[];
   isEvent: boolean;
   isToday: boolean;
+  isMonthStart: boolean;
 }
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -48,7 +49,10 @@ export class CalendarToolComponent {
 
   private entries = computed<Entry[]>(() => (this.plan()?.schedule ?? []).map((item, index) => ({ item, index })));
 
-  eventDay = computed(() => this.entries().filter(e => e.item.date === this.plan()?.date));
+  // The day shown in full in the left panel: the one clicked in the calendar, else the event day
+  selected = signal<string | null>(null);
+  day = computed(() => this.selected() ?? this.plan()?.date ?? null);
+  dayEntries = computed(() => this.entries().filter(e => e.item.date === this.day()));
 
   // From at least a week before the event (or the earliest to-do) through the event week
   // (or the latest item, e.g. thank-you notes the day after)
@@ -67,6 +71,7 @@ export class CalendarToolComponent {
         entries: this.entries().filter(e => e.item.date === date),
         isEvent: date === eventDate,
         isToday: date === today,
+        isMonthStart: date.endsWith('-01'),
       })),
     );
   });
@@ -84,18 +89,41 @@ export class CalendarToolComponent {
     return { https, apple: webcal, google: `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcal)}` };
   });
 
-  // Grid cells show CELL_LIMIT items until the day is expanded, so one busy day doesn't stretch every week
-  readonly CELL_LIMIT = 3;
-  expanded = signal(new Set<string>());
+  // The grid shows WEEKS_SHOWN weeks at a time; the arrows move it a week. Until they're used it
+  // starts at this week, or ends at the event's week if today is outside the plan's range.
+  readonly WEEKS_SHOWN = 5;
+  private weekStart = signal<number | null>(null);
+  firstWeek = computed(() => {
+    const weeks = this.weeks();
+    const last = Math.max(0, weeks.length - this.WEEKS_SHOWN);
+    const todayWeek = weeks.findIndex(week => week.some(cell => cell.isToday));
+    const start = this.weekStart() ?? (todayWeek >= 0 ? todayWeek : last);
+    return Math.min(Math.max(start, 0), last);
+  });
+  shownWeeks = computed(() => this.weeks().slice(this.firstWeek(), this.firstWeek() + this.WEEKS_SHOWN));
+  hasEarlier = computed(() => this.firstWeek() > 0);
+  hasLater = computed(() => this.firstWeek() + this.WEEKS_SHOWN < this.weeks().length);
+  // Items in the weeks out of view, shown on the arrows
+  itemsAbove = computed(() => this.countItems(this.weeks().slice(0, this.firstWeek())));
+  itemsBelow = computed(() => this.countItems(this.weeks().slice(this.firstWeek() + this.WEEKS_SHOWN)));
 
-  shown(cell: Cell): Entry[] {
-    return this.expanded().has(cell.date) ? cell.entries : cell.entries.slice(0, this.CELL_LIMIT);
+  private countItems(weeks: Cell[][]): number {
+    return weeks.reduce((sum, week) => sum + week.reduce((n, cell) => n + cell.entries.length, 0), 0);
   }
 
-  toggleDay(date: string) {
-    const next = new Set(this.expanded());
-    if (!next.delete(date)) next.add(date);
-    this.expanded.set(next);
+  moveWeeks(by: number) {
+    this.weekStart.set(this.firstWeek() + by);
+  }
+
+  // Grid cells show CELL_LIMIT items, so one busy day doesn't stretch every week; clicking opens the day
+  readonly CELL_LIMIT = 3;
+
+  // Opens a day in the left panel (null or the event date goes back to the event day), and points
+  // the add form at it
+  select(date: string | null) {
+    const other = date && date !== this.plan()?.date ? date : null;
+    this.selected.set(other);
+    this.date.set(other ?? '');
   }
 
   formatDate = formatDate;

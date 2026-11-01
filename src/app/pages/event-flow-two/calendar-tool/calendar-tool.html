@@ -17,20 +17,28 @@
     </div>
 
     <div class="calendar-split">
-      <!-- Left column: the event day, then adding the plan to the host's own calendar -->
-        <div class="calendar-side">
+      <!-- Left column: the selected day (the event day until another is clicked), then adding the
+           plan to the host's own calendar -->
+      <div class="calendar-side">
         <div class="calendar-panel">
           <h3 class="calendar-heading">
-            Event day
-            @if (plan.date) {
-              <span class="calendar-tag">{{ formatDate(plan.date) }}</span>
+            @if (day(); as day) {
+              {{ day === plan.date ? 'Event day' : 'Day' }}
+              <span class="calendar-tag">{{ formatDate(day) }}</span>
+              @if (selected()) {
+                <button class="calendar-text-btn" type="button" (click)="select(null)">
+                  {{ plan.date ? 'Back to event day' : 'Close' }}
+                </button>
+              }
+            } @else {
+              Event day
             }
           </h3>
-          @if (!plan.date) {
-            <p class="tool-muted">Set the event date to see the day's schedule.</p>
+          @if (!day()) {
+            <p class="tool-muted">Set the event date to see the day's schedule, or click a day in the calendar.</p>
           } @else {
             <ul class="calendar-day-list">
-              @for (entry of eventDay(); track entry.index) {
+              @for (entry of dayEntries(); track entry.index) {
                 <li class="calendar-day-item" [class.is-done]="entry.item.done">
                   <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
                     (change)="check(entry, $any($event.target).checked)" [attr.aria-label]="'Done: ' + entry.item.title" />
@@ -40,11 +48,11 @@
                     [attr.aria-label]="'Remove ' + entry.item.title">×</button>
                 </li>
               } @empty {
-                <li class="tool-muted">Nothing planned for the day yet.</li>
+                <li class="tool-muted">Nothing planned for this day yet.</li>
               }
             </ul>
           }
-      </div>
+        </div>
 
         <div class="calendar-panel calendar-export">
           <h3 class="calendar-heading">Add to your calendar</h3>
@@ -82,46 +90,50 @@
         </div>
       </div>
 
-      <!-- Week-by-week to-dos leading up to it -->
+      <!-- Week-by-week to-dos leading up to it. Clicking a day opens it in the left panel. -->
       <div class="calendar-panel">
         <h3 class="calendar-heading">Leading up</h3>
         @if (weeks().length) {
+          @if (weeks().length > WEEKS_SHOWN) {
+            <button class="calendar-week-nav" type="button" [disabled]="!hasEarlier()" (click)="moveWeeks(-1)"
+              title="Show an earlier week">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
+              @if (itemsAbove()) { {{ itemsAbove() }} {{ itemsAbove() === 1 ? 'item' : 'items' }} above }
+            </button>
+          }
           <div class="calendar-scroll">
             <div class="calendar-grid" role="grid" aria-label="To-dos by week">
               @for (day of weekdays; track day) {
                 <div class="calendar-weekday" role="columnheader">{{ day }}</div>
               }
-              @for (week of weeks(); track week[0].date) {
+              @for (week of shownWeeks(); track week[0].date) {
                 @for (cell of week; track cell.date) {
                   <div class="calendar-cell" role="gridcell" [class.is-event]="cell.isEvent" [class.is-today]="cell.isToday"
-                    [attr.aria-label]="formatDate(cell.date)">
-                    <span class="calendar-date">
+                    [class.is-month-start]="cell.isMonthStart" [class.is-selected]="cell.date === day()"
+                    (click)="select(cell.date)">
+                    <button class="calendar-date" type="button" [attr.aria-label]="'Open ' + formatDate(cell.date)">
                       {{ cell.label }}
                       @if (cell.isEvent) { <span class="calendar-event-mark">Event</span> }
-                    </span>
+                    </button>
                     @if (cell.isEvent) {
                       @if (cell.entries.length) {
                         <span class="calendar-more">{{ cell.entries.length }} on the schedule</span>
                       }
                     } @else {
-                      @for (entry of shown(cell); track entry.index) {
+                      @for (entry of cell.entries.slice(0, CELL_LIMIT); track entry.index) {
+                        <!-- Only the checkbox checks an item off; clicking its text opens the day -->
                         <div class="calendar-todo" [class.is-done]="entry.item.done">
-                          <label>
-                            <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
-                              (change)="check(entry, $any($event.target).checked)" />
-                            <span class="calendar-todo-text" [class.is-clamped]="!expanded().has(cell.date)" [attr.title]="entry.item.title">
-                              @if (entry.item.time) { <span class="calendar-time">{{ formatTime(entry.item.time) }}</span> }
-                              {{ entry.item.title }}
-                            </span>
-                          </label>
-                          <button class="calendar-x" type="button" [disabled]="locked()" (click)="remove(entry.index)"
-                            [attr.aria-label]="'Remove ' + entry.item.title">×</button>
+                          <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
+                            (click)="$event.stopPropagation()" (change)="check(entry, $any($event.target).checked)"
+                            [attr.aria-label]="'Done: ' + entry.item.title" />
+                          <span class="calendar-todo-text" [attr.title]="entry.item.title">
+                            @if (entry.item.time) { <span class="calendar-time">{{ formatTime(entry.item.time) }}</span> }
+                            {{ entry.item.title }}
+                          </span>
                         </div>
                       }
                       @if (cell.entries.length > CELL_LIMIT) {
-                        <button class="calendar-more" type="button" (click)="toggleDay(cell.date)">
-                          {{ expanded().has(cell.date) ? 'Show less' : '+' + (cell.entries.length - CELL_LIMIT) + ' more' }}
-                        </button>
+                        <span class="calendar-more">+{{ cell.entries.length - CELL_LIMIT }} more</span>
                       }
                     }
                   </div>
@@ -129,6 +141,13 @@
               }
             </div>
           </div>
+          @if (weeks().length > WEEKS_SHOWN) {
+            <button class="calendar-week-nav" type="button" [disabled]="!hasLater()" (click)="moveWeeks(1)"
+              title="Show a later week">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+              @if (itemsBelow()) { {{ itemsBelow() }} {{ itemsBelow() === 1 ? 'item' : 'items' }} below }
+            </button>
+          }
         } @else {
           <p class="tool-muted">Set the event date, or add a to-do below.</p>
         }
@@ -146,6 +165,7 @@
     </form>
     <p class="tool-muted tool-hint">
       @if (plan.date) { Leave the date empty for the event day. }
+      Click a day in the calendar to see all of it.
       Leave the time empty for a to-do.
     </p>
 

@@ -44,7 +44,7 @@
 }
 
 .is-done .calendar-title,
-.is-done label { text-decoration: line-through; color: var(--color-text-muted); }
+.is-done .calendar-todo-text { text-decoration: line-through; color: var(--color-text-muted); }
 
 input[type='checkbox'] { accent-color: var(--color-primary); flex-shrink: 0; }
 
@@ -110,28 +110,11 @@ input[type='checkbox'] { accent-color: var(--color-primary); flex-shrink: 0; }
 
 .calendar-event-mark { margin-left: 0.25rem; color: var(--color-accent); }
 
-.calendar-todo { display: flex; align-items: flex-start; gap: 0.1rem; }
-
-.calendar-todo label {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.25rem;
-  min-width: 0;
-  overflow-wrap: break-word;
-  cursor: pointer;
-}
+.calendar-todo { display: flex; align-items: flex-start; gap: 0.25rem; min-width: 0; }
 
 .calendar-todo .calendar-time { display: block; }
 
 .calendar-todo input { margin-top: 0.15em; }
-
-/* The remove button shows on hover or focus in the small cells, always on touch screens */
-.calendar-todo .calendar-x { opacity: 0; padding: 0 0.15rem; }
-.calendar-todo:hover .calendar-x,
-.calendar-todo:focus-within .calendar-x { opacity: 1; }
-@media (hover: none) {
-  .calendar-todo .calendar-x { opacity: 1; }
-}
 
 /* Add to your calendar: download, then subscribe, in the side column */
 .calendar-export-options { display: grid; gap: 1rem; font-size: 0.8rem; }
@@ -160,25 +143,64 @@ input[type='checkbox'] { accent-color: var(--color-primary); flex-shrink: 0; }
 .calendar-text-btn:hover { color: var(--color-text); }
 .calendar-text-btn:disabled { cursor: progress; opacity: 0.6; }
 
-/* Long to-dos show 2 lines in the grid until their day is expanded; the full title is in the tooltip */
-.calendar-todo-text.is-clamped {
+/* Items show 2 lines in the grid; the full title is in the tooltip and in the day's panel */
+.calendar-todo-text {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   overflow: hidden;
+  overflow-wrap: break-word;
 }
 
-.calendar-more {
+/* Clicking anywhere in a day opens it in the left panel */
+.calendar-cell { cursor: pointer; transition: border-color 0.15s; }
+.calendar-cell:hover { border-color: var(--color-border); }
+.calendar-cell.is-selected { border-color: var(--color-star); }
+
+/* The first of each month is a shade lighter, so months are easy to tell apart */
+.calendar-cell.is-month-start { background: rgba(255, 255, 255, 0.09); }
+
+button.calendar-date {
   align-self: flex-start;
   padding: 0;
   background: none;
   border: none;
-  color: var(--color-text-muted);
   font: inherit;
-  text-decoration: underline;
+  text-align: left;
   cursor: pointer;
 }
 
-span.calendar-more { text-decoration: none; cursor: default; }
-button.calendar-more:hover { color: var(--color-text); }
+.calendar-more { color: var(--color-text-muted); }
+
+.calendar-heading .calendar-text-btn { margin-left: auto; font-family: var(--font-body); font-size: 0.75rem; }
+
+/* Up and down arrows above and below the grid, moving it a week at a time */
+.calendar-week-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  font: inherit;
+  font-size: 0.75rem;
+  width: 100%;
+  padding: 0.15rem;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.calendar-week-nav:hover:not(:disabled) { color: var(--color-text); border-color: var(--color-text-muted); }
+.calendar-week-nav:disabled { opacity: 0.3; cursor: default; }
+
+.calendar-week-nav svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

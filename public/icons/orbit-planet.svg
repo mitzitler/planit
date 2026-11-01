@@ -2,24 +2,24 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
     <g>
-        <circle cx="32" cy="32" r="17" style="fill:rgb(122,129,255);stroke:rgb(234,240,238);stroke-width:2.5px;"/>
+        <circle cx="32" cy="32" r="17" style="fill:rgb(122,129,255);stroke:rgb(251,191,36);stroke-width:2.5px;"/>
         <g transform="matrix(0.906308,-0.422618,0.422618,0.906308,-10.966,13.5219)">
-            <ellipse cx="32" cy="32" rx="29" ry="9" style="fill:none;stroke:rgb(234,240,238);stroke-width:2.5px;"/>
+            <ellipse cx="32" cy="32" rx="29" ry="9" style="fill:none;stroke:rgb(251,191,36);stroke-width:2.5px;"/>
         </g>
         <g transform="matrix(0.904185,0,0,0.937936,2.68723,1.55055)">
             <path d="M16.96,39.928C15.709,37.56 15,34.862 15,32C15,22.617 22.617,15 32,15C37.29,15 42.019,17.421 45.138,21.215C34.287,29.145 29.442,30.516 16.96,39.928Z" style="fill:rgb(122,129,255);"/>
         </g>
         <g transform="matrix(0.0882353,0,0,0.117647,39.6765,23.2353)">
-            <circle cx="32" cy="32" r="17" style="fill:rgb(215,131,255);stroke:rgb(234,240,238);stroke-width:3.85px;"/>
+            <circle cx="32" cy="32" r="17" style="fill:rgb(225,91,185);stroke:rgb(251,191,36);stroke-width:3.85px;"/>
         </g>
         <g transform="matrix(0.0588235,0,0,0.0588235,39.1176,21.1176)">
-            <circle cx="32" cy="32" r="17" style="fill:rgb(215,131,255);stroke:rgb(234,240,238);stroke-width:6.8px;"/>
+            <circle cx="32" cy="32" r="17" style="fill:rgb(225,91,185);stroke:rgb(251,191,36);stroke-width:6.8px;"/>
         </g>
         <g transform="matrix(0.0588235,0,0,0.0588235,19.1176,30.1176)">
-            <circle cx="32" cy="32" r="17" style="fill:rgb(215,131,255);stroke:rgb(234,240,238);stroke-width:6.8px;"/>
+            <circle cx="32" cy="32" r="17" style="fill:rgb(225,91,185);stroke:rgb(251,191,36);stroke-width:6.8px;"/>
         </g>
         <g transform="matrix(0.0588235,0,0,0.0588235,36.1176,25.1176)">
-            <circle cx="32" cy="32" r="17" style="fill:rgb(215,131,255);stroke:rgb(234,240,238);stroke-width:6.8px;"/>
+            <circle cx="32" cy="32" r="17" style="fill:rgb(225,91,185);stroke:rgb(251,191,36);stroke-width:6.8px;"/>
         </g>
     </g>
 </svg>

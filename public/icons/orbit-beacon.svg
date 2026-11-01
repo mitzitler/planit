@@ -2,8 +2,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
     <g>
-        <path d="M24,50L40,50L37,38L27,38L24,50ZM32,38L32,24M17,16C10.333,24 10.333,31.667 17,39M47,16C53.667,24 53.667,31.667 47,39M24,22C20.667,26 20.667,29.667 24,33M40,22C43.333,26 43.333,29.667 40,33M19,56L45,56" style="fill:none;fill-rule:nonzero;stroke:rgb(234,240,238);stroke-width:2.5px;"/>
-        <path d="M24,50L40,50L37,38L27,38L24,50Z" style="fill:rgb(115,250,121);fill-rule:nonzero;stroke:rgb(234,240,238);stroke-width:2.5px;"/>
-        <circle cx="32" cy="28" r="3" style="fill:rgb(255,252,121);stroke:rgb(234,240,238);stroke-width:2.5px;"/>
+        <path d="M24,50L40,50L37,38L27,38L24,50ZM32,38L32,24M17,16C10.333,24 10.333,31.667 17,39M47,16C53.667,24 53.667,31.667 47,39M24,22C20.667,26 20.667,29.667 24,33M40,22C43.333,26 43.333,29.667 40,33M19,56L45,56" style="fill:none;fill-rule:nonzero;stroke:rgb(251,191,36);stroke-width:2.5px;"/>
+        <path d="M24,50L40,50L37,38L27,38L24,50Z" style="fill:rgb(153,94,197);fill-rule:nonzero;stroke:rgb(251,191,36);stroke-width:2.5px;"/>
+        <circle cx="32" cy="28" r="3" style="fill:rgb(173,245,255);stroke:rgb(251,191,36);stroke-width:2.5px;"/>
     </g>
 </svg>

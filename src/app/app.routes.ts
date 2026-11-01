@@ -37,7 +37,8 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/event-flow-two/event-flow-two').then(m => m.EventFlowTwoComponent),
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'budget', pathMatch: 'full' },
+      { path: '', redirectTo: 'overview', pathMatch: 'full' },
+      { path: 'overview', loadComponent: () => import('./pages/event-flow-two/overview/overview').then(m => m.OverviewComponent) },
       { path: 'budget', loadComponent: () => import('./pages/event-flow-two/budget/budget').then(m => m.BudgetComponent) },
       {
         path: 'calendar',

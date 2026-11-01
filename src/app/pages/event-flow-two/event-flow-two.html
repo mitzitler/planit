@@ -15,24 +15,25 @@
   @if (loadError()) {
     <p class="flow-two-error" role="alert">{{ loadError() }}</p>
   } @else if (plan(); as plan) {
-    <div class="flow-two-agent">
+    <!-- Chat on the left; the overview or a tool on the right, switched by the tabs above it -->
+    <div class="flow-two-agent" [class.is-tool]="toolOpen()">
       <app-agent-chat [eventId]="eventId" />
-      <app-plan-card [plan]="plan" />
+      <section class="flow-two-panel">
+        <nav class="flow-two-tabs">
+          @for (tab of tabs; track tab.path) {
+            <a
+              class="flow-two-tab"
+              [routerLink]="tab.path"
+              routerLinkActive="is-active"
+            ><img class="icon" [src]="'/icons/' + tab.icon + '.svg'" alt="" /> {{ tab.label }}</a>
+          }
+        </nav>
+        <div class="flow-two-body">
+          <router-outlet (activate)="onActivate($event)" />
+        </div>
+      </section>
     </div>
   }
-
-  <nav class="flow-two-tabs">
-    @for (tab of tabs; track tab.path) {
-      <a
-        class="flow-two-tab"
-        [routerLink]="tab.path"
-        routerLinkActive="is-active"
-      ><img class="icon" [src]="'/icons/' + tab.icon + '.svg'" alt="" /> {{ tab.label }}</a>
-    }
-  </nav>
-  <section class="flow-two-body">
-    <router-outlet />
-  </section>
 
   <app-confirm-dialog
     heading="Delete event?"

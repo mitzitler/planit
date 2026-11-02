@@ -6,7 +6,7 @@ Planit is tested in three layers. Each layer is cheaper and faster than the one 
 |---|---|---|---|---|
 | Unit tests | `npm test` | No (fake model) | Free | A few seconds |
 | Smoke run | `npx tsx --env-file=.env.local scripts/agent-smoke.mts "..."` | Yes, one turn | A few cents | About 10 s |
-| Agent eval | `npm run eval` | Yes, 27 scripted cases | About $1.60 | About 1 min |
+| Agent eval | `npm run eval` | Yes, 28 scripted cases | About $1.60 | About 1 min |
 
 The unit tests check that the code is correct. The eval checks that the agent behaves well. A model's answers vary from run to run, so the eval can't be an ordinary unit test. It runs on demand, not on every change.
 
@@ -102,6 +102,12 @@ The last 10 are adversarial: hard prompts found by an adversarial review and a P
 | `per-head-budget` | Empty | Brunch for 14 at $35 a head | Total budget $490 |
 | `impossible-date` | Empty | Dinner party on November 31st | No date saved, asks which date |
 
+Added with the Cost card (2026-11-02). Its starting plan has a field only the wizard sets, through the case's `wizard` field.
+
+| Case | Starting plan | Message | Passes if |
+|---|---|---|---|
+| `rough-budget` | Book club for 8, `thrifty` budget bucket, no total | Add food and drinks to the budget | At least one item, items stay within $75 or the reply warns |
+
 Every reply is also checked against the system prompt's rules, including the adversarial ones. The reply is not empty and asks at most two questions. It has no markdown and no emoji, and is at most 3 sentences and 70 words. The turn must also end normally (`end_turn`), not at the round or token cap.
 
 ### How it's designed
@@ -144,6 +150,9 @@ Then run `npm run eval -- --dry` to confirm it fails without the model, and `npm
 | 2026-10-30 | 23/24 (`tight-budget` ran to 4 sentences; it passed on a rerun) | 80 | ≤ $1.44 |
 | 2026-10-30 | 7/7 (after the PR review: the cases the prompt changes touch, plus 3 new ones: `invite-no-date`, `kids-birthday`, `casual-swearing`) | 33 | ≤ $0.40 |
 | 2026-10-31 | 3/3 (after the Calendar tab reminder: `cake-lead-up`, the new `calendar-ask`, and `big-demo-prompt` for reply length) | 30 | ≤ $0.27 |
+| 2026-11-02 | 26/28 (after the budget-bucket prompt line, with the new `rough-budget`. `big-demo-prompt` warned with "over your $2,500", which the check missed; fixed. `tight-budget` ran to 4 sentences) | 81 | ≤ $2.26 |
+| 2026-11-02 | 0/2, then 2/2 (`tight-budget` and `big-demo-prompt` again: both over the length caps, then both passed) | 26, 23 | ≤ $0.54 |
+| 2026-11-02 | 2/2, then 1/2 (the same two on the prompt without the budget-bucket line: `big-demo-prompt` over 70 words, so its length flake predates the change) | 24, 27 | ≤ $0.54 |
 
 A single run can be lucky. Run it two or three times after a prompt change, and record the lowest score.
 

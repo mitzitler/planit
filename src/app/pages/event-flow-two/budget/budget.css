@@ -18,6 +18,8 @@
 .budget-left { font-size: 0.85rem; color: var(--color-text-muted); }
 .budget-left.is-over { color: #fca5a5; }
 
+.budget-note { font-size: 0.8rem; color: var(--color-text-muted); }
+
 @media (prefers-reduced-motion: reduce) {
   .budget-bar span { transition: none; }
 }

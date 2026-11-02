@@ -26,6 +26,8 @@ export class BudgetComponent {
   total = signal<number | null>(null);
 
   range = computed(() => budgetRange(this.plan()?.budget ?? []));
+  // Estimates are the assistant's guesses from general knowledge; the tab says so once there are any
+  hasEstimates = computed(() => (this.plan()?.budget ?? []).some(item => item.low !== undefined));
   over = computed(() => {
     const total = this.plan()?.budgetTotal;
     return total != null && this.range().high > total;

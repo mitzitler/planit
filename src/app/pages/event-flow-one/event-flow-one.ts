@@ -34,7 +34,7 @@ export class EventFlowOneComponent implements OnInit {
     { id: 'size',       label: 'SIZE',       icon: 'orbit-beacon'  },
     { id: 'place',      label: 'PLACE',      icon: 'orbit-map'     },
     { id: 'activities', label: 'ACTIVITIES', icon: 'orbit-compass' },
-    { id: 'cost',       label: 'COST',       icon: 'orbit-crystal' },
+    { id: 'cost',       label: 'COST',       icon: 'orbit-battery' },
     { id: 'extras',     label: 'EXTRAS',     icon: 'orbit-cargo'   },
   ];
 

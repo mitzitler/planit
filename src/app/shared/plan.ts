@@ -1,4 +1,4 @@
-// The event plan and the 8 tools that change it.
+// The event plan and the 10 tools that change it.
 // Pure TypeScript with no Angular imports: the Angular app and api/agent.ts both use this file,
 // so the wizard, the agent and the validation can never disagree about what a valid plan is.
 import {
@@ -45,6 +45,15 @@ export interface ScheduleItem {
   done?: boolean; // checked off
 }
 
+// Someone the host has asked to do something: "Abby: help set up, 6:30pm". The Communication tab
+// turns each into a short message the host sends themselves.
+export interface Ask {
+  who: string;
+  what: string; // a verb phrase that follows "Could you", e.g. "help set up"
+  date?: string; // YYYY-MM-DD; left out for the event day
+  time?: string; // HH:MM, 24-hour
+}
+
 export interface Plan {
   name: string | null;
   date: string | null; // YYYY-MM-DD
@@ -57,6 +66,8 @@ export interface Plan {
   occasion?: string; // an OCCASIONS id: why the event is happening
   // Answers to the activities' follow-up questions: "<activity id>/<follow-up id>" → choice id
   activityDetails?: Record<string, string>;
+  inviteUrl?: string; // the invite the host made elsewhere (Partiful, Evite…)
+  asks?: Ask[];
   budgetTotal: number | null;
   budget: BudgetItem[];
   schedule: ScheduleItem[];
@@ -180,7 +191,9 @@ export type ToolName =
   | 'remove_budget_item'
   | 'add_schedule_item'
   | 'remove_schedule_item'
-  | 'check_schedule_item';
+  | 'check_schedule_item'
+  | 'add_ask'
+  | 'remove_ask';
 
 export type ToolResult = { ok: true; plan: Plan } | { ok: false; error: string };
 
@@ -190,7 +203,7 @@ export const PLAN_TOOLS = [
   {
     name: 'set_basics',
     description:
-      'Set the event name, date, occasion, guest numbers, formality and/or total budget. Only pass the fields you want to change. ' +
+      'Set the event name, date, occasion, guest numbers, formality, total budget and/or invite link. Only pass the fields you want to change. ' +
       'The number to plan for and the size bucket are derived from the guest numbers automatically.',
     input_schema: {
       type: 'object',
@@ -223,6 +236,10 @@ export const PLAN_TOOLS = [
           required: ['level', 'confirmed'],
         },
         budgetTotal: { type: 'number', exclusiveMinimum: 0, description: 'Total budget in dollars.' },
+        inviteUrl: {
+          type: 'string',
+          description: 'The link to the invite the host made in another app (https://…). Only a link the user gave you; empty clears it.',
+        },
       },
     },
   },
@@ -318,6 +335,36 @@ export const PLAN_TOOLS = [
       required: ['index', 'done'],
     },
   },
+  {
+    name: 'add_ask',
+    description:
+      'Note that a specific person was asked to do something, e.g. come early to help set up or lend a car. ' +
+      'The Communication tab turns it into a short message the host sends.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        who: { type: 'string', description: 'Their name, e.g. "Abby".' },
+        what: {
+          type: 'string',
+          description: 'What they\'re doing, as a phrase that follows "Could you", e.g. "help set up" or "lend us your car".',
+        },
+        date: { type: 'string', description: 'YYYY-MM-DD. Leave out for the event day.' },
+        time: { type: 'string', description: '24-hour HH:MM, if there is one.' },
+      },
+      required: ['who', 'what'],
+    },
+  },
+  {
+    name: 'remove_ask',
+    description: 'Remove one ask by its position in the current plan\'s asks list (0 is the first).',
+    input_schema: {
+      type: 'object',
+      properties: {
+        index: { type: 'integer', minimum: 0, description: 'Position in plan.asks, starting at 0.' },
+      },
+      required: ['index'],
+    },
+  },
 ] as const;
 
 type Input = Record<string, unknown>;
@@ -342,15 +389,19 @@ export function applyTool(plan: Plan, name: string, input: Input): ToolResult {
       return removeAt(plan, input, 'schedule', describeScheduleItem);
     case 'check_schedule_item':
       return checkScheduleItem(plan, input);
+    case 'add_ask':
+      return addAsk(plan, input);
+    case 'remove_ask':
+      return removeAsk(plan, input);
     default:
       return fail(`Unknown tool "${name}".`);
   }
 }
 
 function setBasics(plan: Plan, input: Input): ToolResult {
-  const { name, date, occasion, guests, formality, budgetTotal } = input;
-  if ([name, date, occasion, guests, formality, budgetTotal].every(value => value === undefined)) {
-    return fail('Pass at least one of name, date, occasion, guests, formality or budgetTotal.');
+  const { name, date, occasion, guests, formality, budgetTotal, inviteUrl } = input;
+  if ([name, date, occasion, guests, formality, budgetTotal, inviteUrl].every(value => value === undefined)) {
+    return fail('Pass at least one of name, date, occasion, guests, formality, budgetTotal or inviteUrl.');
   }
 
   const next = { ...plan };
@@ -388,6 +439,13 @@ function setBasics(plan: Plan, input: Input): ToolResult {
   if (budgetTotal !== undefined) {
     if (!isPositiveNumber(budgetTotal)) return fail(`budgetTotal must be a positive number; got ${JSON.stringify(budgetTotal)}.`);
     next.budgetTotal = budgetTotal;
+  }
+  if (inviteUrl !== undefined) {
+    if (typeof inviteUrl !== 'string') return fail('inviteUrl must be a string.');
+    const url = inviteUrl.trim();
+    if (!url) delete next.inviteUrl;
+    else if (!isWebLink(url)) return fail(`inviteUrl must be a web link starting with https://; got ${JSON.stringify(inviteUrl)}.`);
+    else next.inviteUrl = url;
   }
 
   return { ok: true, plan: next };
@@ -493,6 +551,39 @@ function addScheduleItem(plan: Plan, input: Input): ToolResult {
     `${a.date} ${a.time ?? ''}`.localeCompare(`${b.date} ${b.time ?? ''}`),
   );
   return { ok: true, plan: { ...plan, schedule } };
+}
+
+export const ASK_TEXT_MAX = 80;
+
+function addAsk(plan: Plan, input: Input): ToolResult {
+  const { who, what, date, time } = input;
+  if (!isNonEmptyString(who) || who.trim().length > ASK_TEXT_MAX) return fail(`who must be a name, at most ${ASK_TEXT_MAX} characters.`);
+  if (!isNonEmptyString(what) || what.trim().length > ASK_TEXT_MAX) return fail(`what must be a short phrase, at most ${ASK_TEXT_MAX} characters.`);
+  if (date !== undefined && !isValidDate(date)) return fail(`date must be a real date as YYYY-MM-DD; got ${JSON.stringify(date)}.`);
+  if (time !== undefined && !isValidTime(time)) return fail(`time must be 24-hour HH:MM; got ${JSON.stringify(time)}.`);
+  const ask: Ask = {
+    who: who.trim(),
+    what: what.trim(),
+    ...(date === undefined ? {} : { date }),
+    ...(time === undefined ? {} : { time }),
+  };
+  return { ok: true, plan: { ...plan, asks: [...(plan.asks ?? []), ask] } };
+}
+
+function removeAsk(plan: Plan, input: Input): ToolResult {
+  const asks = plan.asks ?? [];
+  const error = indexError(asks, input['index'], 'asks', ask => `${ask.who}: ${ask.what}`);
+  if (error) return fail(error);
+  const rest = asks.filter((_, i) => i !== input['index']);
+  return { ok: true, plan: { ...plan, asks: rest.length ? rest : undefined } };
+}
+
+function isWebLink(value: string): boolean {
+  try {
+    return ['https:', 'http:'].includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
 }
 
 function checkScheduleItem(plan: Plan, input: Input): ToolResult {

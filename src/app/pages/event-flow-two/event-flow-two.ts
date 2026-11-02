@@ -40,7 +40,7 @@ export class EventFlowTwoComponent implements OnInit {
     { label: 'Overview',      icon: 'orbit-planet',  path: 'overview' },
     { label: 'Budget',        icon: 'orbit-battery', path: 'budget' },
     { label: 'Calendar',      icon: 'orbit-clock',   path: 'calendar' },
-    // Communication comes back once it has something in it (pages/event-flow-two/communication)
+    { label: 'Communication', icon: 'orbit-signal',  path: 'communication' },
   ];
 
   async ngOnInit() {

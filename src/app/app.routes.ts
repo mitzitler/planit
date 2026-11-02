@@ -41,6 +41,10 @@ export const routes: Routes = [
       { path: 'overview', loadComponent: () => import('./pages/event-flow-two/overview/overview').then(m => m.OverviewComponent) },
       { path: 'budget', loadComponent: () => import('./pages/event-flow-two/budget/budget').then(m => m.BudgetComponent) },
       {
+        path: 'communication',
+        loadComponent: () => import('./pages/event-flow-two/communication/communication').then(m => m.CommunicationComponent),
+      },
+      {
         path: 'calendar',
         loadComponent: () => import('./pages/event-flow-two/calendar-tool/calendar-tool').then(m => m.CalendarToolComponent),
       },

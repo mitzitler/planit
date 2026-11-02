@@ -1,6 +1,6 @@
 ---
 name: demo-gif
-description: Retake the README's agent demo GIF (docs/agent-demo.gif) on the Vercel preview with Claude in Chrome. Use when the user asks to retake, re-record or refresh the demo GIF, usually after UI polish.
+description: Retake the README's agent demo GIF (docs/agent-demo.gif) on the production site with Claude in Chrome. Use when the user asks to retake, re-record or refresh the demo GIF, usually after UI polish.
 ---
 
 # Retake the agent demo GIF
@@ -12,24 +12,26 @@ Each take makes one real agent run (a few cents, and 1 of the demo account's 20 
 
 ## Before recording
 
-1. **The UI changes must be deployed.** The agent only runs on Vercel (`ng serve` has no `/api/agent`).
-   Check that the branch is pushed and the latest commit's deploy succeeded:
-   `gh api repos/mitzitler/planit/commits/$(git rev-parse HEAD)/statuses --jq '.[0].state'` should print `success`.
-   If there are unpushed UI changes, ask the user before committing or pushing.
+1. **The UI changes must be merged to `main` and deployed.** The agent only runs on Vercel (`ng serve`
+   has no `/api/agent`), and the demo account is logged in on production, not on previews.
+   `git fetch` and check that `main`'s latest deploy succeeded:
+   `gh api repos/mitzitler/planit/commits/$(git rev-parse origin/main)/statuses --jq '.[0].state'` should
+   print `success`. If UI changes aren't on `main` yet, ask the user before committing, pushing or merging.
 2. Load the Claude in Chrome tools in one ToolSearch call: `tabs_context_mcp`, `tabs_create_mcp`,
    `tabs_close_mcp`, `navigate`, `computer`, `find`, `resize_window`, `browser_batch`, `gif_creator`.
 3. Call `tabs_context_mcp` (createIfEmpty), work in a new tab, and `resize_window` to **1280×800**
    so takes are the same size.
-4. Open https://planit-git-feat-agent-mitzis-projects-82f79b8e.vercel.app/dashboard (after the merge to
-   `main`, use the production URL instead). The user must be logged in as the demo account; if the page
-   shows Log in, stop and ask them to log in. Never type the password.
+4. Open https://planit-coral.vercel.app/dashboard. The user must be logged in as the demo account
+   (`demo@planit-demo.test`); if the page shows Log in, stop and ask them to log in. Never type the
+   password, and don't click Log in for them.
 5. If a "Sam's birthday" event from an earlier take is on the dashboard, delete it first (its Delete
    button opens an in-page `<dialog>`, not a browser alert, so it's safe to click).
 
 ## Recording
 
-6. Click **Create event**, type `Sam's birthday`, press Enter. Wait for Mission Control to load and
-   take a screenshot to find the chat box.
+6. Click **chat with an agent** (under Create your event), type `Sam's birthday` in the Name your event
+   popup, press Enter. Wait for Mission Control to load and take a screenshot to find the chat box.
+   Move the mouse off the buttons (hover over the empty chat area) so the first frame has no hover state.
 7. In one `browser_batch`:
    - `gif_creator` start_recording, then two screenshots (opening frames)
    - click the chat box, type `Birthday for 12 at my place, board games, $300 budget`, screenshot

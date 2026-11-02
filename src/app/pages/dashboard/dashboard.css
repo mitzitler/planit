@@ -75,9 +75,17 @@
 }
 
 .event-card-name {
+  display: flex;
+  align-items: center;
+  min-width: 0;
   font-size: 1.6rem;
   font-weight: 400;
   color: var(--color-star);
+}
+
+/* Only the name gets the ellipsis, so the icon and the complete badge always show in full */
+.event-card-title {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -92,7 +100,7 @@
 
 .event-card-fact .icon { font-size: 1.3rem; flex-shrink: 0; }
 
-.event-card-name .icon { margin-right: 0.3em; }
+.event-card-name .icon { margin-right: 0.3em; flex-shrink: 0; }
 
 .event-card-label { color: var(--color-text-muted); }
 
@@ -138,7 +146,7 @@
   color: var(--color-star);
   font-size: 0.7rem;
   font-weight: 600;
-  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 /* Below 1000px the create buttons go under the welcome, before their labels get squeezed */

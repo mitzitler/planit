@@ -56,7 +56,7 @@
       <a class="event-card glass-card" [class.is-complete]="event.plan.completedAt" [routerLink]="['/events', event.id, event.plan.completedAt ? 'followup' : 'manage']">
         <h2 class="event-card-name">
           <img class="icon" [src]="'/icons/' + eventIcon(event.id) + '.svg'" alt="" />
-          {{ event.plan.name ?? 'Untitled event' }}
+          <span class="event-card-title">{{ event.plan.name ?? 'Untitled event' }}</span>
           @if (event.plan.completedAt) {
             <span class="event-card-badge">complete</span>
           }

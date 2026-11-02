@@ -11,3 +11,14 @@
     <span class="hero-planet"><img class="icon" src="/icons/orbit-planet.svg" alt="" /></span>
   </div>
 </div>
+
+<!-- What Planit does, in four cards: the two ways in, then the tools beside the chat -->
+<section class="home-features" aria-label="What Planit does">
+  @for (feature of features; track feature.title) {
+    <article class="home-feature glass-card">
+      <img class="icon home-feature-icon" [src]="'/icons/' + feature.icon + '.svg'" alt="" />
+      <h2 class="home-feature-title">{{ feature.title }}</h2>
+      <p class="home-feature-text">{{ feature.text }}</p>
+    </article>
+  }
+</section>

@@ -1,1 +1,64 @@
-<p>event-flow-three works!</p>
+<div class="followup-shell">
+  @if (loadError()) {
+    <p class="followup-error" role="alert">{{ loadError() }} <a routerLink="/dashboard">Back to your events</a></p>
+  } @else if (plan(); as plan) {
+    <section class="followup glass-card" aria-live="polite">
+      <div class="followup-burst" [class.is-playing]="celebrating()" aria-hidden="true">
+        <img class="followup-icon" [src]="'/icons/' + icon + '.svg'" alt="" />
+      </div>
+
+      @if (plan.completedAt) {
+        <h1 class="followup-title">Mission accomplished!</h1>
+        <p class="followup-copy">
+          <strong>{{ plan.name ?? 'Untitled event' }}</strong> is in the books.
+          Marked complete {{ formatDate(plan.completedAt) }}.
+        </p>
+        @if (todosText(); as todos) {
+          <p class="followup-muted">{{ todos }}</p>
+        }
+        <div class="followup-actions">
+          <a class="btn-primary" routerLink="/dashboard">Back to your events</a>
+          <button class="btn-secondary" type="button" [disabled]="busy()" (click)="reopen()">Reopen event</button>
+        </div>
+      } @else {
+        <h1 class="followup-title">Wrap up {{ plan.name ?? 'this event' }}?</h1>
+        <p class="followup-copy">
+          Marking it complete keeps everything and moves it to the Completed list on your dashboard.
+          You can reopen it any time.
+        </p>
+        @if (notHappenedYet()) {
+          <p class="followup-muted">It's planned for {{ formatDate(plan.date!) }}, which hasn't happened yet.</p>
+        }
+        @if (todosText(); as todos) {
+          <p class="followup-muted">{{ todos }}</p>
+        }
+        <div class="followup-actions">
+          <button class="btn-primary" type="button" [disabled]="busy()" (click)="complete()">Mark complete</button>
+          <a class="btn-secondary" [routerLink]="['/events', eventId, 'manage']">Back to Mission Control</a>
+        </div>
+      }
+
+      @if (error()) {
+        <p class="followup-error" role="alert">{{ error() }}</p>
+      }
+    </section>
+  }
+
+  <!-- Outside the glass card: its backdrop-filter would trap a fixed layer inside the card -->
+  @if (sparks().length) {
+    <div class="followup-burst-layer" aria-hidden="true">
+      @for (spark of sparks(); track $index) {
+        <span
+          class="followup-spark"
+          [style.--dx]="spark.dx"
+          [style.--dy]="spark.dy"
+          [style.--size]="spark.size"
+          [style.--spin]="spark.spin"
+          [style.background]="spark.color"
+          [style.animation-delay]="spark.delay"
+          [style.animation-duration]="spark.duration"
+        ></span>
+      }
+    </div>
+  }
+</div>

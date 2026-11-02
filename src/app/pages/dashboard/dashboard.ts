@@ -1,4 +1,5 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { EventsService, type EventRow } from '../../services/events.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
@@ -7,6 +8,8 @@ import { NAME_NOT_ALLOWED, budgetRange, type Plan } from '../../shared/plan';
 import { formatDate, formatMoney, formatRange } from '../../shared/format';
 import { isNameAllowed } from '../../shared/profanity';
 import { eventIcon } from '../../shared/avatars';
+import { localToday } from '../../shared/dates';
+import { dismissWrapUp, wrapUpDismissed } from '../../shared/wrap-up';
 
 // "Welcome back, <title>" starts with the first, then picks the others at random
 const TITLES = [
@@ -27,7 +30,7 @@ function nextTitle(current: string): string {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, ConfirmDialogComponent, NameDialogComponent],
+  imports: [RouterLink, NgTemplateOutlet, ConfirmDialogComponent, NameDialogComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -42,6 +45,9 @@ export class DashboardComponent implements OnInit {
   titleHidden = signal(false); // fades the word out before it changes
 
   events = signal<EventRow[]>([]);
+  // Completed events (Flow 3) get their own list under the others
+  activeEvents = computed(() => this.events().filter(e => !e.plan.completedAt));
+  completedEvents = computed(() => this.events().filter(e => e.plan.completedAt));
   loading = signal(true);
   creating = signal(false);
   errorMessage = signal('');
@@ -49,6 +55,11 @@ export class DashboardComponent implements OnInit {
   // Where the new event opens once the name popup is filled in; null while the popup is closed
   pendingCreate = signal<'manage' | 'plan' | null>(null);
   createError = signal('');
+
+  // An event whose date has passed, offered for wrapping up (Flow 3) once per dashboard visit
+  wrapUp = signal<EventRow | null>(null);
+  wrappingUp = signal(false);
+  wrapUpError = signal('');
 
   // The event waiting on "Are you sure?", if any
   pendingDelete = signal<EventRow | null>(null);
@@ -74,6 +85,11 @@ export class DashboardComponent implements OnInit {
 
     try {
       this.events.set(await this.eventsService.list());
+      const today = localToday();
+      const dismissed = wrapUpDismissed();
+      this.wrapUp.set(
+        this.activeEvents().find(e => e.plan.date !== null && e.plan.date < today && !dismissed.includes(e.id)) ?? null,
+      );
     } catch {
       this.errorMessage.set('Could not load your events. Refresh to try again.');
     } finally {
@@ -100,6 +116,28 @@ export class DashboardComponent implements OnInit {
       this.createError.set('Could not create the event. Try again.');
       this.creating.set(false);
     }
+  }
+
+  async confirmWrapUp() {
+    const event = this.wrapUp();
+    if (!event) return;
+    this.wrappingUp.set(true);
+    this.wrapUpError.set('');
+    try {
+      await this.eventsService.savePlan(event.id, { ...event.plan, completedAt: localToday() });
+      // The follow-up page plays the burst when it's told the event was just completed
+      await this.router.navigate(['/events', event.id, 'followup'], { state: { celebrate: true } });
+    } catch {
+      this.wrapUpError.set("Couldn't save. Check your connection and try again.");
+      this.wrappingUp.set(false);
+    }
+  }
+
+  // "Not yet": don't ask about this event again in this browser. Wrap up is still in Mission Control.
+  skipWrapUp() {
+    const event = this.wrapUp();
+    if (event) dismissWrapUp(event.id);
+    this.wrapUp.set(null);
   }
 
   askDelete(event: EventRow) {

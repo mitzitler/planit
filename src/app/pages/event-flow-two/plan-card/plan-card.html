@@ -36,6 +36,10 @@
       </dd>
     </div>
     <div>
+      <dt>Occasion</dt>
+      <dd>{{ occasion() ?? '—' }}</dd>
+    </div>
+    <div>
       <dt>Places</dt>
       <dd>
         @for (place of places(); track place) {

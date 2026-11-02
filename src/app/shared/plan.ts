@@ -4,6 +4,7 @@
 import {
   ACTIVITY_OPTIONS,
   FORMALITY_LEVELS,
+  OCCASIONS,
   PLACE_OPTIONS,
   getSizeBucket,
   type ActivityOption,
@@ -53,6 +54,9 @@ export interface Plan {
   formality?: Formality;
   places: string[]; // selectable PLACE_OPTIONS ids
   activities: string[]; // selectable ACTIVITY_OPTIONS ids
+  occasion?: string; // an OCCASIONS id: why the event is happening
+  // Answers to the activities' follow-up questions: "<activity id>/<follow-up id>" → choice id
+  activityDetails?: Record<string, string>;
   budgetTotal: number | null;
   budget: BudgetItem[];
   schedule: ScheduleItem[];
@@ -78,9 +82,14 @@ export function emptyPlan(): Plan {
   };
 }
 
-// Fills in any missing fields, e.g. for rows saved before a field existed
+// Fills in any missing fields, e.g. for rows saved before a field existed. Plans from before the
+// occasion was its own question had it as a "celebrating-<occasion>" activity; it moves over.
 export function normalizePlan(raw: Partial<Plan> | null | undefined): Plan {
-  return { ...emptyPlan(), ...(raw ?? {}) };
+  const plan = { ...emptyPlan(), ...(raw ?? {}) };
+  const celebrating = plan.activities.filter(id => id.startsWith('celebrating-'));
+  if (!celebrating.length) return plan;
+  const occasion = plan.occasion ?? celebrating.map(id => id.slice('celebrating-'.length)).find(id => OCCASION_IDS.includes(id));
+  return { ...plan, activities: plan.activities.filter(id => !id.startsWith('celebrating-')), ...(occasion ? { occasion } : {}) };
 }
 
 // ── Guests ───────────────────────────────────────────────────
@@ -152,6 +161,14 @@ function descendantIds(options: (PlaceOption | ActivityOption)[]): string[] {
 export const SELECTABLE_PLACE_IDS: readonly string[] = descendantIds(PLACE_OPTIONS);
 export const SELECTABLE_ACTIVITY_IDS: readonly string[] = descendantIds(ACTIVITY_OPTIONS);
 export const FORMALITY_IDS: readonly string[] = FORMALITY_LEVELS.map(level => level.id);
+export const OCCASION_IDS: readonly string[] = OCCASIONS.map(occasion => occasion.id);
+
+// Keeps only the follow-up answers whose activity is still picked
+export function keepDetailsFor(activities: string[], details: Record<string, string> | undefined): Record<string, string> | undefined {
+  if (!details) return undefined;
+  const kept = Object.entries(details).filter(([key]) => activities.includes(key.split('/')[0]));
+  return kept.length ? Object.fromEntries(kept) : undefined;
+}
 
 // ── Tools ────────────────────────────────────────────────────
 
@@ -173,13 +190,14 @@ export const PLAN_TOOLS = [
   {
     name: 'set_basics',
     description:
-      'Set the event name, date, guest numbers, formality and/or total budget. Only pass the fields you want to change. ' +
+      'Set the event name, date, occasion, guest numbers, formality and/or total budget. Only pass the fields you want to change. ' +
       'The number to plan for and the size bucket are derived from the guest numbers automatically.',
     input_schema: {
       type: 'object',
       properties: {
         name: { type: 'string', maxLength: EVENT_NAME_MAX, description: 'Short event name, e.g. "Sam\'s 30th".' },
         date: { type: 'string', description: 'Event date as YYYY-MM-DD.' },
+        occasion: { type: 'string', enum: OCCASION_IDS, description: 'Why the event is happening, e.g. birthday.' },
         guests: {
           type: 'object',
           description:
@@ -330,9 +348,9 @@ export function applyTool(plan: Plan, name: string, input: Input): ToolResult {
 }
 
 function setBasics(plan: Plan, input: Input): ToolResult {
-  const { name, date, guests, formality, budgetTotal } = input;
-  if ([name, date, guests, formality, budgetTotal].every(value => value === undefined)) {
-    return fail('Pass at least one of name, date, guests, formality or budgetTotal.');
+  const { name, date, occasion, guests, formality, budgetTotal } = input;
+  if ([name, date, occasion, guests, formality, budgetTotal].every(value => value === undefined)) {
+    return fail('Pass at least one of name, date, occasion, guests, formality or budgetTotal.');
   }
 
   const next = { ...plan };
@@ -347,6 +365,12 @@ function setBasics(plan: Plan, input: Input): ToolResult {
   if (date !== undefined) {
     if (!isValidDate(date)) return fail(`date must be a real date as YYYY-MM-DD; got ${JSON.stringify(date)}.`);
     next.date = date;
+  }
+  if (occasion !== undefined) {
+    if (typeof occasion !== 'string' || !OCCASION_IDS.includes(occasion)) {
+      return fail(`occasion must be one of ${OCCASION_IDS.join(', ')}; got ${JSON.stringify(occasion)}.`);
+    }
+    next.occasion = occasion;
   }
   if (guests !== undefined) {
     const parsed = parseGuests(guests);
@@ -427,7 +451,9 @@ function chooseIds(
     return fail(`Unknown ${field} id(s): ${unknown.join(', ')}. Valid ids are: ${allowed.join(', ')}.`);
   }
 
-  return { ok: true, plan: { ...plan, [field]: [...new Set(ids)] } };
+  const chosen = [...new Set(ids)];
+  if (field === 'places') return { ok: true, plan: { ...plan, places: chosen } };
+  return { ok: true, plan: { ...plan, activities: chosen, activityDetails: keepDetailsFor(chosen, plan.activityDetails) } };
 }
 
 function addBudgetItem(plan: Plan, input: Input): ToolResult {

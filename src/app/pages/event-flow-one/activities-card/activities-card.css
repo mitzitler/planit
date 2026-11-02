@@ -3,19 +3,46 @@
   display: contents;
 }
 
-/* Activity columns */
+/* Occasion and ideas: rows of chips above the columns */
+.activity-row { margin-bottom: 1rem; }
+
+.activity-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.activity-chip {
+  padding: 0.25rem 0.7rem;
+  background: transparent;
+  border: 1px solid rgba(201, 164, 50, 0.45);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.75);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.activity-chip:hover { border-color: #c9a432; color: #fff; }
+.activity-chip.is-on { background: rgba(201, 164, 50, 0.25); border-color: #c9a432; color: #fff; }
+.activity-chip--small { padding: 0.1rem 0.5rem; font-size: 0.72rem; }
+
+/* Activity columns: as many as fit, wrapping onto more rows */
 .activity-columns {
-  display: flex;
-  gap: 1.5rem;
-  flex: 1;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 1.25rem 1.5rem;
 }
 
 .activity-column {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  min-width: 120px;
+}
+
+/* A follow-up question under its picked activity */
+.activity-followup {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0 0 0.3rem 1.3rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .activity-category-label {

@@ -2,6 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import {
   ACTIVITY_OPTIONS,
   FORMALITY_LEVELS,
+  OCCASIONS,
   PLACE_OPTIONS,
   type ActivityOption,
   type PlaceOption,
@@ -20,6 +21,14 @@ const collect = (nodes: (PlaceOption | ActivityOption)[]) => {
 collect(PLACE_OPTIONS);
 collect(ACTIVITY_OPTIONS);
 
+// "<activity id>/<follow-up id>/<choice id>" → choice label, for the follow-up answers
+const CHOICE_LABELS = new Map<string, string>();
+for (const option of ACTIVITY_OPTIONS.flatMap(category => category.children ?? [])) {
+  for (const followUp of option.followUps ?? []) {
+    for (const choice of followUp.choices) CHOICE_LABELS.set(`${option.id}/${followUp.id}/${choice.id}`, choice.label);
+  }
+}
+
 // Read-only view of the plan. It redraws whenever the parent passes a new plan,
 // including mid-reply as the assistant's tool calls land.
 @Component({
@@ -31,7 +40,18 @@ export class PlanCardComponent {
   plan = input.required<Plan>();
 
   places = computed(() => this.plan().places.map(label));
-  activities = computed(() => this.plan().activities.map(label));
+  // An activity's follow-up answers follow its name: "Cocktails · A bartender"
+  activities = computed(() => {
+    const details = Object.entries(this.plan().activityDetails ?? {});
+    return this.plan().activities.map(id => {
+      const answers = details
+        .filter(([key]) => key.split('/')[0] === id)
+        .map(([key, choice]) => CHOICE_LABELS.get(`${key}/${choice}`))
+        .filter(Boolean);
+      return [label(id), ...answers].join(' · ');
+    });
+  });
+  occasion = computed(() => OCCASIONS.find(occasion => occasion.id === this.plan().occasion)?.label ?? null);
   guestClash = computed(() => guestConflict(this.plan().guests));
   formality = computed(() => {
     const formality = this.plan().formality;

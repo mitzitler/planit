@@ -296,3 +296,30 @@ describe('event names', () => {
     }
   });
 });
+
+describe('occasion and activity follow-ups', () => {
+  it('sets the occasion with set_basics, and rejects unknown ones', () => {
+    expect(expectOk(applyTool(emptyPlan(), 'set_basics', { occasion: 'birthday' })).occasion).toBe('birthday');
+    expect(expectError(applyTool(emptyPlan(), 'set_basics', { occasion: 'bar-mitzvah' }))).toContain('housewarming');
+  });
+
+  it('moves an old "Celebrating" activity over to the occasion', () => {
+    const plan = normalizePlan({ activities: ['celebrating-birthday', 'playing-board-games'] });
+    expect(plan.occasion).toBe('birthday');
+    expect(plan.activities).toEqual(['playing-board-games']);
+  });
+
+  it("keeps an occasion that's already set over an old Celebrating pick", () => {
+    expect(normalizePlan({ activities: ['celebrating-wedding'], occasion: 'reunion' }).occasion).toBe('reunion');
+  });
+
+  it("drops an activity's follow-up answers when choose_activities leaves it out", () => {
+    const plan: Plan = {
+      ...emptyPlan(),
+      activities: ['drinking-cocktails', 'playing-board-games'],
+      activityDetails: { 'drinking-cocktails/maker': 'bartender', 'playing-board-games/brings': 'guests' },
+    };
+    const next = expectOk(applyTool(plan, 'choose_activities', { ids: ['playing-board-games'] }));
+    expect(next.activityDetails).toEqual({ 'playing-board-games/brings': 'guests' });
+  });
+});

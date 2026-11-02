@@ -92,6 +92,17 @@
   opacity: 0;
 }
 
+/* Phones: the cards stack as an accordion. Closed cards are bars with the icon and label side by
+   side; the open one shows its content at full width, and the page scrolls. */
+@media (max-width: 720px) {
+  .cards-container { flex-direction: column; height: auto; gap: 8px; }
+  .event-card { flex: none; min-width: 0; padding: 0; transition: none; }
+  .card-collapsed-content { position: static; flex-direction: row; justify-content: flex-start; padding: 0.7rem 1rem; }
+  .card-icon { font-size: 1.6rem; }
+  .card-label-vertical { writing-mode: horizontal-tb; }
+  .card-expanded-content { position: static; padding: 1.25rem; overflow: visible; animation-delay: 0s; }
+}
+
 .wizard-message {
   max-width: 40rem;
   margin: 1rem auto;

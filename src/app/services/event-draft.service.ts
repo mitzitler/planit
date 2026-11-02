@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { getSizeBucket } from './decision-tree';
 import { EventsService } from './events.service';
-import { NOTES_MAX, applyTool, type Plan } from '../shared/plan';
+import { NOTES_MAX, applyTool, keepDetailsFor, type Plan } from '../shared/plan';
 
 // The plan the step-by-step wizard is editing. Each choice is saved to the event's row straight away,
 // so the assistant in Mission Control sees it and the plan survives a reload or another device.
@@ -64,8 +64,24 @@ export class EventDraftService {
     this.update(plan => ({ ...plan, places: ids }));
   }
 
+  // Unpicking an activity drops its follow-up answers too
   setActivities(ids: string[]): void {
-    this.update(plan => ({ ...plan, activities: ids }));
+    this.update(plan => ({ ...plan, activities: ids, activityDetails: keepDetailsFor(ids, plan.activityDetails) }));
+  }
+
+  // null clears it
+  setOccasion(id: string | null): void {
+    this.update(plan => ({ ...plan, occasion: id ?? undefined }));
+  }
+
+  // An answer to an activity's follow-up question, keyed "<activity id>/<follow-up id>"; null clears it
+  setActivityDetail(key: string, choice: string | null): void {
+    this.update(plan => {
+      const details = { ...plan.activityDetails };
+      if (choice === null) delete details[key];
+      else details[key] = choice;
+      return { ...plan, activityDetails: Object.keys(details).length ? details : undefined };
+    });
   }
 
   // Picked by the user, so it's confirmed and the assistant won't ask about it

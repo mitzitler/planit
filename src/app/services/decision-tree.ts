@@ -91,23 +91,67 @@ export const PLACE_OPTIONS: PlaceOption[] = [
 
 // ── Activities ───────────────────────────────────────────────
 
+// A short question under an activity once it's picked, only where the answer changes the plan.
+// Answers are saved in plan.activityDetails as "<activity id>/<follow-up id>" → choice id.
+export interface FollowUp {
+  id: string;
+  question: string;
+  choices: { id: string; label: string }[];
+}
+
 export interface ActivityOption {
   id: string;
   label: string;
   children?: ActivityOption[];
+  followUps?: FollowUp[];
 }
 
+const WHO_BRINGS = (question: string): FollowUp => ({
+  id: 'brings',
+  question,
+  choices: [
+    { id: 'host',   label: 'Me'           },
+    { id: 'guests', label: 'Guests bring' },
+    { id: 'buy',    label: 'Buy new'      },
+  ],
+});
+
+const GEAR: FollowUp = {
+  id: 'gear',
+  question: 'Gear?',
+  choices: [
+    { id: 'have', label: 'We have it'   },
+    { id: 'rent', label: 'Need to rent' },
+  ],
+};
+
+// Lots of choices on purpose: the card should remind hosts how much is open to them
 export const ACTIVITY_OPTIONS: ActivityOption[] = [
   {
     id: 'eating',
     label: 'Eating',
     children: [
       { id: 'eating-home-cooked',   label: 'Home-cooked'    },
-      { id: 'eating-out',           label: 'Out on the town' },
+      {
+        id: 'eating-out', label: 'Out on the town',
+        followUps: [{ id: 'price', question: 'How fancy?', choices: [
+          { id: 'cheap', label: '$' }, { id: 'mid', label: '$$' }, { id: 'splurge', label: '$$$' },
+        ] }],
+      },
       { id: 'eating-takeout',       label: 'Takeout / delivery' },
-      { id: 'eating-potluck',       label: 'Potluck style'  },
+      {
+        id: 'eating-potluck', label: 'Potluck style',
+        followUps: [{ id: 'dishes', question: 'Who plans the dishes?', choices: [
+          { id: 'host', label: 'I assign them' }, { id: 'signup', label: 'A sign-up sheet' }, { id: 'surprise', label: 'Surprise me' },
+        ] }],
+      },
       { id: 'eating-buffet',        label: 'Buffet'         },
-      { id: 'eating-catering',      label: 'Catering'       },
+      {
+        id: 'eating-catering', label: 'Catering',
+        followUps: [{ id: 'style', question: 'What kind?', choices: [
+          { id: 'drop-off', label: 'Drop-off' }, { id: 'served', label: 'Served' }, { id: 'food-truck', label: 'Food truck' },
+        ] }],
+      },
       { id: 'eating-picnicking',    label: 'Picnicking'     },
     ],
   },
@@ -115,8 +159,18 @@ export const ACTIVITY_OPTIONS: ActivityOption[] = [
     id: 'drinking',
     label: 'Drinking',
     children: [
-      { id: 'drinking-cocktails',       label: 'Cocktails'       },
-      { id: 'drinking-beers',           label: 'Beers'           },
+      {
+        id: 'drinking-cocktails', label: 'Cocktails',
+        followUps: [{ id: 'maker', question: 'Who makes them?', choices: [
+          { id: 'host', label: 'Me' }, { id: 'bartender', label: 'A bartender' }, { id: 'byo', label: 'Guests BYO' },
+        ] }],
+      },
+      {
+        id: 'drinking-beers', label: 'Beers',
+        followUps: [{ id: 'brings', question: 'Who brings them?', choices: [
+          { id: 'host', label: 'Me' }, { id: 'byo', label: 'Guests BYO' },
+        ] }],
+      },
       { id: 'drinking-mocktails',       label: 'Mocktails'       },
       { id: 'drinking-champagne',       label: 'Champagne'       },
       { id: 'drinking-clubbing',        label: 'Clubbing'        },
@@ -128,23 +182,76 @@ export const ACTIVITY_OPTIONS: ActivityOption[] = [
     id: 'playing',
     label: 'Playing',
     children: [
-      { id: 'playing-sports',       label: 'Sports'       },
-      { id: 'playing-board-games',  label: 'Board games'  },
+      { id: 'playing-sports',       label: 'Sports', followUps: [GEAR] },
+      { id: 'playing-board-games',  label: 'Board games', followUps: [WHO_BRINGS('Who brings them?')] },
       { id: 'playing-parlor-games', label: 'Parlor games' },
       { id: 'playing-video-games',  label: 'Video games'  },
+      { id: 'playing-trivia',       label: 'Trivia'       },
+      { id: 'playing-escape-room',  label: 'Escape room'  },
+      {
+        id: 'playing-karaoke', label: 'Karaoke',
+        followUps: [{ id: 'where', question: 'Where?', choices: [
+          { id: 'home', label: 'At home' }, { id: 'bar', label: 'A karaoke bar' },
+        ] }],
+      },
     ],
   },
   {
-    id: 'celebrating',
-    label: 'Celebrating',
+    id: 'making',
+    label: 'Making',
     children: [
-      { id: 'celebrating-engagement',   label: 'An engagement'  },
-      { id: 'celebrating-wedding',      label: 'A wedding'      },
-      { id: 'celebrating-housewarming', label: 'A housewarming' },
-      { id: 'celebrating-graduation',   label: 'A graduation'   },
-      { id: 'celebrating-birthday',     label: 'A birthday'     },
-      { id: 'celebrating-semester-end', label: 'A semester end' },
-      { id: 'celebrating-promotion',    label: 'A promotion'    },
+      {
+        id: 'making-cooking', label: 'Cooking together',
+        followUps: [{ id: 'led', question: 'Led by?', choices: [
+          { id: 'host', label: 'Me' }, { id: 'class', label: 'A chef or class' },
+        ] }],
+      },
+      { id: 'making-crafts',          label: 'Crafts'           },
+      {
+        id: 'making-pottery', label: 'Pottery or painting',
+        followUps: [{ id: 'where', question: 'Where?', choices: [
+          { id: 'studio', label: 'At a studio' }, { id: 'kit', label: 'A kit at home' },
+        ] }],
+      },
+      { id: 'making-cake-decorating', label: 'Cake decorating'  },
+      { id: 'making-diy-pizza',       label: 'DIY pizza'        },
+    ],
+  },
+  {
+    id: 'watching',
+    label: 'Watching',
+    children: [
+      {
+        id: 'watching-movie-night', label: 'Movie night',
+        followUps: [{ id: 'screen', question: 'Screen?', choices: [
+          { id: 'tv', label: 'Indoor TV' }, { id: 'projector', label: 'Outdoor projector' },
+        ] }],
+      },
+      {
+        id: 'watching-live-music', label: 'Live music',
+        followUps: [{ id: 'where', question: 'Where?', choices: [
+          { id: 'out', label: 'Going out' }, { id: 'booked', label: 'A band or DJ at ours' },
+        ] }],
+      },
+      { id: 'watching-watch-party', label: 'Watch party'  },
+      { id: 'watching-comedy',      label: 'Comedy show'  },
+      { id: 'watching-theater',     label: 'Theater'      },
+    ],
+  },
+  {
+    id: 'exploring',
+    label: 'Exploring',
+    children: [
+      {
+        id: 'exploring-scavenger-hunt', label: 'Scavenger hunt',
+        followUps: [{ id: 'clues', question: 'Who makes the clues?', choices: [
+          { id: 'host', label: 'Me' }, { id: 'kit', label: 'A ready-made kit' },
+        ] }],
+      },
+      { id: 'exploring-museum',       label: 'Museum or gallery' },
+      { id: 'exploring-walking-tour', label: 'Walking tour'      },
+      { id: 'exploring-stargazing',   label: 'Stargazing'        },
+      { id: 'exploring-day-trip',     label: 'Day trip'          },
     ],
   },
   {
@@ -155,7 +262,30 @@ export const ACTIVITY_OPTIONS: ActivityOption[] = [
       { id: 'relaxing-spa',         label: 'Spa day'     },
       { id: 'relaxing-sunbathing',  label: 'Sunbathing'  },
       { id: 'relaxing-swimming',    label: 'Swimming'    },
-      { id: 'relaxing-camping',     label: 'Camping'     },
+      { id: 'relaxing-camping',     label: 'Camping', followUps: [GEAR] },
     ],
   },
+];
+
+// ── Occasion ─────────────────────────────────────────────────
+
+// Why the event is happening, apart from what people do at it. Each has a few activity ids to
+// suggest, so hosts think past the usual dinner.
+export interface Occasion {
+  id: string;
+  label: string;
+  ideas: string[];
+}
+
+export const OCCASIONS: Occasion[] = [
+  { id: 'birthday',     label: 'Birthday',     ideas: ['playing-karaoke', 'playing-escape-room', 'making-cake-decorating', 'eating-out'] },
+  { id: 'engagement',   label: 'Engagement',   ideas: ['drinking-champagne', 'eating-catering', 'watching-live-music', 'drinking-cocktails'] },
+  { id: 'wedding',      label: 'Wedding',      ideas: ['eating-catering', 'drinking-champagne', 'watching-live-music', 'drinking-cocktails'] },
+  { id: 'housewarming', label: 'Housewarming', ideas: ['eating-potluck', 'playing-board-games', 'making-diy-pizza', 'drinking-cocktails'] },
+  { id: 'graduation',   label: 'Graduation',   ideas: ['eating-buffet', 'playing-trivia', 'exploring-scavenger-hunt', 'drinking-champagne'] },
+  { id: 'semester-end', label: 'Semester end', ideas: ['eating-takeout', 'playing-video-games', 'watching-movie-night', 'drinking-drinking-games'] },
+  { id: 'promotion',    label: 'Promotion',    ideas: ['eating-out', 'drinking-cocktails', 'watching-comedy', 'playing-escape-room'] },
+  { id: 'holiday',      label: 'Holiday',      ideas: ['eating-home-cooked', 'making-crafts', 'watching-movie-night', 'playing-parlor-games'] },
+  { id: 'reunion',      label: 'Reunion',      ideas: ['eating-picnicking', 'playing-trivia', 'exploring-walking-tour', 'playing-sports'] },
+  { id: 'just-because', label: 'Just because', ideas: ['making-pottery', 'exploring-stargazing', 'playing-escape-room', 'watching-live-music'] },
 ];

@@ -27,6 +27,7 @@ interface Case {
 
 const hasPlace = (id: string): Check => [`places include ${id}`, plan => plan.places.includes(id)];
 const hasActivity = (id: string): Check => [`activities include ${id}`, plan => plan.activities.includes(id)];
+const hasOccasion = (id: string): Check => [`occasion is ${id}`, plan => plan.occasion === id];
 const size = (bucket: string): Check => [`size is ${bucket}`, plan => plan.size === bucket];
 const budgetWithin = (total: number): Check => [
   `budget items total at most $${total} (high end)`,
@@ -59,7 +60,7 @@ const CASES: Case[] = [
       size('cozy'),
       hasPlace('home-my'),
       hasActivity('playing-board-games'),
-      hasActivity('celebrating-birthday'),
+      hasOccasion('birthday'),
       ['total budget is $300', plan => plan.budgetTotal === 300],
       budgetWithin(300),
     ],
@@ -253,7 +254,7 @@ const CASES: Case[] = [
       ['date is Nov 21', plan => plan.date === '2026-11-21'],
       ['plans for 40', plan => plan.guestCount === 40],
       hasPlace('restaurant-private-room'),
-      hasActivity('celebrating-engagement'),
+      hasOccasion('engagement'),
       hasActivity('drinking-champagne'),
       ['budget total is $2,500', plan => plan.budgetTotal === 2500],
       // A dinner for 40 can honestly cost more; going over is fine if the reply says so
@@ -300,7 +301,7 @@ const CASES: Case[] = [
     message: "My son's 7th birthday at the park, about 15 kids plus some parents, $250.",
     checks: [
       hasPlace('park-city'),
-      hasActivity('celebrating-birthday'),
+      hasOccasion('birthday'),
       ['plans for at least 15', plan => (plan.guestCount ?? 0) >= 15],
       ['budget total is $250', plan => plan.budgetTotal === 250],
       budgetWithin(250),

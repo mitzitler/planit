@@ -10,6 +10,7 @@ import type {
 import {
   ACTIVITY_OPTIONS,
   FORMALITY_LEVELS,
+  OCCASIONS,
   PLACE_OPTIONS,
   type ActivityOption,
   type PlaceOption,
@@ -41,12 +42,18 @@ function catalog(options: (PlaceOption | ActivityOption)[]): string {
     for (const node of nodes) {
       const line = depth === 0 ? `${node.label} (category, not selectable)` : `${node.id}: ${node.label}`;
       lines.push(`${'  '.repeat(depth)}- ${line}`);
+      for (const followUp of ('followUps' in node && node.followUps) || []) {
+        const choices = followUp.choices.map(choice => `${choice.id} = ${choice.label}`).join(', ');
+        lines.push(`${'  '.repeat(depth + 1)}- follow-up ${node.id}/${followUp.id}: ${followUp.question} (${choices})`);
+      }
       if (node.children) walk(node.children, depth + 1);
     }
   };
   walk(options, 0);
   return lines.join('\n');
 }
+
+const occasionList = OCCASIONS.map(occasion => `- ${occasion.id}: ${occasion.label}`).join('\n');
 
 const formalityScale = FORMALITY_LEVELS.map(
   level => `- ${level.id}: ${level.label}. Feels like: ${level.feelsLike}. Suggests: ${level.suggests}.`,
@@ -91,6 +98,8 @@ ${formalityScale}
 Rules:
 - Places and activities must be ids from the lists below. If nothing fits what the user wants, say so and suggest the closest options rather than picking one silently.
 - choose_places and choose_activities replace the whole list, so include the ids already in the plan that should stay.
+- The occasion (a birthday, a housewarming) is why the event is happening, not an activity. Save it with set_basics occasion as soon as the user says it.
+- plan.activityDetails holds the host's answers to an activity's follow-up question, keyed "<activity id>/<follow-up id>" (the follow-ups are listed under the activities below). Let them shape your suggestions, budget lines and to-dos: "drinking-cocktails/maker": "bartender" means a bartender to book and pay for, not a shopping list.
 - To change a budget or schedule item, remove it (remove_budget_item or remove_schedule_item, by its position in the current plan's list, starting at 0) and add the corrected one. Positions shift after each removal, so when removing several, start with the highest position.
 - When the user says they've done a to-do, check it off with check_schedule_item.
 - You can't add anything to the user's calendar or send reminders yourself. If they ask, point them to the Calendar tab: a one-time download, or a subscribe link that stays updated.
@@ -104,6 +113,9 @@ Rules:
 
 Places:
 ${catalog(PLACE_OPTIONS)}
+
+Occasions:
+${occasionList}
 
 Activities:
 ${catalog(ACTIVITY_OPTIONS)}`;

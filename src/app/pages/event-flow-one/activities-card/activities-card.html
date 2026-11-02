@@ -1,5 +1,34 @@
 <h2 class="card-question">shoot for the stars —</h2>
 <p class="card-subquestion">what would you want to do together, if planning was no object? choose lots!</p>
+
+<!-- The occasion is one pick; clicking it again clears it -->
+<div class="activity-row">
+  <h3 class="activity-category-label">what's the occasion?</h3>
+  <div class="activity-chips">
+    @for (occasion of occasions; track occasion.id) {
+      <button class="activity-chip" type="button" [class.is-on]="occasion.id === occasionId()"
+        [attr.aria-pressed]="occasion.id === occasionId()" (click)="toggleOccasion(occasion.id)">
+        {{ occasion.label }}
+      </button>
+    }
+  </div>
+</div>
+
+<!-- A few ideas for the occasion, so hosts think past the usual dinner; they tick the same boxes as below -->
+@if (ideas().length) {
+  <div class="activity-row">
+    <h3 class="activity-category-label">ideas to try</h3>
+    <div class="activity-chips">
+      @for (idea of ideas(); track idea.id) {
+        <button class="activity-chip" type="button" [class.is-on]="isActivitySelected(idea.id)"
+          [attr.aria-pressed]="isActivitySelected(idea.id)" (click)="toggleActivitySelect(idea.id)">
+          {{ idea.label }}
+        </button>
+      }
+    </div>
+  </div>
+}
+
 <div class="activity-columns">
   @for (category of activityOptions; track category.id) {
     <div class="activity-column">
@@ -13,6 +42,24 @@
           />
           {{ option.label }}
         </label>
+        <!-- Follow-up questions show once the activity is picked -->
+        @if (isActivitySelected(option.id)) {
+          @for (followUp of option.followUps ?? []; track followUp.id) {
+            <div class="activity-followup">
+              <span>{{ followUp.question }}</span>
+              <div class="activity-chips">
+                @for (choice of followUp.choices; track choice.id) {
+                  <button class="activity-chip activity-chip--small" type="button"
+                    [class.is-on]="detail(option.id, followUp.id) === choice.id"
+                    [attr.aria-pressed]="detail(option.id, followUp.id) === choice.id"
+                    (click)="toggleDetail(option.id, followUp.id, choice.id)">
+                    {{ choice.label }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        }
       }
     </div>
   }

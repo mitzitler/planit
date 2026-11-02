@@ -16,7 +16,7 @@ export class HomeComponent {
     },
     {
       icon: 'orbit-radar',
-      title: 'Or chat with an agent',
+      title: 'Or chat instead',
       text: 'Describe the event in your own words. The agent fills in the plan as you talk, and you watch it change beside the chat.',
     },
     {

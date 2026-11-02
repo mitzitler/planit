@@ -1,0 +1,10 @@
+.comm-intro { font-size: 0.85rem; }
+
+.comm-heading { font-size: 0.85rem; }
+
+.comm-app { font-size: 0.85rem; padding: 0.4rem 0.9rem; }
+
+.comm-message { display: grid; gap: 0.35rem; }
+.comm-message label { font-size: 0.8rem; }
+
+.comm-text { width: 100%; max-width: none; resize: vertical; font-family: var(--font-body); line-height: 1.5; }

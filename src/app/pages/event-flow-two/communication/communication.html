@@ -1,1 +1,67 @@
-<p>communication works!</p>
+@if (plan(); as plan) {
+  <section class="tool" aria-label="Communication">
+    <p class="tool-muted comm-intro">
+      Planit doesn't send anything. These are short starting points to send from your own phone or email.
+    </p>
+
+    <!-- The invite lives in another app; Planit keeps its link -->
+    <div class="tool-summary">
+      <h3 class="comm-heading">Invitation</h3>
+      @if (plan.inviteUrl) {
+        <div class="tool-inline">
+          <a class="btn-secondary" [href]="plan.inviteUrl" target="_blank" rel="noopener">Open invite</a>
+          <button class="tool-remove" type="button" [disabled]="locked()" (click)="setLink('')">Remove link</button>
+        </div>
+      } @else {
+        <p class="tool-muted">Get started with an invitation on one of these, then paste its link here.</p>
+        <div class="tool-inline">
+          @for (app of apps(); track app.name) {
+            <a class="btn-secondary comm-app" [href]="app.url" target="_blank" rel="noopener">{{ app.name }}</a>
+          }
+        </div>
+        <form class="tool-inline" (ngSubmit)="setLink(link())">
+          <input class="card-input tool-grow" type="url" name="link" aria-label="Invite link"
+            placeholder="Paste the invite link" [(ngModel)]="link" [disabled]="locked()" />
+          <button class="btn-secondary" type="submit" [disabled]="locked() || !link().trim()">Save</button>
+        </form>
+      }
+    </div>
+
+    <!-- Each message is editable before it's copied or opened in the host's own app -->
+    <div class="tool-summary">
+      <h3 class="comm-heading">Messages</h3>
+      @for (message of messages(); track message.id) {
+        <div class="comm-message">
+          <label class="tool-muted" [for]="message.id">{{ message.label }}</label>
+          <textarea #box class="card-input comm-text" rows="2" [id]="message.id" [value]="message.text"></textarea>
+          <div class="tool-inline">
+            <button class="btn-secondary" type="button" (click)="copy(box.value, message.id)">
+              {{ copied() === message.id ? 'Copied' : 'Copy' }}
+            </button>
+            <button class="btn-secondary" type="button" (click)="open('sms', box.value)">Text</button>
+            <button class="btn-secondary" type="button" (click)="open('email', box.value)">Email</button>
+            @if (message.ask !== undefined) {
+              <button class="tool-remove" type="button" [disabled]="locked()" (click)="removeAsk(message.ask)"
+                [attr.aria-label]="'Remove the ask for ' + message.label">Remove</button>
+            }
+          </div>
+        </div>
+      }
+
+      <form class="tool-form" (ngSubmit)="addAsk()">
+        <input class="card-input tool-input-sm" type="text" name="who" maxlength="80" aria-label="Who"
+          placeholder="Who" [(ngModel)]="who" [disabled]="locked()" />
+        <input class="card-input tool-grow" type="text" name="what" maxlength="80" aria-label="What you asked them to do"
+          placeholder="Could you… e.g. help set up" [(ngModel)]="what" [disabled]="locked()" />
+        <input class="card-input tool-input-sm" type="time" name="time" aria-label="Time (optional)"
+          [(ngModel)]="time" [disabled]="locked()" />
+        <button class="btn-secondary" type="submit" [disabled]="locked()">Add</button>
+      </form>
+      <p class="tool-muted tool-hint">Asked someone to come early or lend something? Add them for a short message to send.</p>
+    </div>
+
+    @if (error()) {
+      <p class="tool-error" role="alert">{{ error() }}</p>
+    }
+  </section>
+}

@@ -323,3 +323,22 @@ describe('occasion and activity follow-ups', () => {
     expect(next.activityDetails).toEqual({ 'playing-board-games/brings': 'guests' });
   });
 });
+
+describe('asks and the invite link', () => {
+  it('adds and removes asks', () => {
+    const plan = expectOk(applyTool(emptyPlan(), 'add_ask', { who: ' Abby ', what: 'help set up', time: '18:30' }));
+    expect(plan.asks).toEqual([{ who: 'Abby', what: 'help set up', time: '18:30' }]);
+    expect(expectOk(applyTool(plan, 'remove_ask', { index: 0 })).asks).toBeUndefined();
+    expect(expectError(applyTool(plan, 'remove_ask', { index: 3 }))).toContain('Abby');
+    expectError(applyTool(emptyPlan(), 'add_ask', { who: 'Abby' }));
+    expectError(applyTool(emptyPlan(), 'add_ask', { who: 'Abby', what: 'help', time: '7pm' }));
+  });
+
+  it('saves a web link as the invite, and clears it with an empty string', () => {
+    const plan = expectOk(applyTool(emptyPlan(), 'set_basics', { inviteUrl: ' https://partiful.com/e/abc ' }));
+    expect(plan.inviteUrl).toBe('https://partiful.com/e/abc');
+    expect(expectOk(applyTool(plan, 'set_basics', { inviteUrl: '' })).inviteUrl).toBeUndefined();
+    expectError(applyTool(emptyPlan(), 'set_basics', { inviteUrl: 'javascript:alert(1)' }));
+    expectError(applyTool(emptyPlan(), 'set_basics', { inviteUrl: 'my partiful' }));
+  });
+});

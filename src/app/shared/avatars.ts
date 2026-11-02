@@ -17,3 +17,10 @@ export const AVATARS = [
 export function randomAvatar(): string {
   return AVATARS[Math.floor(Math.random() * AVATARS.length)];
 }
+
+// An event's icon, picked from its id: random-looking, but the same every time, with nothing to store
+export function eventIcon(eventId: string): string {
+  let hash = 0;
+  for (const char of eventId) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return AVATARS[hash % AVATARS.length];
+}

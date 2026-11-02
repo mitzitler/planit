@@ -1,4 +1,4 @@
-.flow-two-shell { max-width: 72rem; margin: 0.75rem auto 0; }
+.flow-two-shell { max-width: 72rem; margin: 0.75rem auto 0; padding: 0 1rem; }
 
 .flow-two-header {
   display: flex;

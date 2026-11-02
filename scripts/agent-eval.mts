@@ -19,6 +19,7 @@ type Check = [description: string, passes: (plan: Plan, reply: string) => boolea
 interface Case {
   name: string;
   start?: [ToolName, Record<string, unknown>][]; // tool calls that build the starting plan
+  wizard?: Partial<Plan>; // fields only the wizard sets (no tool does), added after the tool calls
   message: string;
   checks: Check[];
 }
@@ -46,6 +47,9 @@ const RULES: Check[] = [
   ['at most 3 sentences', (_, reply) => sentences(reply) <= 3],
   ['at most 70 words', (_, reply) => reply.trim().split(/\s+/).length <= 70],
 ];
+
+// A reply that says the budget won't stretch: "over budget", "over $200", "over your $2,500"…
+const WARNS_OVER = /over (your |the )?(budget|\$)|exceed|above|tight|stretch|more than/i;
 
 const STEERS_BACK: Check = ['steers back to the event', (_, reply) => /event|party|plan|game night/i.test(reply)];
 
@@ -237,7 +241,7 @@ const CASES: Case[] = [
       ['total budget is $200', plan => plan.budgetTotal === 200],
       [
         'stays within $200 or warns about it',
-        (plan, reply) => budgetRange(plan.budget).high <= 200 || /over (your |the )?budget|over \$|exceed|above|tight|stretch|more than/i.test(reply),
+        (plan, reply) => budgetRange(plan.budget).high <= 200 || WARNS_OVER.test(reply),
       ],
     ],
   },
@@ -259,7 +263,7 @@ const CASES: Case[] = [
       ['budget total is $2,500', plan => plan.budgetTotal === 2500],
       // A dinner for 40 can honestly cost more; going over is fine if the reply says so
       ['stays within $2,500 or warns about it', (plan, reply) =>
-        budgetRange(plan.budget).high <= 2500 || /over (your |the )?budget|over \$|exceed|above|tight|stretch|more than/i.test(reply)],
+        budgetRange(plan.budget).high <= 2500 || WARNS_OVER.test(reply)],
       ['dinner at 7pm and toast at 8pm on the day', plan =>
         plan.schedule.some(i => i.date === '2026-11-21' && i.time === '19:00') &&
         plan.schedule.some(i => i.date === '2026-11-21' && i.time === '20:00')],
@@ -378,6 +382,22 @@ const CASES: Case[] = [
       ['plans for 10', plan => plan.guestCount === 10],
     ],
   },
+
+  // ── Cost card (2026-11-02) ──
+  {
+    // A bucket from the wizard but no hard total: estimates should stay inside it
+    name: 'rough-budget',
+    start: [['set_basics', { name: 'Book club', guests: { exact: 8 } }]],
+    wizard: { budgetSize: 'thrifty' },
+    message: 'Can you add food and drinks to the budget?',
+    checks: [
+      ['adds at least one budget item', plan => plan.budget.length > 0],
+      [
+        'stays within $75 or warns about it',
+        (plan, reply) => budgetRange(plan.budget).high <= 75 || WARNS_OVER.test(reply),
+      ],
+    ],
+  },
 ];
 
 // ── Runner ───────────────────────────────────────────────────
@@ -392,14 +412,14 @@ interface Result {
   ms: number;
 }
 
-function startPlan(calls: Case['start'] = []): Plan {
+function startPlan(calls: Case['start'] = [], wizard: Case['wizard'] = {}): Plan {
   let plan = emptyPlan();
   for (const [name, input] of calls) {
     const result = applyTool(plan, name, input);
     if (!result.ok) throw new Error(`Bad starting plan (${name}): ${result.error}`);
     plan = result.plan;
   }
-  return plan;
+  return { ...plan, ...wizard };
 }
 
 async function runCase(c: Case): Promise<Result> {
@@ -408,7 +428,7 @@ async function runCase(c: Case): Promise<Result> {
   try {
     const run = await runAgent({
       callModel: makeCallModel(),
-      plan: startPlan(c.start),
+      plan: startPlan(c.start, c.wizard),
       history: [],
       userText: c.message,
       today: TODAY,
@@ -462,7 +482,7 @@ const selected = only.length ? CASES.filter(c => only.includes(c.name)) : CASES;
 
 if (dry) {
   // Only the case's own checks: the house rules would fail every empty reply and prove nothing
-  const weak = selected.filter(c => c.checks.every(([, passes]) => passes(startPlan(c.start), '')));
+  const weak = selected.filter(c => c.checks.every(([, passes]) => passes(startPlan(c.start, c.wizard), '')));
   for (const c of weak) console.log(`passes without the model: ${c.name}`);
   console.log(weak.length ? `\n${weak.length} case(s) need stronger checks.` : `All ${selected.length} cases fail without the model.`);
   process.exit(weak.length ? 1 : 0);

@@ -20,6 +20,22 @@ export function getSizeBucket(count: number): SizeBucket | undefined {
   );
 }
 
+// ── Budget ───────────────────────────────────────────────────
+
+// The whole event's spend in dollars, same shape as the size buckets
+export const BUDGET_BUCKETS: SizeBucket[] = [
+  { label: 'thrifty', min: 0,    max: 75,   display: '$75 or less' },
+  { label: 'modest',  min: 76,   max: 250,  display: '$75–250'     },
+  { label: 'comfy',   min: 251,  max: 1000, display: '$250–1k'     },
+  { label: 'splurge', min: 1001, max: null, display: '$1k+'        },
+];
+
+// Totals with cents fall between buckets' whole-dollar edges, so round up first
+export function getBudgetBucket(total: number): SizeBucket | undefined {
+  const dollars = Math.ceil(total);
+  return BUDGET_BUCKETS.find(b => dollars >= b.min && (b.max === null || dollars <= b.max));
+}
+
 // ── Formality ────────────────────────────────────────────────
 
 export interface FormalityLevel {

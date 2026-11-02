@@ -75,6 +75,14 @@ describe('set_basics', () => {
   });
 });
 
+describe('set_basics budgetTotal', () => {
+  it('derives the budget bucket from the total, rounding cents up', () => {
+    expect(expectOk(applyTool(emptyPlan(), 'set_basics', { budgetTotal: 250 })).budgetSize).toBe('modest');
+    expect(expectOk(applyTool(emptyPlan(), 'set_basics', { budgetTotal: 250.5 })).budgetSize).toBe('comfy');
+    expect(expectOk(applyTool(emptyPlan(), 'set_basics', { budgetTotal: 12000 })).budgetSize).toBe('splurge');
+  });
+});
+
 describe('set_basics guests', () => {
   const guestsPlan = (guests: unknown) => expectOk(applyTool(emptyPlan(), 'set_basics', { guests }));
 

@@ -73,6 +73,8 @@
       <span class="plan-total" [class.is-over]="overBudget()">
         {{ formatRange(budgetLow(), budgetHigh()) }} of {{ formatMoney(plan().budgetTotal!) }}
       </span>
+    } @else if (plan().budgetSize) {
+      <span class="plan-muted">({{ plan().budgetSize }})</span>
     }
   </h3>
   @if (plan().budget.length) {

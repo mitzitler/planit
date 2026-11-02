@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { getSizeBucket } from './decision-tree';
+import { getBudgetBucket, getSizeBucket } from './decision-tree';
 import { EventsService } from './events.service';
 import { NOTES_MAX, applyTool, keepDetailsFor, type Plan } from '../shared/plan';
 
@@ -46,6 +46,24 @@ export class EventDraftService {
     if (!current) return null;
     const result = applyTool(current, 'set_basics', { guests: { exact: count } });
     if (!result.ok) return 'Enter a whole number of guests, 1 or more.';
+    this.update(() => result.plan);
+    return null;
+  }
+
+  // Same as setSize: a hard total that doesn't fit the chosen bucket is dropped
+  setBudgetSize(label: string): void {
+    this.update(plan => {
+      const fits = plan.budgetTotal !== null && getBudgetBucket(plan.budgetTotal)?.label === label;
+      return fits ? { ...plan, budgetSize: label } : { ...plan, budgetSize: label, budgetTotal: null };
+    });
+  }
+
+  // A hard total, through set_basics so the bucket is derived the same way the assistant's changes are
+  setBudgetTotal(total: number): string | null {
+    const current = this.plan();
+    if (!current) return null;
+    const result = applyTool(current, 'set_basics', { budgetTotal: total });
+    if (!result.ok) return 'Enter a dollar amount above $0.';
     this.update(() => result.plan);
     return null;
   }

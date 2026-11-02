@@ -6,6 +6,7 @@ import {
   FORMALITY_LEVELS,
   OCCASIONS,
   PLACE_OPTIONS,
+  getBudgetBucket,
   getSizeBucket,
   type ActivityOption,
   type PlaceOption,
@@ -69,6 +70,7 @@ export interface Plan {
   inviteUrl?: string; // the invite the host made elsewhere (Partiful, Evite…)
   asks?: Ask[];
   budgetTotal: number | null;
+  budgetSize?: string; // BUDGET_BUCKETS label: the host's rough budget, or the bucket budgetTotal falls in
   budget: BudgetItem[];
   schedule: ScheduleItem[];
   // The host's own notes from the wizard's Extras card. Only the user writes them (there's no
@@ -439,6 +441,8 @@ function setBasics(plan: Plan, input: Input): ToolResult {
   if (budgetTotal !== undefined) {
     if (!isPositiveNumber(budgetTotal)) return fail(`budgetTotal must be a positive number; got ${JSON.stringify(budgetTotal)}.`);
     next.budgetTotal = budgetTotal;
+    const bucket = getBudgetBucket(budgetTotal)?.label;
+    if (bucket) next.budgetSize = bucket;
   }
   if (inviteUrl !== undefined) {
     if (typeof inviteUrl !== 'string') return fail('inviteUrl must be a string.');

@@ -22,6 +22,12 @@
           placeholder="$" [(ngModel)]="total" [disabled]="locked()" />
         <button class="btn-secondary" type="submit" [disabled]="locked()">Save</button>
       </form>
+      @if (hasEstimates()) {
+        <p class="budget-note">
+          Estimates are the assistant's rough guesses from general knowledge, not prices it looked up.
+          Check them before you book or buy.
+        </p>
+      }
     </div>
 
     <ul class="tool-list">

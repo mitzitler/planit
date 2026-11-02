@@ -6,9 +6,9 @@
       <p class="confirm-error" role="alert">{{ error() }}</p>
     }
     <div class="confirm-actions">
-      <button class="btn-secondary" type="button" autofocus [disabled]="busy()" (click)="cancel.emit()">Cancel</button>
-      <button class="btn-danger" type="button" [disabled]="busy()" (click)="confirm.emit()">
-        {{ busy() ? 'Deleting…' : confirmLabel() }}
+      <button class="btn-secondary" type="button" autofocus [disabled]="busy()" (click)="cancel.emit()">{{ cancelLabel() }}</button>
+      <button [class]="tone() === 'danger' ? 'btn-danger' : 'btn-primary'" type="button" [disabled]="busy()" (click)="confirm.emit()">
+        {{ busy() ? busyLabel() : confirmLabel() }}
       </button>
     </div>
   </div>

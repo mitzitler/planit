@@ -7,8 +7,13 @@
 
   <header class="flow-two-header">
     <h1 class="flow-two-title">Mission Control</h1>
-    @if (plan()) {
-      <button class="btn-quiet-danger" type="button" (click)="askDelete()">Delete event</button>
+    @if (plan(); as plan) {
+      <div class="flow-two-header-actions">
+        <a class="btn-secondary flow-two-wrap-up" [routerLink]="['/events', eventId, 'followup']">
+          {{ plan.completedAt ? 'Completed' : 'Wrap up event' }}
+        </a>
+        <button class="btn-quiet-danger" type="button" (click)="askDelete()">Delete event</button>
+      </div>
     }
   </header>
 

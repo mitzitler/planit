@@ -1,6 +1,6 @@
 import { Component, ElementRef, effect, input, output, viewChild } from '@angular/core';
 
-// A yes/no popup for destructive actions. The question is projected content, e.g.
+// A yes/no popup, red for destructive actions by default. The question is projected content, e.g.
 // <app-confirm-dialog ...>Are you sure you want to delete <strong>{{ name }}</strong>?</app-confirm-dialog>
 // Built on the native <dialog>, which handles Esc, focus trapping and the backdrop.
 @Component({
@@ -12,6 +12,9 @@ export class ConfirmDialogComponent {
   open = input.required<boolean>();
   heading = input.required<string>();
   confirmLabel = input('Delete');
+  busyLabel = input('Deleting…');
+  cancelLabel = input('Cancel');
+  tone = input<'danger' | 'primary'>('danger'); // primary for a nudge that isn't destructive
   busy = input(false); // disables the buttons while the action runs
   error = input('');
 

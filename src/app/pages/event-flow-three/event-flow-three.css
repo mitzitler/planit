@@ -1,0 +1,79 @@
+.followup-shell { max-width: 36rem; margin: var(--page-top-space) auto 0; padding: 0 1rem; }
+
+.followup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.followup-title { font-family: var(--font-title); font-size: 1.6rem; margin: 0; }
+
+.followup-copy { margin: 0; line-height: 1.6; }
+
+.followup-muted { margin: 0; font-size: 0.9rem; color: var(--color-text-muted); }
+
+.followup-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 0.5rem; }
+
+.followup-error { color: #fca5a5; margin: 0; }
+
+/* The event's icon pops right after "Mark complete" */
+.followup-burst { display: grid; place-items: center; width: 7rem; height: 7rem; }
+
+.followup-icon { width: 4.5rem; height: 4.5rem; }
+
+.followup-burst.is-playing .followup-icon { animation: followup-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes followup-pop {
+  0%   { transform: scale(0.6); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* The whole-screen star burst: over everything, but clicks go through to the page */
+.followup-burst-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Each spark starts in the middle of the screen, flies out fast to (--dx, --dy), then slows and
+   drifts down while it fades */
+.followup-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0;
+  animation-name: followup-spark;
+  animation-fill-mode: both;
+}
+
+@keyframes followup-spark {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(0.3);
+    animation-timing-function: cubic-bezier(0.1, 0.8, 0.3, 1);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(var(--dx), var(--dy)) rotate(calc(var(--spin) / 2)) scale(1);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), calc(var(--dy) + 35vh)) rotate(var(--spin)) scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .followup-burst.is-playing .followup-icon { animation: none; }
+  .followup-burst-layer { display: none; }
+}

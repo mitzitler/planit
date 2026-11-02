@@ -76,6 +76,8 @@ export interface Plan {
   // The host's own notes from the wizard's Extras card. Only the user writes them (there's no
   // tool for it); the assistant reads them as part of the plan.
   notes: string | null;
+  // YYYY-MM-DD the host marked the event complete on the follow-up page. Only the host sets it.
+  completedAt?: string;
 }
 
 export const NOTES_MAX = 1000;

@@ -31,11 +31,11 @@ export class EventFlowOneComponent implements OnInit {
   activeCardIndex = -1;
 
   cards: Card[] = [
-    { id: 'size',       label: 'SIZE',       icon: 'orbit-beacon'  },
-    { id: 'place',      label: 'PLACE',      icon: 'orbit-map'     },
-    { id: 'activities', label: 'ACTIVITIES', icon: 'orbit-compass' },
-    { id: 'cost',       label: 'COST',       icon: 'orbit-battery' },
-    { id: 'extras',     label: 'EXTRAS',     icon: 'orbit-cargo'   },
+    { id: 'size',       label: 'SIZE',       icon: 'orbit-satellite' },
+    { id: 'place',      label: 'PLACE',      icon: 'orbit-map'       },
+    { id: 'activities', label: 'ACTIVITIES', icon: 'orbit-rocket'    },
+    { id: 'cost',       label: 'COST',       icon: 'orbit-battery'   },
+    { id: 'extras',     label: 'EXTRAS',     icon: 'orbit-cargo'     },
   ];
 
   // The cards read the plan when they open, so they're only shown once it has loaded

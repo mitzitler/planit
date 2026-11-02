@@ -1,5 +1,5 @@
 import { Component, ElementRef, effect, input, output, signal, viewChild } from '@angular/core';
-import { EVENT_NAME_MAX } from '../../shared/plan';
+import { EVENT_NAME_MAX_UNITS } from '../../shared/plan';
 
 // Asks for an event's name before it's created. Built on the native <dialog>, like ConfirmDialog.
 @Component({
@@ -15,7 +15,7 @@ export class NameDialogComponent {
   save = output<string>();
   cancel = output<void>();
 
-  readonly maxLength = EVENT_NAME_MAX;
+  readonly maxLength = EVENT_NAME_MAX_UNITS; // the real limit, in characters as a reader counts them, is checked on save
   name = signal('');
   private dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
 

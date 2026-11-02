@@ -146,14 +146,36 @@ export function budgetRange(budget: BudgetItem[]): { low: number; high: number }
 
 // ── Names ────────────────────────────────────────────────────
 
+// Counted as a reader sees characters, so 🍕 and 👨‍👩‍👧 are 1 each
 export const EVENT_NAME_MAX = 80;
+// A backstop on the stored length, in UTF-16 units, so one "character" (a long chain of joined
+// emoji) can't be huge. Also the name inputs' maxlength, which counts the same way.
+export const EVENT_NAME_MAX_UNITS = EVENT_NAME_MAX * 10;
 export const NAME_NOT_ALLOWED = "That name isn't allowed. Try something else.";
 
-// Trims and collapses runs of whitespace. Angular escapes names when it shows them, so this is
-// about tidiness, not safety.
+// Angular escapes names when it shows them, so this isn't about HTML. It removes what a reader
+// can't see or that changes how text around it shows: zero-width and direction-override characters,
+// soft hyphens, private-use characters and Unicode tag characters (which can hide text from the user
+// but not from the assistant). Emoji stay, with the joiner (U+200D) that builds ones like 👨‍👩‍👧, and
+// skin tones and style selectors. Piled-up accents ("Zalgo" text) are cut to 3 per character.
 function cleanName(name: string): string {
-  return name.trim().replace(/\s+/g, ' ');
+  return name
+    .normalize('NFC')
+    .replace(/[\p{Cc}\s]+/gu, ' ')
+    .replace(/(?!\u200D)[\p{Cf}\p{Co}]/gu, '')
+    .replace(/(\p{M}{3})\p{M}+/gu, '$1')
+    .trim()
+    .replace(/ {2,}/g, ' ');
 }
+
+const graphemes = new Intl.Segmenter('en', { granularity: 'grapheme' });
+
+function nameLength(name: string): number {
+  return [...graphemes.segment(name)].length;
+}
+
+// Letters, numbers, punctuation or symbols (emoji are symbols): something a reader can see
+const VISIBLE = /[\p{L}\p{N}\p{P}\p{S}]/u;
 
 // ── Selectable ids ───────────────────────────────────────────
 
@@ -411,7 +433,10 @@ function setBasics(plan: Plan, input: Input): ToolResult {
   if (name !== undefined) {
     if (!isNonEmptyString(name)) return fail('name must be a non-empty string.');
     const cleaned = cleanName(name);
-    if (cleaned.length > EVENT_NAME_MAX) return fail(`name must be at most ${EVENT_NAME_MAX} characters.`);
+    if (!VISIBLE.test(cleaned)) return fail('name must have at least one visible character.');
+    if (nameLength(cleaned) > EVENT_NAME_MAX || cleaned.length > EVENT_NAME_MAX_UNITS) {
+      return fail(`name must be at most ${EVENT_NAME_MAX} characters.`);
+    }
     if (!isNameAllowed(cleaned)) return fail(NAME_NOT_ALLOWED);
     next.name = cleaned;
   }

@@ -298,6 +298,35 @@ describe('event names', () => {
     }
   });
 
+  it('keeps emoji, including joined ones, skin tones and style selectors', () => {
+    for (const name of ['Pizza night 🍕', '👨‍👩‍👧 reunion', 'High five 👋🏽', '❤️ Anniversary', 'Countdown 3️⃣2️⃣1️⃣', '🎉']) {
+      expect(expectOk(rename(name)).name).toBe(name);
+    }
+  });
+
+  it('removes invisible and direction-changing characters', () => {
+    expect(expectOk(rename('Game\u200B night\u00AD')).name).toBe('Game night');
+    expect(expectOk(rename('\uFEFFBook club\u2060')).name).toBe('Book club');
+    expect(expectOk(rename('Party \u202Eevil\u202C time')).name).toBe('Party evil time');
+    expect(expectOk(rename('Brunch\u{E0049}\u{E0067}\u{E006E}')).name).toBe('Brunch'); // tag characters
+    expect(expectOk(rename('Tab\there\u0007')).name).toBe('Tab here');
+  });
+
+  it('cuts piled-up accents to 3 per character', () => {
+    // NFC first turns e + U+0301 into é, then 3 of the other 5 accents stay
+    expect(expectOk(rename('Ze\u0301\u0302\u0303\u0304\u0305\u0306lgo')).name).toBe('Z\u00E9\u0302\u0303\u0304lgo');
+  });
+
+  it('counts an emoji as one character toward the limit', () => {
+    expect(rename('👨‍👩‍👧'.repeat(80)).ok).toBe(true);
+    expectError(rename('🍕'.repeat(81)));
+    expectError(rename('x'.repeat(81)));
+  });
+
+  it('rejects a name with nothing visible', () => {
+    for (const name of ['\u200B\u200B', '\u200D', ' \u202E ', '\u{E0041}']) expectError(rename(name));
+  });
+
   it('allows mild words and ordinary names', () => {
     for (const name of ['Shit Show Saturday', 'Crap Gift Swap', "Sam's 30th", 'Scunthorpe reunion', 'Essex trip']) {
       expect(rename(name).ok).toBe(true);

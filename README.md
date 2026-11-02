@@ -21,8 +21,13 @@ guests, budget, schedule, to-dos and the messages to send.
 
 </div>
 
+## Why I built this
+
+I love pouring myself into event planning, for myself, my family and my friends. I wanted to build a tool that mirrors the way I approach an event's logistics, to see if it could help other people get over the planning hump and out of the fog. A big plan is much easier to make with a buddy who suggests the scope, irons out the details and helps put the ideas on a calendar. Planit is that buddy.
+
 ## Contents
 
+- [Why I built this](#why-i-built-this)
 - [What Planit does](#what-planit-does)
 - [Architecture](#architecture)
 - [The planning agent](#the-planning-agent)
@@ -32,7 +37,7 @@ guests, budget, schedule, to-dos and the messages to send.
 - [Roadmap](#roadmap)
 - [Getting started](#getting-started)
 - [Project structure](#project-structure)
-- [Credits](#credits)
+- [Credits and license](#credits-and-license)
 
 ## What Planit does
 
@@ -70,7 +75,8 @@ The wizard and the agent edit **the same saved plan**, so a host can switch betw
 | ![The Calendar tab](docs/screenshots/calendar.jpg) | ![The Communication tab](docs/screenshots/communication.jpg) |
 | **Calendar:** the event day beside a week-by-week lead-up with checkboxes | **Communication:** invite apps, plus short messages to send from your own phone |
 
-<p align="center"><img src="docs/screenshots/wrap-up.jpg" alt="The wrap-up page" width="70%"><br><b>Wrap up:</b> "Mission accomplished!"</p>
+| ![The wrap-up page](docs/screenshots/wrap-up.jpg) | ![Planit on a phone](docs/screenshots/phone.jpg) |
+| **Wrap up:** "Mission accomplished!" | **On a phone:** every page stacks to one column |
 
 ## Architecture
 
@@ -138,7 +144,9 @@ sequenceDiagram
 | `add_schedule_item` / `remove_schedule_item` / `check_schedule_item` | The event day's timeline *and* the host's to-dos leading up to it, such as ordering the cake a week ahead |
 | `add_ask` / `remove_ask` | Someone the host asked to help ("Jordan: bring folding chairs"), which Communication turns into a short message |
 
-**Guardrails**
+<details>
+<summary><b>Guardrails</b>: staying on task, the host's voice, profanity, limits and cost</summary>
+
 - **It only plans the event.** The user's words are wrapped as data, and fake `<system>` tags are stripped. Requests to ignore its instructions, reveal its prompt or do something unrelated get a one-line redirect.
 - **The host's own voice.** Asked to write an invite or a message to a loved one, it gives a short starting point and hands it back. Planit never speaks for the host.
 - **Profanity.** Swearing aimed at the agent, or in an event name, gets "I can't engage with profanity." and nothing else. Swearing in an otherwise normal request is planned as usual. Names with slurs are refused everywhere.
@@ -150,16 +158,19 @@ sequenceDiagram
 - **Observability.** Every run is logged to `agent_runs` with its tokens, tool calls, stop reason, latency and any error.
 - **Cost.** The system prompt is cached and stays the same between requests. Today's date and the current plan go in the user message instead.
 
+</details>
+
 **Calendar export.** The Calendar tab can put the plan on the host's own calendar in two ways. A **download** is an `.ics` file built in the browser: instant, but a one-time copy. A **subscription** is a private link to `api/calendar.ts`, which Apple or Google Calendar polls for the latest plan. The feed holds only the name, date and schedule, never the budget, guests or notes. Both are built by `src/app/shared/ics.ts`, so they always match.
 
 ## Testing and the agent eval
 
 An agent's answers vary from run to run, so it can't be tested only by ordinary unit tests. Planit is tested in three layers, each cheaper and faster than the next:
 
-```mermaid
-flowchart LR
-    U["<b>Unit tests</b><br/>npm test<br/>76 tests, fake model<br/>free, seconds"] --> S["<b>Smoke run</b><br/>scripts/agent-smoke.mts<br/>one real turn<br/>cents, ~10 s"] --> E["<b>Agent eval</b><br/>npm run eval<br/>28 scripted cases<br/>~$1.60, ~1 min"]
-```
+| Layer | Command | Real model? | Cost | Time |
+|---|---|---|---|---|
+| **Unit tests** | `npm test` | No: 76 tests with a fake model | Free | Seconds |
+| **Smoke run** | `npx tsx --env-file=.env.local scripts/agent-smoke.mts "..."` | Yes, one turn | Cents | About 10 s |
+| **Agent eval** | `npm run eval` | Yes, 28 scripted cases | About $1.60 | About 1 min |
 
 - **The fake model.** `runAgent` takes the model call as a parameter. In production, `api/agent.ts` passes in the real Claude call. The unit tests pass in scripted responses. That lets them check the hard parts of the loop for free: bad tool calls, the 6-round cap, refusals, and replies cut off at `max_tokens`.
 - **The eval runs the real model** on 28 scripted cases, from "Birthday for 12 at my place" to a 40-guest engagement party with every detail. It checks **outcomes, not wording**: the saved plan, plus a few keywords in the reply.
@@ -198,7 +209,7 @@ The polish was done in small, reviewable steps. Each was its own PR, and each on
 - **Layout:** a quiet delete, side gutters and an icon on every event card (#11). Mission Control's tabs sit beside the chat (#12). The landing page explains the app in one screen (#13), and it stacks cleanly on phones (#18).
 - **Wizard:** the occasion, follow-up questions and a phone layout (#14). The Cost card reuses the Size card's design, so the five cards feel like one set (#20).
 - **Details:**
-  - every component stays under its CSS budget
+  - each component's CSS stays under Angular's 4 kB budget
   - the full-screen star burst respects reduced motion
   - completed events get a warm green tint
   - a long event name never cuts off its "complete" badge (#24)
@@ -219,22 +230,22 @@ timeline
            : Dashboard, Mission Control, Budget and Calendar tabs
            : First eval, 12/12, and the 20 runs a day limit
     Oct 29 : The agent stays on task, saved chat, account page
-           : Dashboard redesign with the ORBIT icons
     Oct 30 : Hardened against adversarial prompts (eval up to 24 cases)
+           : Dashboard redesign with the ORBIT icons
            : The icon lab
     Oct 31 : Calendar download and subscribed feed
            : Icons recoloured to the site yellow
     Nov 1  : Landing page, occasions and follow-ups, price sheet
-           : Communication tab, the host's voice principle
-    Nov 2  : Cost card, Flow 3 wrap-up with a star burst
+    Nov 2  : Communication tab, the host's voice principle
+           : Cost card, Flow 3 wrap-up with a star burst
            : Name sanitizing, demo events, v1 done
 ```
 
 **How we worked**
 - **I decided what to build, and Claude helped build it.** Each feature started as a conversation: I described what I wanted, often as a sketch in words ("very similar to the size card, with a big button that says I'm going to build my budget from the bottom up"). Claude proposed a plan, and I changed it before any code was written.
-- **Every change went through a PR.** Feature branch → commit → PR → review on a Vercel preview → merge. That's **25 PRs** and **105 commits**, **75** of them co-authored with Claude.
+- **Every change went through a PR.** Feature branch → commit → PR → review on a Vercel preview → merge. v1 was made with **26 PRs** and **100+ commits**, about three-quarters of them co-authored with Claude.
 - **The eval kept the agent honest.** Any prompt change meant an eval run. Claude wrote the cases with me, ran them, and logged every result in `TESTING.md`, including the flaky ones.
-- **I taught Claude the project's rules** with Claude Code's memory and skills:
+- **I taught Claude the project's rules** with Claude Code's memory and a project skill:
   - no emoji in the UI, only the approved icons
   - the host's own voice
   - a $20 API budget, so every eval run was priced first
@@ -258,7 +269,7 @@ timeline
 
 ## Getting started
 
-**Prerequisites:** Node 22+, a Supabase project, and an Anthropic API key for the agent.
+**Prerequisites:** Node 20.19+ or 22+, a Supabase project, and an Anthropic API key for the agent.
 
 ```bash
 git clone https://github.com/mitzitler/planit.git
@@ -274,6 +285,7 @@ npm install
 npm start        # ng serve on http://localhost:4200
 npm test         # unit tests (Vitest)
 npm run eval     # agent eval against the real model (about $1.60)
+npx tsx --env-file=.env.local scripts/agent-smoke.mts "Pizza night for 8"  # one real turn
 npm run build    # production build to dist/
 ```
 
@@ -300,8 +312,9 @@ docs/               # demo GIF, screenshots, change logs, design notes
 .claude/skills/     # the /demo-gif skill
 ```
 
-## Credits
+## Credits and license
 
 - Icons: [ORBIT Space UI](https://fraheat.itch.io/orbit-space-ui) by fraheat, recoloured. Only the icons used are committed.
 - Fonts: [Audiowide](https://fonts.google.com/specimen/Audiowide), [Exo 2](https://fonts.google.com/specimen/Exo+2) and [Zen Dots](https://fonts.google.com/specimen/Zen+Dots) from Google Fonts.
 - Built by Mitzi Zitler, with [Claude Code](https://claude.ai/code) and Claude Opus.
+- License: the code is [MIT](LICENSE). The ORBIT icons in `public/icons/` are fraheat's and stay under the pack's own licence.

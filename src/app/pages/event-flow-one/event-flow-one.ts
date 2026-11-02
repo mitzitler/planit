@@ -5,6 +5,7 @@ import { PlanBarComponent } from '../../components/plan-bar/plan-bar';
 import { SizeCardComponent } from './size-card/size-card';
 import { PlaceCardComponent } from './place-card/place-card';
 import { ActivitiesCardComponent } from './activities-card/activities-card';
+import { CostCardComponent } from './cost-card/cost-card';
 import { NOTES_MAX } from '../../shared/plan';
 
 interface Card {
@@ -15,7 +16,7 @@ interface Card {
 
 @Component({
   selector: 'app-event-flow-one',
-  imports: [RouterLink, PlanBarComponent, SizeCardComponent, PlaceCardComponent, ActivitiesCardComponent],
+  imports: [RouterLink, PlanBarComponent, SizeCardComponent, PlaceCardComponent, ActivitiesCardComponent, CostCardComponent],
   templateUrl: './event-flow-one.html',
   styleUrl: './event-flow-one.css',
 })

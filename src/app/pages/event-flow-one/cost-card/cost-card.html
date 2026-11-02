@@ -1,0 +1,41 @@
+<h2 class="card-question">let's talk budget.</h2>
+<p class="card-copy">roughly what do you want to spend on the whole thing?</p>
+<div class="bucket-row">
+  @for (bucket of budgetBuckets; track bucket.label) {
+    <button
+      class="bucket-btn"
+      [class.is-selected]="selectedBudget() === bucket.label"
+      (click)="selectBudget(bucket.label)"
+      type="button"
+    >
+      <span class="bucket-label">{{ bucket.label }}</span>
+      <span class="bucket-sublabel">{{ bucket.display }}</span>
+    </button>
+  }
+</div>
+<p class="card-copy">
+  a ballpark is plenty for now, and the assistant keeps its estimates inside it —
+  alternatively, if you have a <strong>hard number:</strong>
+</p>
+<input
+  class="card-input"
+  type="number"
+  min="1"
+  step="any"
+  placeholder="total budget in dollars"
+  [(ngModel)]="exactTotal"
+  (change)="saveExactTotal()"
+/>
+@if (exactError()) {
+  <p class="card-copy card-error" role="alert">{{ exactError() }}</p>
+}
+
+<button class="bottom-up-btn" type="button" [attr.aria-expanded]="bottomUp()" (click)="bottomUp.set(!bottomUp())">
+  i'm going to build my budget from the bottom up
+</button>
+@if (bottomUp()) {
+  <p class="bottom-up-message" role="status">
+    mission control is perfect for that!
+    <a [routerLink]="['/events', eventId(), 'manage', 'budget']">open the budget tab</a>
+  </p>
+}

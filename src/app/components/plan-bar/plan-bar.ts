@@ -1,6 +1,6 @@
 import { Component, ElementRef, computed, effect, input, output, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { EVENT_NAME_MAX } from '../../shared/plan';
+import { EVENT_NAME_MAX_UNITS } from '../../shared/plan';
 
 // The last name shown for each event, so switching screens keeps showing it while the next
 // screen loads the plan (instead of flashing the placeholder)
@@ -21,7 +21,7 @@ export class PlanBarComponent {
 
   rename = output<string>();
 
-  readonly maxLength = EVENT_NAME_MAX;
+  readonly maxLength = EVENT_NAME_MAX_UNITS; // the real limit, in characters as a reader counts them, is checked on save
   editing = signal(false);
   draft = signal('');
   private field = viewChild<ElementRef<HTMLInputElement>>('field');

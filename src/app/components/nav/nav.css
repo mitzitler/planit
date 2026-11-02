@@ -180,6 +180,13 @@
   color: var(--color-text-muted);
 }
 
+/* Phones: just the avatar on the right, a shorter pill, and tighter sides */
+@media (max-width: 640px) {
+  .nav { padding: 0 1rem; }
+  .nav-ready, .nav-long { display: none; }
+  .nav-location-pill { padding: 0.4rem 1rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .logout-spinner { animation-duration: 2.5s; }
   .nav-menu, .logout-overlay { animation: none; }

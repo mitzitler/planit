@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EventDraftService } from '../../services/event-draft.service';
 import { PlanBarComponent } from '../../components/plan-bar/plan-bar';
@@ -49,8 +49,13 @@ export class EventFlowOneComponent implements OnInit {
   }
 
   // ── Card layout ───────────────────────────────────────────────
+  private host = inject(ElementRef<HTMLElement>);
+
+  // On phones the cards stack, so closing the one above moves the new one up; scroll it into view
   setActiveCard(index: number): void {
     this.activeCardIndex = this.activeCardIndex === index ? -1 : index;
+    if (this.activeCardIndex === -1 || !matchMedia('(max-width: 720px)').matches) return;
+    setTimeout(() => this.host.nativeElement.querySelectorAll('.event-card')[index]?.scrollIntoView({ block: 'start' }));
   }
 
   getOverlayDistance(index: number): number {

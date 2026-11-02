@@ -1,9 +1,10 @@
-import { Component, ElementRef, OnInit, inject, input, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, computed, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { BetaMessageParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
 import { AgentError, AgentService } from '../../../services/agent.service';
 import { EventsService } from '../../../services/events.service';
 import { chatLines } from '../../../shared/agent';
+import type { Plan } from '../../../shared/plan';
 import { EventPlanStore } from '../event-plan.store';
 
 interface ChatLine {
@@ -11,10 +12,25 @@ interface ChatLine {
   text: string;
 }
 
-const SUGGESTIONS = [
+// For an untitled, empty event: examples of describing one from scratch
+const NEW_EVENT_EXAMPLES = [
   'Birthday for 12 at my place next Saturday, board games, $300 budget',
   'A picnic in a city park for about 30 people',
 ];
+
+// Two starting points for this event, from what its plan is still missing
+function suggestionsFor(plan: Plan | null): string[] {
+  const name = plan?.name;
+  if (!plan || !name) return NEW_EVENT_EXAMPLES;
+  const ideas = [
+    !plan.date && plan.guestCount === null && `Help me plan ${name}`,
+    !plan.budget.length && `What should I budget for ${name}?`,
+    plan.date && !plan.schedule.length && `Make a to-do list leading up to ${name}`,
+    !plan.activities.length && `Ideas for what to do at ${name}`,
+    `What am I forgetting for ${name}?`,
+  ];
+  return ideas.filter((idea): idea is string => !!idea).slice(0, 2);
+}
 
 @Component({
   selector: 'app-agent-chat',
@@ -34,7 +50,7 @@ export class AgentChatComponent implements OnInit {
   saving = this.store.saving;
   errorMessage = signal('');
   draft = '';
-  suggestions = SUGGESTIONS;
+  suggestions = computed(() => suggestionsFor(this.store.plan()));
 
   private log = viewChild<ElementRef<HTMLElement>>('log');
 

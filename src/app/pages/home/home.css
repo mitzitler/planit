@@ -55,3 +55,25 @@
 .home-feature-title { font-size: 1.05rem; color: var(--color-star); }
 
 .home-feature-text { font-size: 0.9rem; color: var(--color-text-muted); }
+
+/* Phones: the planet above the text, a full-width button, and the features as a plain list (icon beside the text, a line
+   between them) so they don't look like buttons */
+@media (max-width: 560px) {
+  .home-hero { flex-direction: column; align-items: stretch; gap: 0; min-height: 0; padding: 1rem 1rem 0; margin-bottom: 2rem; }
+  .home-hero-graphic { order: -1; align-self: flex-end; font-size: 5rem; }
+  .home-hero-content .btn-large { display: flex; justify-content: center; width: 100%; }
+  .home-features { gap: 0; }
+  .home-feature {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.25rem 1rem;
+    padding: 1rem 0;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .home-feature:last-child { border-bottom: none; }
+  .home-feature-icon { grid-row: span 2; font-size: 1.8rem; }
+}

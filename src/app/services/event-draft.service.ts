@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, isDevMode, signal } from '@angular/core';
 import { getBudgetBucket, getSizeBucket } from './decision-tree';
 import { EventsService } from './events.service';
 import { NOTES_MAX, applyTool, keepDetailsFor, type Plan } from '../shared/plan';
@@ -28,6 +28,7 @@ export class EventDraftService {
     this.saveError.set('');
     const event = await this.eventsService.get(eventId);
     if (event) this.plan.set(event.plan);
+    log(event ? 'loaded' : 'not found', eventId, event?.plan ?? '');
     return event !== null;
   }
 
@@ -129,14 +130,32 @@ export class EventDraftService {
     if (!current || !eventId) return;
     const next = change(current);
     this.plan.set(next);
+    log('changed', changedFields(current, next));
     // Saves run one after another, so a slow earlier save can't overwrite a later one
     this.saving = this.saving.then(async () => {
       try {
         await this.eventsService.savePlan(eventId, next);
         this.saveError.set('');
-      } catch {
+        log('saved', eventId);
+      } catch (error) {
         this.saveError.set("Couldn't save your last change. Check your connection and try again.");
+        log('save failed', eventId, error);
       }
     });
   }
+}
+
+// Dev builds only. Filter the console on "[EventDraft]".
+function log(...args: unknown[]): void {
+  if (isDevMode()) console.log('[EventDraft]', ...args);
+}
+
+// { field: { from, to } } for each top-level plan field that changed
+function changedFields(before: Plan, after: Plan): Record<string, { from: unknown; to: unknown }> {
+  const fields = new Set([...Object.keys(before), ...Object.keys(after)] as (keyof Plan)[]);
+  const changed: Record<string, { from: unknown; to: unknown }> = {};
+  for (const field of fields) {
+    if (JSON.stringify(before[field]) !== JSON.stringify(after[field])) changed[field] = { from: before[field], to: after[field] };
+  }
+  return changed;
 }

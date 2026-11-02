@@ -64,6 +64,20 @@
   .flow-two-agent,
   .flow-two-agent.is-tool { grid-template-columns: minmax(0, 1fr); height: auto; }
   .flow-two-body { overflow: visible; }
+  /* Four even tabs with the icon above the label, so "Communication" fits a 360px phone */
+  .flow-two-tabs { gap: 0; }
+  .flow-two-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.4rem 0;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+  .flow-two-tab .icon { margin: 0; }
 }
 
 .flow-two-error { color: #fca5a5; margin-bottom: 2rem; }

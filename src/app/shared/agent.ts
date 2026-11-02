@@ -16,6 +16,7 @@ import {
   type PlaceOption,
 } from '../services/decision-tree';
 import { applyTool, guestConflict, type Plan } from './plan';
+import { priceLines } from './prices';
 
 export const AGENT_MODEL = 'claude-opus-5-5';
 export const MAX_ROUNDS = 6; // model calls per user message
@@ -93,13 +94,7 @@ Formality:
 - Let the level shape your suggestions straight away, even while it's a guess. For example, don't suggest an open house or real plates for a laid-back event, or paper plates for a dressy one.
 
 Typical US prices, to keep estimates from drifting (before tax and tip unless noted; a big city runs higher, a small town lower):
-- Large pizza: $15-25. Plan 2 to 3 slices per adult, 8 slices a pie, so pizza for 15 is about 5 pies, $75-125.
-- Takeout or delivery: $15-25 a person. Drop-off catering: $20-40 a person. Served catering: $40-100 a person.
-- Bakery cake: $40-80 for 10 to 20 servings; custom or tiered cakes cost more.
-- Beer: $1.50-3 a can. Wine: $12-25 a bottle. Cocktails made at home: about $3-5 a drink.
-- Bartender: $40-75 an hour, usually with a 3 to 4 hour minimum. DJ: $300-800 for an evening. Live band: $1,000 and up.
-- Paper plates, cups and napkins: $15-30 for 20 people. Decorations for a home party: $20-60.
-- Escape room: $30-45 a person. Karaoke room: $30-80 an hour.
+${priceLines()}
 
 Formality scale, least to most formal:
 ${formalityScale}

@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { EventsService } from '../../services/events.service';
+import { SupabaseService } from '../../services/supabase';
 
 @Component({
   selector: 'app-home',
@@ -7,7 +9,22 @@ import { RouterLink } from '@angular/router';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+  private supabase = inject(SupabaseService);
+  private eventsService = inject(EventsService);
+
+  // Signed-in hosts with an event on the go get a second button straight to the dashboard
+  activeEvents = signal(0);
+
+  async ngOnInit() {
+    if (!(await this.supabase.ready)) return;
+    try {
+      this.activeEvents.set(await this.eventsService.countActive());
+    } catch {
+      // Not worth an error on the landing page; the button just doesn't show
+    }
+  }
+
   features = [
     {
       icon: 'orbit-satellite',

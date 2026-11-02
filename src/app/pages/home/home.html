@@ -5,7 +5,12 @@
       Planit helps you design, organize, and launch the perfect event —
       from casual get-togethers to star-studded celebrations.
     </p>
-    <a class="btn-primary btn-large" routerLink="/dashboard">Plan Your Event <img class="icon" src="/icons/orbit-rocket.svg" alt="" /></a>
+    <div class="home-actions">
+      <a class="btn-primary btn-large" routerLink="/dashboard">Plan Your Event <img class="icon" src="/icons/orbit-rocket.svg" alt="" /></a>
+      @if (activeEvents() > 0) {
+        <a class="btn-secondary btn-large home-dashboard-link" routerLink="/dashboard">Go to your dashboard</a>
+      }
+    </div>
   </div>
   <div class="home-hero-graphic">
     <span class="hero-planet"><img class="icon" src="/icons/orbit-planet.svg" alt="" /></span>

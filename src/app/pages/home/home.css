@@ -56,11 +56,17 @@
 
 .home-feature-text { font-size: 0.9rem; color: var(--color-text-muted); }
 
+.home-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+/* Clearly a button on the dark sky, but quieter than Plan Your Event */
+.home-dashboard-link { color: var(--color-text); border-color: rgba(200, 180, 255, 0.4); }
+
 /* Phones: the planet above the text, a full-width button, and the features as a plain list (icon beside the text, a line
    between them) so they don't look like buttons */
 @media (max-width: 560px) {
   .home-hero { flex-direction: column; align-items: stretch; gap: 0; min-height: 0; padding: 1rem 1rem 0; margin-bottom: 2rem; }
   .home-hero-graphic { order: -1; align-self: flex-end; font-size: 5rem; }
+  .home-actions { flex-direction: column; }
   .home-hero-content .btn-large { display: flex; justify-content: center; width: 100%; }
   .home-features { gap: 0; }
   .home-feature {

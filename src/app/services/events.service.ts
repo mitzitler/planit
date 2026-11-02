@@ -28,6 +28,16 @@ export class EventsService {
     return data.map(toRow);
   }
 
+  // Events not marked complete (Flow 3), counted without downloading them
+  async countActive(): Promise<number> {
+    const { count, error } = await this.supabase.client
+      .from('events')
+      .select('id', { count: 'exact', head: true })
+      .is('plan->>completedAt', null);
+    if (error) throw error;
+    return count ?? 0;
+  }
+
   async get(id: string): Promise<EventWithChat | null> {
     const { data, error } = await this.supabase.client
       .from('events')

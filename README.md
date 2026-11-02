@@ -74,7 +74,6 @@ The wizard and the agent edit **the same saved plan**, so a host can switch betw
 | **Wizard:** the Cost card, with four budget buckets or a hard number | **Budget:** the total, what's left, and every line, estimates marked as such |
 | ![The Calendar tab](docs/screenshots/calendar.jpg) | ![The Communication tab](docs/screenshots/communication.jpg) |
 | **Calendar:** the event day beside a week-by-week lead-up with checkboxes | **Communication:** invite apps, plus short messages to send from your own phone |
-
 | ![The wrap-up page](docs/screenshots/wrap-up.jpg) | ![Planit on a phone](docs/screenshots/phone.jpg) |
 | **Wrap up:** "Mission accomplished!" | **On a phone:** every page stacks to one column |
 

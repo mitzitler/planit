@@ -49,7 +49,7 @@ export class CalendarToolComponent {
 
   private entries = computed<Entry[]>(() => (this.plan()?.schedule ?? []).map((item, index) => ({ item, index })));
 
-  // The day shown in full in the left panel: the one clicked in the calendar, else the event day
+  // The day shown in full in the day panel: the one clicked in the calendar, else the event day
   selected = signal<string | null>(null);
   day = computed(() => this.selected() ?? this.plan()?.date ?? null);
   dayEntries = computed(() => this.entries().filter(e => e.item.date === this.day()));
@@ -127,7 +127,7 @@ export class CalendarToolComponent {
   // Grid cells show CELL_LIMIT items, so one busy day doesn't stretch every week; clicking opens the day
   readonly CELL_LIMIT = 3;
 
-  // Opens a day in the left panel (null or the event date goes back to the event day), and points
+  // Opens a day in the day panel (null or the event date goes back to the event day), and points
   // the add form at it
   select(date: string | null) {
     const other = date && date !== this.plan()?.date ? date : null;

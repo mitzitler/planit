@@ -1,4 +1,4 @@
-.flow-two-shell { max-width: 56rem; margin: 0.75rem auto 0; padding: 0 1rem; }
+.flow-two-shell { max-width: 72rem; margin: 0.75rem auto 0; padding: 0 1rem; }
 
 .flow-two-header {
   display: flex;
@@ -11,16 +11,35 @@
 
 .flow-two-title { font-size: 1.6rem; font-weight: 800; }
 
-.flow-two-tabs {
-  display: flex;
-  gap: 0.5rem;
-  border-bottom: 1px solid var(--color-border);
+/* Chat on the left, the panel on the right, both one fixed height that fits the window
+   (the chat log and the panel scroll inside it); stacked at their natural height on narrow screens.
+   The chat is the wider side for the overview, the panel for Budget and Calendar. */
+.flow-two-agent {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1rem;
+  height: clamp(26rem, calc(100vh - var(--nav-height) - 12rem), 60rem);
   margin-bottom: 2rem;
 }
 
+.flow-two-agent.is-tool { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+
+.flow-two-agent > app-agent-chat { display: block; min-height: 0; }
+
+.flow-two-panel { display: flex; flex-direction: column; min-height: 0; }
+
+.flow-two-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+}
+
 .flow-two-tab {
-  padding: 0.6rem 1.25rem;
+  padding: 0.4rem 0.85rem;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-text-muted);
   transition: color 0.15s, background 0.15s;
@@ -33,22 +52,13 @@
   border-bottom: 2px solid var(--color-primary);
 }
 
-/* Chat on the left, live plan on the right, both one fixed height that fits the window
-   (the chat log and the plan scroll inside it); stacked at their natural height on narrow screens */
-.flow-two-agent {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: 1rem;
-  height: clamp(26rem, calc(100vh - var(--nav-height) - 12rem), 44rem);
-  margin-bottom: 2rem;
-}
-
-.flow-two-agent > app-agent-chat,
-.flow-two-agent > app-plan-card { display: block; min-height: 0; }
+/* The overview fills the space below the tabs; a tool scrolls inside it */
+.flow-two-body { flex: 1; min-height: 0; overflow-y: auto; }
 
 @media (max-width: 720px) {
-  .flow-two-agent { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .flow-two-agent,
+  .flow-two-agent.is-tool { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .flow-two-body { overflow: visible; }
 }
 
 .flow-two-error { color: #fca5a5; margin-bottom: 2rem; }
-

@@ -16,148 +16,109 @@
       </form>
     </div>
 
-    <div class="calendar-split">
-      <!-- Left column: the selected day (the event day until another is clicked), then adding the
-           plan to the host's own calendar -->
-      <div class="calendar-side">
-        <div class="calendar-panel">
-          <h3 class="calendar-heading">
-            @if (day(); as day) {
-              {{ day === plan.date ? 'Event day' : 'Day' }}
-              <span class="calendar-tag">{{ formatDate(day) }}</span>
-              @if (selected()) {
-                <button class="calendar-text-btn" type="button" (click)="select(null)">
-                  {{ plan.date ? 'Back to event day' : 'Close' }}
-                </button>
-              }
-            } @else {
-              Event day
-            }
-          </h3>
-          @if (!day()) {
-            <p class="tool-muted">Set the event date to see the day's schedule, or click a day in the calendar.</p>
-          } @else {
-            <ul class="calendar-day-list">
-              @for (entry of dayEntries(); track entry.index) {
-                <li class="calendar-day-item" [class.is-done]="entry.item.done">
-                  <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
-                    (change)="check(entry, $any($event.target).checked)" [attr.aria-label]="'Done: ' + entry.item.title" />
-                  <span class="calendar-time">{{ entry.item.time ? formatTime(entry.item.time) : 'To do' }}</span>
-                  <span class="calendar-title">{{ entry.item.title }}</span>
-                  <button class="calendar-x" type="button" [disabled]="locked()" (click)="remove(entry.index)"
-                    [attr.aria-label]="'Remove ' + entry.item.title">×</button>
-                </li>
-              } @empty {
-                <li class="tool-muted">Nothing planned for this day yet.</li>
-              }
-            </ul>
-            <form class="tool-inline" (ngSubmit)="addToDay()">
-              <input class="card-input tool-grow calendar-day-input" type="text" name="dayTitle" maxlength="80"
-                [attr.aria-label]="'Add to ' + formatDate(day()!)" placeholder="Add to this day"
-                [(ngModel)]="dayTitle" [disabled]="locked()" />
-              <button class="btn-secondary" type="submit" [disabled]="locked() || !dayTitle().trim()">Add</button>
-            </form>
-          }
-        </div>
-
-        <div class="calendar-panel calendar-export">
-          <h3 class="calendar-heading">Add to your calendar</h3>
-          <div class="calendar-export-options">
-            <div class="calendar-export-option">
-              <p><strong>Download</strong> <span class="tool-muted">A one-time copy. Download again after changes.</span></p>
-              <div class="tool-inline">
-                <button class="btn-secondary" type="button" [disabled]="!canExport()" (click)="download()">Download .ics</button>
-              </div>
-            </div>
-            <div class="calendar-export-option">
-              <p>
-                <strong>Subscribe</strong>
-                <span class="tool-muted">Stays updated. Google checks every 12 to 24 hours; Apple lets you choose.</span>
-              </p>
-              @if (feed(); as feed) {
-                <div class="tool-inline">
-                  <a class="btn-secondary" [href]="feed.apple">Apple Calendar</a>
-                  <a class="btn-secondary" [href]="feed.google" target="_blank" rel="noopener">Google Calendar</a>
-                  <button class="btn-secondary" type="button" (click)="copy(feed.https)">{{ copied() ? 'Copied' : 'Copy link' }}</button>
-                </div>
-                <p class="tool-muted calendar-export-note">
-                  Anyone with the link sees the name, date and schedule, never the budget or guests.
-                  If Google shows the link as the name, rename it in Google's settings.
-                  <button class="calendar-text-btn" type="button" [disabled]="linkBusy()" (click)="newLink()">Reset link</button>
-                  <button class="calendar-text-btn" type="button" [disabled]="linkBusy()" (click)="setLink(null)">Turn off</button>
-                </p>
-              } @else {
-                <div class="tool-inline">
-                  <button class="btn-secondary" type="button" [disabled]="linkBusy()" (click)="newLink()">Make a subscribe link</button>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Week-by-week to-dos leading up to it. Clicking a day opens it in the left panel. -->
-      <div class="calendar-panel">
-        <h3 class="calendar-heading">Leading up</h3>
-        @if (weeks().length) {
-          @if (weeks().length > WEEKS_SHOWN) {
-            <button class="calendar-week-nav" type="button" [disabled]="!hasEarlier()" (click)="moveWeeks(-1)"
-              title="Show an earlier week">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
-              @if (itemsAbove()) { {{ itemsAbove() }} {{ itemsAbove() === 1 ? 'item' : 'items' }} above }
-            </button>
-          }
-          <div class="calendar-scroll">
-            <div class="calendar-grid" role="grid" aria-label="To-dos by week">
-              @for (day of weekdays; track day) {
-                <div class="calendar-weekday" role="columnheader">{{ day }}</div>
-              }
-              @for (week of shownWeeks(); track week[0].date) {
-                @for (cell of week; track cell.date) {
-                  <div class="calendar-cell" role="gridcell" [class.is-event]="cell.isEvent" [class.is-today]="cell.isToday"
-                    [class.is-month-start]="cell.isMonthStart" [class.is-selected]="cell.date === day()"
-                    (click)="select(cell.date)">
-                    <button class="calendar-date" type="button" [attr.aria-label]="'Open ' + formatDate(cell.date)">
-                      {{ cell.label }}
-                      @if (cell.isEvent) { <span class="calendar-event-mark">Event</span> }
-                    </button>
-                    @if (cell.isEvent) {
-                      @if (cell.entries.length) {
-                        <span class="calendar-more">{{ cell.entries.length }} on the schedule</span>
-                      }
-                    } @else {
-                      @for (entry of cell.entries.slice(0, CELL_LIMIT); track entry.index) {
-                        <!-- Only the checkbox checks an item off; clicking its text opens the day -->
-                        <div class="calendar-todo" [class.is-done]="entry.item.done">
-                          <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
-                            (click)="$event.stopPropagation()" (change)="check(entry, $any($event.target).checked)"
-                            [attr.aria-label]="'Done: ' + entry.item.title" />
-                          <span class="calendar-todo-text" [attr.title]="entry.item.title">
-                            @if (entry.item.time) { <span class="calendar-time">{{ formatTime(entry.item.time) }}</span> }
-                            {{ entry.item.title }}
-                          </span>
-                        </div>
-                      }
-                      @if (cell.entries.length > CELL_LIMIT) {
-                        <span class="calendar-more">+{{ cell.entries.length - CELL_LIMIT }} more</span>
-                      }
-                    }
-                  </div>
-                }
-              }
-            </div>
-          </div>
-          @if (weeks().length > WEEKS_SHOWN) {
-            <button class="calendar-week-nav" type="button" [disabled]="!hasLater()" (click)="moveWeeks(1)"
-              title="Show a later week">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-              @if (itemsBelow()) { {{ itemsBelow() }} {{ itemsBelow() === 1 ? 'item' : 'items' }} below }
+    <!-- One column, to fit beside the chat: the selected day (the event day until another is clicked),
+         the weeks leading up to it, the add form, then adding the plan to the host's own calendar -->
+    <div class="calendar-panel">
+      <h3 class="calendar-heading">
+        @if (day(); as day) {
+          {{ day === plan.date ? 'Event day' : 'Day' }}
+          <span class="calendar-tag">{{ formatDate(day) }}</span>
+          @if (selected()) {
+            <button class="calendar-text-btn" type="button" (click)="select(null)">
+              {{ plan.date ? 'Back to event day' : 'Close' }}
             </button>
           }
         } @else {
-          <p class="tool-muted">Set the event date, or add a to-do below.</p>
+          Event day
         }
-      </div>
+      </h3>
+      @if (!day()) {
+        <p class="tool-muted">Set the event date to see the day's schedule, or click a day in the calendar.</p>
+      } @else {
+        <ul class="calendar-day-list">
+          @for (entry of dayEntries(); track entry.index) {
+            <li class="calendar-day-item" [class.is-done]="entry.item.done">
+              <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
+                (change)="check(entry, $any($event.target).checked)" [attr.aria-label]="'Done: ' + entry.item.title" />
+              <span class="calendar-time">{{ entry.item.time ? formatTime(entry.item.time) : 'To do' }}</span>
+              <span class="calendar-title">{{ entry.item.title }}</span>
+              <button class="calendar-x" type="button" [disabled]="locked()" (click)="remove(entry.index)"
+                [attr.aria-label]="'Remove ' + entry.item.title">×</button>
+            </li>
+          } @empty {
+            <li class="tool-muted">Nothing planned for this day yet.</li>
+          }
+        </ul>
+        <form class="tool-inline" (ngSubmit)="addToDay()">
+          <input class="card-input tool-grow calendar-day-input" type="text" name="dayTitle" maxlength="80"
+            [attr.aria-label]="'Add to ' + formatDate(day()!)" placeholder="Add to this day"
+            [(ngModel)]="dayTitle" [disabled]="locked()" />
+          <button class="btn-secondary" type="submit" [disabled]="locked() || !dayTitle().trim()">Add</button>
+        </form>
+      }
+    </div>
+
+    <!-- Week-by-week to-dos leading up to it. Clicking a day opens it in the day panel above. -->
+    <div class="calendar-panel">
+      <h3 class="calendar-heading">Leading up</h3>
+      @if (weeks().length) {
+        @if (weeks().length > WEEKS_SHOWN) {
+          <button class="calendar-week-nav" type="button" [disabled]="!hasEarlier()" (click)="moveWeeks(-1)"
+            title="Show an earlier week">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
+            @if (itemsAbove()) { {{ itemsAbove() }} {{ itemsAbove() === 1 ? 'item' : 'items' }} above }
+          </button>
+        }
+        <div class="calendar-scroll">
+          <div class="calendar-grid" role="grid" aria-label="To-dos by week">
+            @for (day of weekdays; track day) {
+              <div class="calendar-weekday" role="columnheader">{{ day }}</div>
+            }
+            @for (week of shownWeeks(); track week[0].date) {
+              @for (cell of week; track cell.date) {
+                <div class="calendar-cell" role="gridcell" [class.is-event]="cell.isEvent" [class.is-today]="cell.isToday"
+                  [class.is-month-start]="cell.isMonthStart" [class.is-selected]="cell.date === day()"
+                  (click)="select(cell.date)">
+                  <button class="calendar-date" type="button" [attr.aria-label]="'Open ' + formatDate(cell.date)">
+                    {{ cell.label }}
+                    @if (cell.isEvent) { <span class="calendar-event-mark">Event</span> }
+                  </button>
+                  @if (cell.isEvent) {
+                    @if (cell.entries.length) {
+                      <span class="calendar-more">{{ cell.entries.length }} on the schedule</span>
+                    }
+                  } @else {
+                    @for (entry of cell.entries.slice(0, CELL_LIMIT); track entry.index) {
+                      <!-- Only the checkbox checks an item off; clicking its text opens the day -->
+                      <div class="calendar-todo" [class.is-done]="entry.item.done">
+                        <input type="checkbox" [checked]="entry.item.done" [disabled]="locked()"
+                          (click)="$event.stopPropagation()" (change)="check(entry, $any($event.target).checked)"
+                          [attr.aria-label]="'Done: ' + entry.item.title" />
+                        <span class="calendar-todo-text" [attr.title]="entry.item.title">
+                          @if (entry.item.time) { <span class="calendar-time">{{ formatTime(entry.item.time) }}</span> }
+                          {{ entry.item.title }}
+                        </span>
+                      </div>
+                    }
+                    @if (cell.entries.length > CELL_LIMIT) {
+                      <span class="calendar-more">+{{ cell.entries.length - CELL_LIMIT }} more</span>
+                    }
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+        @if (weeks().length > WEEKS_SHOWN) {
+          <button class="calendar-week-nav" type="button" [disabled]="!hasLater()" (click)="moveWeeks(1)"
+            title="Show a later week">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            @if (itemsBelow()) { {{ itemsBelow() }} {{ itemsBelow() === 1 ? 'item' : 'items' }} below }
+          </button>
+        }
+      } @else {
+        <p class="tool-muted">Set the event date, or add a to-do below.</p>
+      }
     </div>
 
     <form class="tool-form" (ngSubmit)="add()">
@@ -174,6 +135,41 @@
       Click a day in the calendar to see all of it.
       Leave the time empty for a to-do.
     </p>
+
+    <div class="calendar-panel calendar-export">
+      <h3 class="calendar-heading">Add to your calendar</h3>
+      <div class="calendar-export-options">
+        <div class="calendar-export-option">
+          <p><strong>Download</strong> <span class="tool-muted">A one-time copy. Download again after changes.</span></p>
+          <div class="tool-inline">
+            <button class="btn-secondary" type="button" [disabled]="!canExport()" (click)="download()">Download .ics</button>
+          </div>
+        </div>
+        <div class="calendar-export-option">
+          <p>
+            <strong>Subscribe</strong>
+            <span class="tool-muted">Stays updated. Google checks every 12 to 24 hours; Apple lets you choose.</span>
+          </p>
+          @if (feed(); as feed) {
+            <div class="tool-inline">
+              <a class="btn-secondary" [href]="feed.apple">Apple Calendar</a>
+              <a class="btn-secondary" [href]="feed.google" target="_blank" rel="noopener">Google Calendar</a>
+              <button class="btn-secondary" type="button" (click)="copy(feed.https)">{{ copied() ? 'Copied' : 'Copy link' }}</button>
+            </div>
+            <p class="tool-muted calendar-export-note">
+              Anyone with the link sees the name, date and schedule, never the budget or guests.
+              If Google shows the link as the name, rename it in Google's settings.
+              <button class="calendar-text-btn" type="button" [disabled]="linkBusy()" (click)="newLink()">Reset link</button>
+              <button class="calendar-text-btn" type="button" [disabled]="linkBusy()" (click)="setLink(null)">Turn off</button>
+            </p>
+          } @else {
+            <div class="tool-inline">
+              <button class="btn-secondary" type="button" [disabled]="linkBusy()" (click)="newLink()">Make a subscribe link</button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
 
     @if (locked()) {
       <p class="tool-muted">The assistant is working. You can edit again once it replies.</p>

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, ActivatedRoute, Router } from '@angular/router';
 import { AgentChatComponent } from './agent-chat/agent-chat';
-import { PlanCardComponent } from './plan-card/plan-card';
+import { OverviewComponent } from './overview/overview';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { PlanBarComponent } from '../../components/plan-bar/plan-bar';
 import { EventsService } from '../../services/events.service';
@@ -9,7 +9,7 @@ import { EventPlanStore } from './event-plan.store';
 
 @Component({
   selector: 'app-event-flow-two',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, AgentChatComponent, PlanCardComponent, ConfirmDialogComponent, PlanBarComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, AgentChatComponent, ConfirmDialogComponent, PlanBarComponent],
   templateUrl: './event-flow-two.html',
   styleUrl: './event-flow-two.css',
   providers: [EventPlanStore],
@@ -29,8 +29,16 @@ export class EventFlowTwoComponent implements OnInit {
   deleting = signal(false);
   deleteError = signal('');
 
+  // Budget and Calendar widen the panel; the overview leaves the chat the wider side
+  toolOpen = signal(false);
+
+  onActivate(tab: unknown) {
+    this.toolOpen.set(!(tab instanceof OverviewComponent));
+  }
+
   tabs = [
-    { label: 'Budget',        icon: 'orbit-crystal', path: 'budget' },
+    { label: 'Overview',      icon: 'orbit-planet',  path: 'overview' },
+    { label: 'Budget',        icon: 'orbit-battery', path: 'budget' },
     { label: 'Calendar',      icon: 'orbit-clock',   path: 'calendar' },
     // Communication comes back once it has something in it (pages/event-flow-two/communication)
   ];

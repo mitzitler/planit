@@ -13,8 +13,8 @@ const TITLES = [
   'Astronaut', 'Space Cadet', 'Captain', 'Traveler', 'Starfarer',
   'Scientist', 'Navigator', 'Pilot', 'Commander', 'Explorer',
   'Voyager', 'Stargazer', 'Cosmonaut', 'Pioneer', 'Ranger',
-  'Engineer', 'Spacefarer', 'Comet Chaser', 'Moonwalker', 'Mission Specialist',
-  'Flight Director', 'Orbiter', 'Wayfinder', 'Rocketeer', 'Nebula Hopper',
+  'Engineer', 'Spacefarer', 'Comet Chaser', 'Moonwalker', 'Orbiter',
+  'Wayfinder', 'Rocketeer',
 ];
 const TITLE_MS = 6250; // how long each title shows
 const FADE_MS = 600; // matches .dashboard-title-word's transition

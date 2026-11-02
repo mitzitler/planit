@@ -75,34 +75,16 @@ The wizard and the agent edit **the same saved plan**, so a host can switch betw
 ## Architecture
 
 ```mermaid
-flowchart TB
-    subgraph Browser["Browser: Angular 21 app"]
-        UI[Pages and components<br/>signals, standalone]
-        Shared["src/app/shared/plan.ts<br/>Plan shape + 10 validated tools"]
-        UI --- Shared
-    end
-
-    subgraph Vercel["Vercel functions"]
-        Agent["api/agent.ts<br/>runs the agent"]
-        Cal["api/calendar.ts<br/>subscribed .ics feed"]
-    end
-
-    subgraph Supabase["Supabase"]
-        Auth[Auth]
-        DB[(Postgres + RLS<br/>events, agent_runs)]
-    end
-
-    Claude[[Claude API<br/>claude-opus-5-5]]
-    Apps[Apple / Google Calendar]
-
-    UI -->|login, read and save plans| Auth
-    UI -->|plans, as the user| DB
-    UI -->|message + login token| Agent
-    Agent -->|loads the event as that user| DB
-    Agent <-->|tool use, streamed| Claude
-    Agent -.->|imports| Shared
-    Apps -->|polls a private link| Cal
-    Cal --> DB
+flowchart LR
+    Host((Host)) --> App["Angular 21 app<br/>(browser)"]
+    App -->|"login, plans (RLS)"| SB[("Supabase<br/>Auth + Postgres<br/>events, agent_runs")]
+    App -->|"message + login token"| Agent["api/agent.ts<br/>(Vercel)"]
+    Agent -->|"loads the event as the user"| SB
+    Agent <-->|"tool use, streamed"| Claude[["Claude API<br/>claude-opus-5-5"]]
+    App -.- Shared{{"shared/plan.ts<br/>Plan + 10 tools"}}
+    Shared -.- Agent
+    Apps["Apple / Google<br/>Calendar"] -->|"polls a private link"| Cal["api/calendar.ts<br/>(Vercel)"]
+    Cal --> SB
 ```
 
 One file, `src/app/shared/plan.ts`, defines the plan and the tools that change it, and **both the app and the agent's server import it**. The wizard, the hand edits in the tabs and the agent can never disagree about what a valid plan is.

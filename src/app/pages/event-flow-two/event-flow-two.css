@@ -18,7 +18,7 @@
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   gap: 1rem;
-  height: clamp(26rem, calc(100vh - var(--nav-height) - 12rem), 44rem);
+  height: clamp(26rem, calc(100vh - var(--nav-height) - 12rem), 60rem);
   margin-bottom: 2rem;
 }
 

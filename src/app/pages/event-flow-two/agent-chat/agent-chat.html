@@ -6,7 +6,7 @@
     } @empty {
       <div class="chat-empty">
         <p>Tell me about your event and I'll fill in the plan.</p>
-        @for (suggestion of suggestions; track suggestion) {
+        @for (suggestion of suggestions(); track suggestion) {
           <button class="chat-suggestion" type="button" (click)="send(suggestion)">{{ suggestion }}</button>
         }
       </div>

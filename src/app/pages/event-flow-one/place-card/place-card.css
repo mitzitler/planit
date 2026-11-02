@@ -51,9 +51,11 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+/* Options sit side by side and wrap, so a long group (Public space) stays short */
 .place-chips {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 0.4rem;
   padding-left: 0.75rem;
 }
@@ -64,6 +66,9 @@
   align-items: center;
   gap: 0.4rem;
 }
+
+/* An option with its sub-options open (Park) takes its own line */
+.place-chip-row.is-open { flex-basis: 100%; }
 
 .place-chip-btn {
   padding: 0.3rem 0.8rem;

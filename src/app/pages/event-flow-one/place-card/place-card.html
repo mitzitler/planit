@@ -10,7 +10,7 @@
       @if (isPlaceExpanded(category.id)) {
         <div class="place-chips">
           @for (option of category.children; track option.id) {
-            <div class="place-chip-row">
+            <div class="place-chip-row" [class.is-open]="option.children?.length && isPlaceExpanded(option.id)">
               <button
                 class="place-chip-btn"
                 type="button"

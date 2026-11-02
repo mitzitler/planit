@@ -1,4 +1,4 @@
-.dashboard { max-width: 64rem; margin: 0 auto; padding: 0 1rem; }
+.dashboard { max-width: 72rem; margin: 0 auto; padding: 0 1rem; }
 
 .dashboard-header {
   display: flex;
@@ -8,7 +8,7 @@
   margin-bottom: 3rem;
 }
 
-.dashboard-title { font-size: 1.8rem; font-weight: 800; }
+.dashboard-title { font-size: 2.1rem; font-weight: 800; }
 
 .dashboard-title .icon { margin-right: 0.35em; }
 
@@ -19,19 +19,19 @@
 
 .dashboard-title-word.is-hidden { opacity: 0; transform: translateY(0.2em); }
 
-.dashboard-subtitle { color: var(--color-text-muted); margin-top: 0.25rem; }
+.dashboard-subtitle { color: var(--color-text-muted); margin-top: 0.35rem; font-size: 1.1rem; }
 
 /* Create buttons: two stacked pills (.pill in styles.css) */
 .dashboard-create {
   display: grid;
   gap: 0.75rem;
-  flex: 0 1 26rem;
+  flex: 0 1 30rem;
 }
 
-.dashboard-create .pill-half { font-size: 0.9rem; }
+.dashboard-create .pill-half { font-size: 0.95rem; white-space: nowrap; }
 
 .dashboard-create .dashboard-create-main {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   text-transform: uppercase;
   color: var(--color-star);
 }
@@ -45,7 +45,7 @@
 }
 
 /* One event per row */
-.dashboard-events { display: grid; gap: 1.5rem; }
+.dashboard-events { display: grid; gap: 1.5rem; padding-top: 1.5rem; }
 
 /* Event card: a glass card (styles.css), name and date on the left, guests and budget on the right */
 .event-card {
@@ -101,6 +101,8 @@
   color: var(--color-star);
   cursor: pointer;
 }
+
+.event-card-shell ~ .event-card--empty { min-height: 5rem; }
 
 .event-card--empty:disabled { cursor: progress; opacity: 0.6; }
 

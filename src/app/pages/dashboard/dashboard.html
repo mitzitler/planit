@@ -54,12 +54,12 @@
           (click)="askDelete(event)"
         >Delete</button>
       </div>
-    } @empty {
-      @if (!loading() && !errorMessage()) {
-        <button class="event-card event-card--empty glass-card" type="button" [disabled]="creating()" (click)="askName('plan')">
-          get started, try planning something out now
-        </button>
-      }
+    }
+    <!-- A dashed card at the end of the list starts a new event, and is the whole list for new users -->
+    @if (!loading() && !errorMessage()) {
+      <button class="event-card event-card--empty glass-card" type="button" [disabled]="creating()" (click)="askName('plan')">
+        {{ events().length ? 'create a new event' : 'get started, try planning something out now' }}
+      </button>
     }
   </section>
 

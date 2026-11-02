@@ -50,6 +50,7 @@ export function toIcs(entries: CalendarEntry[], options: IcsOptions): string {
     'PRODID:-//Planit//Planit Events//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
+    `NAME:${escape(calendarName)}`, // RFC 7986; X-WR-CALNAME is the older name most apps read
     `X-WR-CALNAME:${escape(calendarName)}`,
     ...(timeZone ? [`X-WR-TIMEZONE:${timeZone}`] : []),
     ...(feed ? ['REFRESH-INTERVAL;VALUE=DURATION:PT1H', 'X-PUBLISHED-TTL:PT1H'] : []),

@@ -49,6 +49,8 @@ describe('toIcs', () => {
     expect(lines).toContain('DTEND;TZID=America/New_York:20261115T003000');
     expect(lines).toContain('DTSTAMP:20261031T120000Z');
     expect(lines).toContain('X-WR-TIMEZONE:America/New_York');
+    expect(lines).toContain('NAME:Planit: Party');
+    expect(lines).toContain('X-WR-CALNAME:Planit: Party');
     expect(lines).not.toContain('REFRESH-INTERVAL;VALUE=DURATION:PT1H');
     expect(ics.endsWith('END:VCALENDAR\r\n')).toBe(true);
   });

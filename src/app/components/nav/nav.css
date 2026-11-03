@@ -180,11 +180,17 @@
   color: var(--color-text-muted);
 }
 
-/* Phones: just the avatar on the right, a shorter pill, and tighter sides */
+/* Phones: just the avatar on the right, a smaller logo, pill and buttons, and tighter sides,
+   so "Log in" and "Sign up" stay on one line */
 @media (max-width: 640px) {
   .nav { padding: 0 1rem; }
   .nav-ready, .nav-long { display: none; }
-  .nav-location-pill { padding: 0.4rem 1rem; }
+  .nav-logo { gap: 0.35rem; font-size: 1.1rem; }
+  .nav-logo-icon { font-size: 1.2rem; }
+  .nav-location-pill { padding: 0.3rem 0.75rem; font-size: 0.75rem; }
+  .nav-right { gap: 0.6rem; }
+  .nav-link, .nav-right .btn-primary { font-size: 0.8rem; white-space: nowrap; }
+  .nav-right .btn-primary { padding: 0.4rem 0.75rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
